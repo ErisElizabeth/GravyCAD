@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GravyCAD</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <header class="app-header">
+      <div class="brand-block">
+        <h1>GravyCAD</h1>
+        <p>You draw. It solves.</p>
+      </div>
+    </header>
+
+    <nav class="menu-bar" aria-label="Main menu">
+      <div class="menu-item">
+        <button type="button" class="menu-button">File</button>
+        <div class="dropdown-menu">
+          <button type="button">New</button>
+          <button type="button">Open</button>
+          <button type="button">Save</button>
+          <button type="button">Save As</button>
+          <button type="button">Export DXF</button>
+        </div>
+      </div>
+
+      <div class="menu-item">
+        <button type="button" class="menu-button">Edit</button>
+        <div class="dropdown-menu">
+          <button type="button">Undo</button>
+          <button type="button">Redo</button>
+          <button type="button">Delete</button>
+          <button type="button">Select All</button>
+        </div>
+      </div>
+
+      <div class="menu-item">
+        <button type="button" class="menu-button">Draw</button>
+        <div class="dropdown-menu">
+          <button type="button">Point</button>
+          <button type="button">Line</button>
+          <button type="button">Circle</button>
+          <button type="button">Arc</button>
+        </div>
+      </div>
+
+      <div class="menu-item">
+        <button type="button" class="menu-button">Dimension</button>
+        <div class="dropdown-menu">
+          <button type="button">Linear</button>
+          <button type="button">Diameter</button>
+          <button type="button">Radius</button>
+          <button type="button">Angle</button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="app-shell">
+      <!--
+      <aside class="left-panel">
+        <h2>Draw</h2>
+
+        <button type="button">Line</button>
+        <button type="button">Circle</button>
+        <button type="button">Arc</button>
+        <button type="button">Point</button>
+
+        <h2>Math</h2>
+
+        <button type="button">Bolt Circle</button>
+        <button type="button">Drill Point</button>
+        <button type="button">True Position</button>
+        <button type="button">Tangent Finder</button>
+      </aside>
+    -->
+      <section class="drawing-area" aria-label="Drawing surface">
+        <svg id="cadCanvas" viewBox="-7.111 -4 14.222 8">
+          <g id="worldLayer" transform="scale(1 -1)">
+            <g id="gridLayer"></g>
+            <g id="axisLayer"></g>
+            <g id="entityLayer"></g>
+            <g id="previewLayer"></g>
+          </g>
+        </svg>
+      </section>
+      <!--
+      <aside class="right-panel">
+        <h2>Tool Panel</h2>
+
+        <div class="tool-card">
+          <h3>Ready</h3>
+          <p>Select a drawing or math tool.</p>
+        </div>
+
+        <h2>Results</h2>
+
+        <div class="results-box">
+          <p>No results yet.</p>
+        </div>
+      </aside>
+    --></main>
+
+    <footer class="status-bar">
+      <span>X: 0.0000</span>
+      <span>Y: 0.0000</span>
+      <span>Units: Inch</span>
+      <span>Snap: Grid</span>
+      <span>Ready</span>
+    </footer>
+
+    <script src="main.js"></script>
+  </body>
+</html>
