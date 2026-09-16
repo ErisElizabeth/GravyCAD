@@ -33,7 +33,11 @@ const zoomInMenu = document.querySelector("#zoomInMenu");
 const zoomOutMenu = document.querySelector("#zoomOutMenu");
 const homeViewMenu = document.querySelector("#homeViewMenu");
 const graniteThemeMenu = document.querySelector("#graniteThemeMenu");
+const lightThemeMenu = document.querySelector("#lightThemeMenu");
+const darkThemeMenu = document.querySelector("#darkThemeMenu");
 const matrixThemeMenu = document.querySelector("#matrixThemeMenu");
+const themeMenuItem = graniteThemeMenu.closest(".menu-item");
+const themeMenuButton = themeMenuItem.querySelector(".menu-button");
 const singleSelectMenu = document.querySelector("#singleSelectMenu");
 const cursorX = document.querySelector("#cursorX");
 const cursorY = document.querySelector("#cursorY");
@@ -54,6 +58,20 @@ const BASE_VIEW = {
 const ZOOM_STEP = 0.2;
 const MIN_ZOOM = 0.2;
 const MAX_ZOOM = 5;
+
+const THEME_MENUS = {
+  granite: graniteThemeMenu,
+  light: lightThemeMenu,
+  dark: darkThemeMenu,
+  matrix: matrixThemeMenu,
+};
+
+const THEME_DISPLAY_NAMES = {
+  granite: "Granite",
+  light: "Light",
+  dark: "Dark",
+  matrix: "Matrix",
+};
 
 const viewState = {
   zoom: 1,
@@ -196,16 +214,25 @@ function homeView() {
 }
 
 function applyTheme(themeName) {
-  const isGranite = themeName === "granite";
   document.body.dataset.theme = themeName;
 
-  graniteThemeMenu.classList.toggle("current-menu-option", isGranite);
-  graniteThemeMenu.setAttribute("aria-pressed", String(isGranite));
-  matrixThemeMenu.classList.toggle("current-menu-option", !isGranite);
-  matrixThemeMenu.setAttribute("aria-pressed", String(!isGranite));
+  Object.entries(THEME_MENUS).forEach(([menuTheme, menuButton]) => {
+    const isCurrentTheme = menuTheme === themeName;
+    menuButton.classList.toggle("current-menu-option", isCurrentTheme);
+    menuButton.setAttribute("aria-pressed", String(isCurrentTheme));
+  });
 
-  const displayName = isGranite ? "Granite" : "Matrix";
-  commandStatus.textContent = `Theme: ${displayName}`;
+  commandStatus.textContent = `Theme: ${THEME_DISPLAY_NAMES[themeName]}`;
+}
+
+function closeThemeMenu() {
+  themeMenuItem.classList.add("is-dismissed");
+  document.activeElement?.blur();
+}
+
+function selectTheme(themeName) {
+  applyTheme(themeName);
+  closeThemeMenu();
 }
 
 function activateSingleSelect() {
@@ -406,8 +433,15 @@ pointCoordinatesMenu.addEventListener("click", activatePointCoordinates);
 zoomInMenu.addEventListener("click", zoomIn);
 zoomOutMenu.addEventListener("click", zoomOut);
 homeViewMenu.addEventListener("click", homeView);
-graniteThemeMenu.addEventListener("click", () => applyTheme("granite"));
-matrixThemeMenu.addEventListener("click", () => applyTheme("matrix"));
+themeMenuButton.addEventListener("click", () => {
+  themeMenuItem.classList.remove("is-dismissed");
+});
+themeMenuItem.addEventListener("pointerleave", () => {
+  themeMenuItem.classList.remove("is-dismissed");
+});
+Object.entries(THEME_MENUS).forEach(([themeName, menuButton]) => {
+  menuButton.addEventListener("click", () => selectTheme(themeName));
+});
 singleSelectMenu.addEventListener("click", activateSingleSelect);
 
 cadCanvas.addEventListener("click", (event) => {

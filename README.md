@@ -285,3 +285,25 @@ Changes made since V0.0.12:
 - Gave the Matrix axes a `0.75px` visible white core while preserving Granite's original line weight.
 - Kept future Matrix grid lines at the original subtle `#0C1A0E`.
 - Granite axes remain unchanged.
+
+## V0.0.14 Alpha Dev Build
+
+Theme Menu Dismissal
+
+Changes made since V0.0.13:
+
+- The Theme dropdown now closes immediately after choosing Granite or Matrix.
+- The Theme button can reopen the dropdown normally after a selection.
+- Moving away from the Theme menu resets its temporary dismissed state.
+
+## V0.0.15 Alpha Dev Build
+
+Light and Dark Themes
+
+Changes made since V0.0.14:
+
+- Enabled Light and Dark in the Theme dropdown with the same selection checkmark and auto-close behavior as Granite and Matrix.
+- Light uses a `#FFFFFF` background, `#6B7280` axes, `#111827` entities, `#DC2626` hover, and `#2563EB` selection.
+- Dark uses a `#1E2022` background, `#9CA3AF` axes, `#F9FAFB` entities, `#F87171` hover, and `#60A5FA` selection.
+- Light and Dark axes use the visible `0.75px` line weight without a glow.
+- Until dedicated grid colors are chosen, Light and Dark grid lines inherit their respective axis colors.

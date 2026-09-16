@@ -9,6 +9,28 @@
   --grid-color: #000000;
 }
 
+body[data-theme="light"] {
+  --drawing-background: #ffffff;
+  --entity-color: #111827;
+  --entity-hover-color: #dc2626;
+  --entity-selected-color: #2563eb;
+  --axis-color: #6b7280;
+  --axis-glow: none;
+  --axis-stroke-width: 0.75;
+  --grid-color: #6b7280;
+}
+
+body[data-theme="dark"] {
+  --drawing-background: #1e2022;
+  --entity-color: #f9fafb;
+  --entity-hover-color: #f87171;
+  --entity-selected-color: #60a5fa;
+  --axis-color: #9ca3af;
+  --axis-glow: none;
+  --axis-stroke-width: 0.75;
+  --grid-color: #9ca3af;
+}
+
 body[data-theme="matrix"] {
   --drawing-background: #050b06;
   --entity-color: #00ff41;
@@ -377,6 +399,10 @@ body {
 .menu-item:hover .dropdown-menu,
 .menu-item:focus-within .dropdown-menu {
   display: flex;
+}
+
+.menu-item.is-dismissed .dropdown-menu {
+  display: none;
 }
 
 .dropdown-menu button {
