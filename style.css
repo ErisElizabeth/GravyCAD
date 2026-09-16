@@ -1,42 +1,316 @@
+:root {
+  --drawing-background: #a3a0a0;
+  --entity-color: #010b13;
+  --entity-hover-color: #000075;
+  --entity-selected-color: #0000ff;
+  --axis-color: #000000;
+  --axis-glow: none;
+  --axis-stroke-width: 0.1;
+  --grid-color: #000000;
+}
+
+body[data-theme="matrix"] {
+  --drawing-background: #050b06;
+  --entity-color: #00ff41;
+  --entity-hover-color: #85ff9e;
+  --entity-selected-color: #00e5ff;
+  --axis-color: #ffffff;
+  --axis-glow: drop-shadow(0 0 1px rgba(0, 255, 65, 0.7))
+    drop-shadow(0 0 3px rgba(0, 255, 65, 0.3));
+  --axis-stroke-width: 0.75;
+  --grid-color: #0c1a0e;
+}
+
+.app-shell {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  background: #202124;
+}
+
+.tool-window {
+  position: fixed;
+  z-index: 200;
+  width: min(360px, calc(100vw - 32px));
+  padding: 0;
+  overflow: hidden;
+  color: #ededed;
+  background: #2b2c2f;
+  border: 1px solid #777;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6);
+}
+
+.tool-window.is-maximized {
+  inset: 8px !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+.tool-window.is-minimized {
+  right: auto !important;
+  bottom: auto !important;
+  width: 280px !important;
+  height: auto !important;
+}
+
+.tool-window.is-minimized .tool-window-body {
+  display: none;
+}
+
+.tool-window.is-minimized .window-title-bar {
+  border-bottom: 0;
+}
+
+.window-title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 34px;
+  padding-left: 11px;
+  color: #fff;
+  background: #29459a;
+  border-bottom: 1px solid #17285f;
+  cursor: move;
+  user-select: none;
+  touch-action: none;
+}
+
+.window-title-bar.is-dragging {
+  cursor: grabbing;
+}
+
+.tool-window.is-maximized .window-title-bar {
+  cursor: default;
+}
+
+.window-title-bar h2 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.window-controls {
+  display: flex;
+  align-self: stretch;
+}
+
+.window-control {
+  width: 42px;
+  padding: 0;
+  border: 0;
+  color: #fff;
+  background: transparent;
+  font-size: 1.05rem;
+  line-height: 1;
+  cursor: default;
+}
+
+.window-control:hover,
+.window-control:focus-visible {
+  background: rgba(255, 255, 255, 0.16);
+  outline: none;
+}
+
+.window-close:hover,
+.window-close:focus-visible {
+  background: #c42b1c;
+}
+
+.tool-window-body {
+  background: #2b2c2f;
+}
+
+.tool-window.is-maximized .tool-window-body {
+  height: calc(100% - 35px);
+  overflow: auto;
+}
+
+.tool-window.is-maximized #pointCoordinatesForm {
+  max-width: 360px;
+}
+
+#pointCoordinatesForm {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px 16px;
+}
+
+#pointCoordinatesForm label {
+  margin-top: 4px;
+  color: #d0d0d0;
+  font-size: 0.8rem;
+}
+
+.coordinate-input {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid #666;
+  background: #171717;
+}
+
+.coordinate-input span {
+  color: #f0d36c;
+  font-weight: 700;
+  text-align: center;
+}
+
+.coordinate-input input {
+  min-width: 0;
+  padding: 8px;
+  border: 0;
+  border-left: 1px solid #555;
+  outline: none;
+  color: #fff;
+  background: #202124;
+  font-variant-numeric: tabular-nums;
+}
+
+.coordinate-input input:focus {
+  box-shadow: inset 0 0 0 2px #6889e8;
+}
+
+.primary-action {
+  border: 1px solid #17285f;
+  color: #fff;
+  background: #365bb8;
+}
+
+.primary-action:hover,
+.primary-action:focus-visible {
+  background: #426aca;
+}
+
+.tool-message {
+  min-height: 1.5em;
+  margin: 6px 0 0;
+  color: #c7c7c7;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.dialog-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.dialog-actions button {
+  min-width: 0;
+  padding: 9px 8px;
+  border: 1px solid #666;
+  color: #f2f2f2;
+  background: #414246;
+  cursor: pointer;
+}
+
+.dialog-actions button:hover,
+.dialog-actions button:focus-visible {
+  background: #505259;
+}
+
+.dialog-actions .primary-action {
+  border-color: #17285f;
+  background: #365bb8;
+}
+
+.dialog-actions .primary-action:hover,
+.dialog-actions .primary-action:focus-visible {
+  background: #426aca;
+}
+
 .drawing-area {
-  background: #000000;
-  padding: 16px;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  background: var(--drawing-background);
+  padding: 0;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 /* TEMP DEV: Thick axes/ticks for visibility while building GravyCAD. Refine later. */
 .axis-line {
-  stroke: #000000;
-  stroke-width: 0.1;
+  stroke: var(--axis-color);
+  stroke-width: var(--axis-stroke-width);
   vector-effect: non-scaling-stroke;
+  filter: var(--axis-glow);
 }
 
 .tick-half {
-  stroke: #000000;
-  stroke-width: 0.1;
+  stroke: var(--axis-color);
+  stroke-width: var(--axis-stroke-width);
   vector-effect: non-scaling-stroke;
+  filter: var(--axis-glow);
 }
 
 .tick-full {
-  stroke: #000000;
-  stroke-width: 0.1;
+  stroke: var(--axis-color);
+  stroke-width: var(--axis-stroke-width);
   vector-effect: non-scaling-stroke;
+  filter: var(--axis-glow);
+}
+
+.point-x {
+  stroke: var(--entity-color);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.entity-hit-target {
+  fill: transparent;
+  stroke: none;
+  pointer-events: all;
+}
+
+#cadCanvas.select-single .point-entity {
+  cursor: pointer;
+}
+
+#cadCanvas.select-single .point-entity:hover .point-x {
+  stroke: var(--entity-hover-color);
+}
+
+#cadCanvas.select-single .point-entity.is-selected .point-x {
+  stroke: var(--entity-selected-color);
+}
+
+#gridLayer line {
+  stroke: var(--grid-color);
 }
 
 #cadCanvas {
   width: 100%;
-  aspect-ratio: 16 / 9;
-  background: #a3a0a0;
-  border: 2px solid #1f1f1f;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+  height: 100%;
+  box-sizing: border-box;
+  background: var(--drawing-background);
+  border: 0;
 }
+html,
+body {
+  height: 100%;
+}
+
 body,
 button,
 input,
 select,
 textarea {
   font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  min-width: 720px;
+  overflow: hidden;
+  color: #e5e5e5;
+  background: #202124;
 }
 .app-header {
   background: #29459a;
@@ -120,4 +394,52 @@ textarea {
 .dropdown-menu button:focus {
   background: #d8d8d8;
   outline: none;
+}
+
+.dropdown-menu button:disabled {
+  color: #888;
+  cursor: not-allowed;
+}
+
+.dropdown-menu button:disabled:hover {
+  background: transparent;
+}
+
+.dropdown-menu .theme-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dropdown-menu .current-menu-option {
+  font-weight: 600;
+}
+
+.theme-option .menu-check {
+  visibility: hidden;
+}
+
+.theme-option.current-menu-option .menu-check {
+  visibility: visible;
+}
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  min-height: 26px;
+  color: #e6e6e6;
+  background: #303134;
+  border-top: 1px solid #111;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.status-bar span {
+  min-width: 94px;
+  padding: 4px 10px;
+  border-right: 1px solid #505155;
+}
+
+.status-bar span:last-child {
+  flex: 1;
 }

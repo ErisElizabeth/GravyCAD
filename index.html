@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css" />
   </head>
 
-  <body>
+  <body data-theme="granite">
     <header class="app-header">
       <div class="brand-block">
         <h1>GravyCAD</h1>
@@ -38,9 +38,52 @@
       </div>
 
       <div class="menu-item">
+        <button type="button" class="menu-button">View</button>
+        <div class="dropdown-menu">
+          <button type="button" id="zoomInMenu">Zoom In</button>
+          <button type="button" id="zoomOutMenu">Zoom Out</button>
+          <button type="button" id="homeViewMenu">Home</button>
+        </div>
+      </div>
+
+      <div class="menu-item">
+        <button type="button" class="menu-button">Theme</button>
+        <div class="dropdown-menu">
+          <button
+            type="button"
+            id="graniteThemeMenu"
+            class="theme-option current-menu-option"
+            aria-pressed="true"
+          >
+            <span>Granite</span>
+            <span class="menu-check" aria-hidden="true">&#10003;</span>
+          </button>
+          <button type="button" disabled title="Theme styling coming next">Light</button>
+          <button type="button" disabled title="Theme styling coming next">Dark</button>
+          <button
+            type="button"
+            id="matrixThemeMenu"
+            class="theme-option"
+            aria-pressed="false"
+          >
+            <span>Matrix</span>
+            <span class="menu-check" aria-hidden="true">&#10003;</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="menu-item">
+        <button type="button" class="menu-button">Select</button>
+        <div class="dropdown-menu">
+          <button type="button" id="singleSelectMenu">Single</button>
+        </div>
+      </div>
+
+      <div class="menu-item">
         <button type="button" class="menu-button">Draw</button>
         <div class="dropdown-menu">
-          <button type="button">Point</button>
+          <button type="button" id="pointCoordinatesMenu">Point - Coordinates</button>
+          <button type="button" disabled title="Planned for a future build">Point - Sketch</button>
           <button type="button">Line</button>
           <button type="button">Circle</button>
           <button type="button">Arc</button>
@@ -58,24 +101,75 @@
       </div>
     </nav>
 
+    <section
+      id="pointCoordinatesWindow"
+      class="tool-window"
+      role="dialog"
+      aria-modal="false"
+      aria-labelledby="pointCoordinatesTitle"
+      hidden
+    >
+      <div id="pointWindowTitleBar" class="window-title-bar">
+        <h2 id="pointCoordinatesTitle">Point Coordinates</h2>
+        <div class="window-controls">
+          <button
+            type="button"
+            id="pointMinimizeButton"
+            class="window-control"
+            aria-label="Minimize Point Coordinates"
+            title="Minimize"
+          >
+            <span aria-hidden="true">&minus;</span>
+          </button>
+          <button
+            type="button"
+            id="pointMaximizeButton"
+            class="window-control"
+            aria-label="Maximize Point Coordinates"
+            title="Maximize"
+          >
+            <span id="pointMaximizeIcon" aria-hidden="true">&#9633;</span>
+          </button>
+          <button
+            type="button"
+            id="pointCloseButton"
+            class="window-control window-close"
+            aria-label="Close Point Coordinates"
+            title="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="tool-window-body">
+        <form id="pointCoordinatesForm" autocomplete="off">
+          <label for="pointX">X coordinate</label>
+          <div class="coordinate-input">
+            <span aria-hidden="true">X</span>
+            <input id="pointX" name="x" type="number" step="any" value="0" required />
+          </div>
+
+          <label for="pointY">Y coordinate</label>
+          <div class="coordinate-input">
+            <span aria-hidden="true">Y</span>
+            <input id="pointY" name="y" type="number" step="any" value="0" required />
+          </div>
+
+          <p id="toolMessage" class="tool-message" role="status" aria-live="polite">
+            Enter the point coordinates.
+          </p>
+
+          <div class="dialog-actions">
+            <button type="submit" class="primary-action">Create</button>
+            <button type="button" id="pointContinueButton">Continue</button>
+            <button type="button" id="pointCancelButton">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
     <main class="app-shell">
-      <!--
-      <aside class="left-panel">
-        <h2>Draw</h2>
-
-        <button type="button">Line</button>
-        <button type="button">Circle</button>
-        <button type="button">Arc</button>
-        <button type="button">Point</button>
-
-        <h2>Math</h2>
-
-        <button type="button">Bolt Circle</button>
-        <button type="button">Drill Point</button>
-        <button type="button">True Position</button>
-        <button type="button">Tangent Finder</button>
-      </aside>
-    -->
       <section class="drawing-area" aria-label="Drawing surface">
         <svg id="cadCanvas" viewBox="-7.111 -4 14.222 8">
           <g id="worldLayer" transform="scale(1 -1)">
@@ -86,29 +180,16 @@
           </g>
         </svg>
       </section>
-      <!--
-      <aside class="right-panel">
-        <h2>Tool Panel</h2>
-
-        <div class="tool-card">
-          <h3>Ready</h3>
-          <p>Select a drawing or math tool.</p>
-        </div>
-
-        <h2>Results</h2>
-
-        <div class="results-box">
-          <p>No results yet.</p>
-        </div>
-      </aside>
-    --></main>
+    </main>
 
     <footer class="status-bar">
-      <span>X: 0.0000</span>
-      <span>Y: 0.0000</span>
+      <span id="cursorX">X: 0.0000</span>
+      <span id="cursorY">Y: 0.0000</span>
       <span>Units: Inch</span>
-      <span>Snap: Grid</span>
-      <span>Ready</span>
+      <span>Snap: Off</span>
+      <span id="zoomStatus">Zoom: 100%</span>
+      <span id="entityCount">Entities: 0</span>
+      <span id="commandStatus">Ready</span>
     </footer>
 
     <script src="main.js"></script>
