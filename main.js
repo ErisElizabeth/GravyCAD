@@ -22,6 +22,7 @@ const pointWindowTitleBar = document.querySelector("#pointWindowTitleBar");
 const pointCoordinatesForm = document.querySelector("#pointCoordinatesForm");
 const pointCoordinatesMenu = document.querySelector("#pointCoordinatesMenu");
 const pointIntersectMenu = document.querySelector("#pointIntersectMenu");
+const pointOnEntityMenu = document.querySelector("#pointOnEntityMenu");
 const lineJoinMenu = document.querySelector("#lineJoinMenu");
 const circleCenterRadiusMenu = document.querySelector("#circleCenterRadiusMenu");
 const drawMenuItem = lineJoinMenu.closest(".menu-item");
@@ -67,6 +68,40 @@ const offsetMaximizeButton = document.querySelector("#offsetMaximizeButton");
 const offsetMaximizeIcon = document.querySelector("#offsetMaximizeIcon");
 const offsetCloseButton = document.querySelector("#offsetCloseButton");
 const offsetCancelButton = document.querySelector("#offsetCancelButton");
+const pointOnEntityWindow = document.querySelector("#pointOnEntityWindow");
+const pointOnEntityWindowTitleBar = document.querySelector(
+  "#pointOnEntityWindowTitleBar",
+);
+const pointOnEntityForm = document.querySelector("#pointOnEntityForm");
+const pointOnEntitySourceReadout = document.querySelector(
+  "#pointOnEntitySourceReadout",
+);
+const pointOnEntityValueLabel = document.querySelector(
+  "#pointOnEntityValueLabel",
+);
+const pointOnEntityUnit = document.querySelector("#pointOnEntityUnit");
+const pointOnEntityValueInput = document.querySelector("#pointOnEntityValue");
+const pointOnEntityToolMessage = document.querySelector(
+  "#pointOnEntityToolMessage",
+);
+const pointOnEntityCreateButton = document.querySelector(
+  "#pointOnEntityCreateButton",
+);
+const pointOnEntityMinimizeButton = document.querySelector(
+  "#pointOnEntityMinimizeButton",
+);
+const pointOnEntityMaximizeButton = document.querySelector(
+  "#pointOnEntityMaximizeButton",
+);
+const pointOnEntityMaximizeIcon = document.querySelector(
+  "#pointOnEntityMaximizeIcon",
+);
+const pointOnEntityCloseButton = document.querySelector(
+  "#pointOnEntityCloseButton",
+);
+const pointOnEntityCancelButton = document.querySelector(
+  "#pointOnEntityCancelButton",
+);
 const zoomInMenu = document.querySelector("#zoomInMenu");
 const zoomOutMenu = document.querySelector("#zoomOutMenu");
 const homeViewMenu = document.querySelector("#homeViewMenu");
@@ -150,8 +185,20 @@ const offsetState = {
 
 const trimExtendState = {
   active: false,
-  sourceLineId: null,
+  sourceEntityId: null,
   endpointProperty: null,
+  sourcePickWorld: null,
+};
+
+const pointOnEntityState = {
+  active: false,
+  sourceEntityId: null,
+  zeroPointId: null,
+  zeroChoiceIndex: null,
+  awaitingDirection: false,
+  directionChoices: [],
+  linePercentage: 50,
+  angleDegrees: 0,
 };
 
 const GEOMETRY_EPSILON = 1e-9;
@@ -169,6 +216,12 @@ const circleWindowState = {
 };
 
 const offsetWindowState = {
+  hasPosition: false,
+  restoreBounds: null,
+  drag: null,
+};
+
+const pointOnEntityWindowState = {
   hasPosition: false,
   restoreBounds: null,
   drag: null,
@@ -325,6 +378,7 @@ function activateSingleSelect() {
   deactivateJoin();
   deactivateIntersectingPoint();
   deactivateTrimExtend();
+  deactivatePointOnEntity();
   if (!circleRadiusWindow.hidden) closeCircleRadiusWindow(null);
   if (!offsetWindow.hidden) closeOffsetWindow(null);
   if (!pointCoordinatesWindow.hidden) closePointCoordinatesWindow(null);
@@ -363,6 +417,28 @@ function getEntityDescription(entity) {
     );
   }
 
+  if (entity.type === "arc") {
+    const centerPoint = getPointById(entity.centerPointId);
+    const startPoint = getPointById(entity.startPointId);
+    const endPoint = getPointById(entity.endPointId);
+    if (!centerPoint || !startPoint || !endPoint) return `Arc ${entity.id}`;
+    const startAngle = Math.atan2(
+      startPoint.y - centerPoint.y,
+      startPoint.x - centerPoint.x,
+    );
+    const endAngle = Math.atan2(
+      endPoint.y - centerPoint.y,
+      endPoint.x - centerPoint.x,
+    );
+    const sweepDegrees =
+      (getCounterClockwiseSweep(startAngle, endAngle) * 180) / Math.PI;
+    return (
+      `Arc ${entity.id}: X${formatCoordinate(centerPoint.x)} ` +
+      `Y${formatCoordinate(centerPoint.y)} R${formatCoordinate(entity.radius)} ` +
+      `Sweep ${formatCoordinate(sweepDegrees)}°`
+    );
+  }
+
   return `Entity ${entity.id}`;
 }
 
@@ -375,7 +451,7 @@ function clearEntityHoverInfo() {
 
 function updateEntityHoverInfo(target) {
   const entityElement = target.closest(
-    ".point-entity, .line-entity, .circle-entity",
+    ".point-entity, .line-entity, .circle-entity, .arc-entity",
   );
   if (!entityElement) {
     clearEntityHoverInfo();
@@ -397,12 +473,21 @@ function updateEntityHoverInfo(target) {
 }
 
 function renderPoint(point) {
+  const isDirectionChoice = pointOnEntityState.directionChoices.some(
+    (choice) => choice.pointId === point.id,
+  );
   const pointGroup = createSvgElement("g", {
     class: [
       "point-entity",
       selectionState.selectedEntityId === point.id ? "is-selected" : "",
       joinState.firstPointId === point.id ? "is-join-start" : "",
       circleState.centerPointId === point.id ? "is-circle-center" : "",
+      pointOnEntityState.awaitingDirection && isDirectionChoice
+        ? "is-point-on-entity-direction"
+        : "",
+      pointOnEntityState.zeroPointId === point.id
+        ? "is-point-on-entity-zero"
+        : "",
     ]
       .filter(Boolean)
       .join(" "),
@@ -464,8 +549,11 @@ function renderLineEntity(lineEntity) {
         ? "is-intersection-first"
         : "",
       offsetState.sourceEntityId === lineEntity.id ? "is-offset-source" : "",
-      trimExtendState.sourceLineId === lineEntity.id
+      trimExtendState.sourceEntityId === lineEntity.id
         ? "is-trim-extend-source"
+        : "",
+      pointOnEntityState.sourceEntityId === lineEntity.id
+        ? "is-point-on-entity-source"
         : "",
     ]
       .filter(Boolean)
@@ -509,6 +597,12 @@ function renderCircleEntity(circleEntity) {
         ? "is-intersection-first"
         : "",
       offsetState.sourceEntityId === circleEntity.id ? "is-offset-source" : "",
+      trimExtendState.sourceEntityId === circleEntity.id
+        ? "is-trim-extend-source"
+        : "",
+      pointOnEntityState.sourceEntityId === circleEntity.id
+        ? "is-point-on-entity-source"
+        : "",
     ]
       .filter(Boolean)
       .join(" "),
@@ -539,6 +633,62 @@ function renderCircleEntity(circleEntity) {
   entityLayer.appendChild(circleGroup);
 }
 
+function renderArcEntity(arcEntity) {
+  const centerPoint = getPointById(arcEntity.centerPointId);
+  const startPoint = getPointById(arcEntity.startPointId);
+  const endPoint = getPointById(arcEntity.endPointId);
+  if (!centerPoint || !startPoint || !endPoint) return;
+
+  const startAngle = Math.atan2(
+    startPoint.y - centerPoint.y,
+    startPoint.x - centerPoint.x,
+  );
+  const endAngle = Math.atan2(
+    endPoint.y - centerPoint.y,
+    endPoint.x - centerPoint.x,
+  );
+  const sweep = getCounterClockwiseSweep(startAngle, endAngle);
+  if (sweep <= GEOMETRY_EPSILON) return;
+
+  const arcPath = [
+    `M ${startPoint.x} ${startPoint.y}`,
+    `A ${arcEntity.radius} ${arcEntity.radius} 0 ${sweep > Math.PI ? 1 : 0} 1 ${endPoint.x} ${endPoint.y}`,
+  ].join(" ");
+  const arcGroup = createSvgElement("g", {
+    class: [
+      "arc-entity",
+      selectionState.selectedEntityId === arcEntity.id ? "is-selected" : "",
+      pointOnEntityState.sourceEntityId === arcEntity.id
+        ? "is-point-on-entity-source"
+        : "",
+    ]
+      .filter(Boolean)
+      .join(" "),
+    "data-entity-id": arcEntity.id,
+    "data-entity-type": arcEntity.type,
+  });
+
+  arcGroup.appendChild(
+    createSvgElement("path", {
+      d: arcPath,
+      class: "arc-hit-target",
+    }),
+  );
+  arcGroup.appendChild(
+    createSvgElement("path", {
+      d: arcPath,
+      class: "arc-geometry",
+    }),
+  );
+
+  const title = createSvgElement("title", {});
+  title.textContent =
+    `Arc ${arcEntity.id}: Center point ${centerPoint.id}, ` +
+    `endpoint points ${startPoint.id} and ${endPoint.id}`;
+  arcGroup.appendChild(title);
+  entityLayer.appendChild(arcGroup);
+}
+
 function getCircleRadiusInputValue() {
   const radius = Number(circleRadiusInput.value);
   return Number.isFinite(radius) && radius > 0 ? radius : null;
@@ -546,6 +696,44 @@ function getCircleRadiusInputValue() {
 
 function renderToolPreview() {
   previewLayer.innerHTML = "";
+
+  if (pointOnEntityState.active && pointOnEntityState.awaitingDirection) {
+    pointOnEntityState.directionChoices.forEach((choice, index) => {
+      if (choice.pointId !== null) return;
+      const group = createSvgElement("g", {
+        class: "temporary-direction-point",
+        "data-choice-index": index,
+      });
+      const pointDiagonal = 0.15 / viewState.zoom;
+      const diagonalOffset = pointDiagonal / (2 * Math.SQRT2);
+      group.appendChild(
+        createSvgElement("circle", {
+          cx: choice.x,
+          cy: choice.y,
+          r: 0.14 / viewState.zoom,
+          class: "entity-hit-target",
+        }),
+      );
+      drawLine(
+        group,
+        choice.x - diagonalOffset,
+        choice.y - diagonalOffset,
+        choice.x + diagonalOffset,
+        choice.y + diagonalOffset,
+        "point-x",
+      );
+      drawLine(
+        group,
+        choice.x - diagonalOffset,
+        choice.y + diagonalOffset,
+        choice.x + diagonalOffset,
+        choice.y - diagonalOffset,
+        "point-x",
+      );
+      previewLayer.appendChild(group);
+    });
+    return;
+  }
 
   if (joinState.active && joinState.firstPointId !== null && joinState.previewWorld) {
     const startPoint = getPointById(joinState.firstPointId);
@@ -585,6 +773,7 @@ function renderEntities() {
   documentModel.entities.forEach((entity) => {
     if (entity.type === "line") renderLineEntity(entity);
     if (entity.type === "circle") renderCircleEntity(entity);
+    if (entity.type === "arc") renderArcEntity(entity);
   });
 
   documentModel.entities.forEach((entity) => {
@@ -705,12 +894,43 @@ function squaredDistance(a, b) {
   return dx * dx + dy * dy;
 }
 
+function normalizeAngle(angle) {
+  const fullTurn = Math.PI * 2;
+  return ((angle % fullTurn) + fullTurn) % fullTurn;
+}
+
+function getCounterClockwiseSweep(startAngle, endAngle) {
+  return normalizeAngle(endAngle - startAngle);
+}
+
+function isAngleOnCounterClockwiseArc(angle, startAngle, endAngle) {
+  return (
+    getCounterClockwiseSweep(startAngle, angle) <=
+    getCounterClockwiseSweep(startAngle, endAngle) + 1e-7
+  );
+}
+
 function findExistingPointAt(worldPoint) {
   return documentModel.entities.find(
     (entity) =>
       entity.type === "point" &&
       squaredDistance(entity, worldPoint) <= 1e-14,
   );
+}
+
+function getOrCreatePointWithoutHistory(worldPoint) {
+  const existingPoint = findExistingPointAt(worldPoint);
+  if (existingPoint) return existingPoint;
+
+  const point = {
+    id: documentModel.nextEntityId,
+    type: "point",
+    x: worldPoint.x,
+    y: worldPoint.y,
+  };
+  documentModel.nextEntityId += 1;
+  documentModel.entities.push(point);
+  return point;
 }
 
 function getLineEndpointPair(line) {
@@ -792,6 +1012,44 @@ function intersectRayCircle(origin, direction, center, radius) {
       },
       parameter,
     }));
+}
+
+function intersectInfiniteLineCircle(lineStart, lineEnd, center, radius) {
+  const direction = {
+    x: lineEnd.x - lineStart.x,
+    y: lineEnd.y - lineStart.y,
+  };
+  const fromCenter = {
+    x: lineStart.x - center.x,
+    y: lineStart.y - center.y,
+  };
+  const coefficientA = dotProduct(direction, direction);
+  if (coefficientA <= GEOMETRY_EPSILON ** 2) {
+    return { points: [], kind: "degenerate" };
+  }
+
+  const coefficientB = 2 * dotProduct(fromCenter, direction);
+  const coefficientC = dotProduct(fromCenter, fromCenter) - radius * radius;
+  const discriminant = coefficientB ** 2 - 4 * coefficientA * coefficientC;
+  if (discriminant < -GEOMETRY_EPSILON) {
+    return { points: [], kind: "none" };
+  }
+
+  const root = Math.sqrt(Math.max(0, discriminant));
+  const parameters = [
+    (-coefficientB - root) / (2 * coefficientA),
+    (-coefficientB + root) / (2 * coefficientA),
+  ];
+  const points = uniqueIntersectionPoints(
+    parameters.map((parameter) => ({
+      x: lineStart.x + parameter * direction.x,
+      y: lineStart.y + parameter * direction.y,
+    })),
+  );
+  return {
+    points,
+    kind: points.length ? "point" : "none",
+  };
 }
 
 function uniqueIntersectionPoints(points) {
@@ -1047,14 +1305,23 @@ function restoreDocumentSnapshot(snapshot) {
   offsetState.active = false;
   offsetState.sourceEntityId = null;
   trimExtendState.active = false;
-  trimExtendState.sourceLineId = null;
+  trimExtendState.sourceEntityId = null;
   trimExtendState.endpointProperty = null;
+  trimExtendState.sourcePickWorld = null;
+  pointOnEntityState.active = false;
+  pointOnEntityState.sourceEntityId = null;
+  pointOnEntityState.zeroPointId = null;
+  pointOnEntityState.zeroChoiceIndex = null;
+  pointOnEntityState.awaitingDirection = false;
+  pointOnEntityState.directionChoices = [];
   cadCanvas.classList.remove("join-points");
   cadCanvas.classList.remove("circle-center-radius");
   cadCanvas.classList.remove("intersect-entities");
   cadCanvas.classList.remove("offset-entity");
   cadCanvas.classList.remove("trim-extend");
   cadCanvas.classList.remove("trim-extend-source-pick");
+  cadCanvas.classList.remove("point-on-entity");
+  cadCanvas.classList.remove("point-on-entity-source-pick");
   previewLayer.innerHTML = "";
   if (circleRadiusWindow.classList.contains("is-maximized")) {
     restoreCircleWindow();
@@ -1066,6 +1333,11 @@ function restoreDocumentSnapshot(snapshot) {
   }
   setOffsetWindowMinimized(false);
   offsetWindow.hidden = true;
+  if (pointOnEntityWindow.classList.contains("is-maximized")) {
+    restorePointOnEntityWindow();
+  }
+  setPointOnEntityWindowMinimized(false);
+  pointOnEntityWindow.hidden = true;
   renderEntities();
 }
 
@@ -1141,6 +1413,13 @@ function deleteSelectedEntity() {
       (entity) =>
         entity.type === "circle" && entity.centerPointId === selectedEntity.id,
     ).length;
+    const dependentArcCount = documentModel.entities.filter(
+      (entity) =>
+        entity.type === "arc" &&
+        (entity.centerPointId === selectedEntity.id ||
+          entity.startPointId === selectedEntity.id ||
+          entity.endPointId === selectedEntity.id),
+    ).length;
 
     documentModel.entities = documentModel.entities.filter(
       (entity) =>
@@ -1150,7 +1429,13 @@ function deleteSelectedEntity() {
           (entity.startPointId === selectedEntity.id ||
             entity.endPointId === selectedEntity.id)
         ) &&
-        !(entity.type === "circle" && entity.centerPointId === selectedEntity.id),
+        !(entity.type === "circle" && entity.centerPointId === selectedEntity.id) &&
+        !(
+          entity.type === "arc" &&
+          (entity.centerPointId === selectedEntity.id ||
+            entity.startPointId === selectedEntity.id ||
+            entity.endPointId === selectedEntity.id)
+        ),
     );
     selectionState.selectedEntityId = null;
     renderEntities();
@@ -1163,6 +1448,11 @@ function deleteSelectedEntity() {
     if (centeredCircleCount) {
       dependentDescriptions.push(
         `${centeredCircleCount} centered ${centeredCircleCount === 1 ? "circle" : "circles"}`,
+      );
+    }
+    if (dependentArcCount) {
+      dependentDescriptions.push(
+        `${dependentArcCount} dependent ${dependentArcCount === 1 ? "arc" : "arcs"}`,
       );
     }
     commandStatus.textContent = dependentDescriptions.length
@@ -1201,6 +1491,7 @@ function activateJoin() {
   dismissDrawMenu();
   deactivateIntersectingPoint();
   deactivateTrimExtend();
+  deactivatePointOnEntity();
   if (!circleRadiusWindow.hidden) closeCircleRadiusWindow(null);
   if (!offsetWindow.hidden) closeOffsetWindow(null);
   if (!pointCoordinatesWindow.hidden) closePointCoordinatesWindow(null);
@@ -1290,6 +1581,7 @@ function activateIntersectingPoint() {
   dismissDrawMenu();
   deactivateJoin();
   deactivateTrimExtend();
+  deactivatePointOnEntity();
   if (!circleRadiusWindow.hidden) closeCircleRadiusWindow(null);
   if (!offsetWindow.hidden) closeOffsetWindow(null);
   if (!pointCoordinatesWindow.hidden) closePointCoordinatesWindow();
@@ -1461,6 +1753,7 @@ function activateCircleCenterRadius() {
   deactivateJoin();
   deactivateIntersectingPoint();
   deactivateTrimExtend();
+  deactivatePointOnEntity();
   if (!offsetWindow.hidden) closeOffsetWindow(null);
   if (!pointCoordinatesWindow.hidden) closePointCoordinatesWindow();
 
@@ -1630,6 +1923,7 @@ function activateOffset() {
   deactivateJoin();
   deactivateIntersectingPoint();
   deactivateTrimExtend();
+  deactivatePointOnEntity();
   if (!circleRadiusWindow.hidden) closeCircleRadiusWindow(null);
   if (!pointCoordinatesWindow.hidden) closePointCoordinatesWindow(null);
 
@@ -1666,8 +1960,9 @@ function activateOffset() {
 
 function deactivateTrimExtend(statusMessage) {
   trimExtendState.active = false;
-  trimExtendState.sourceLineId = null;
+  trimExtendState.sourceEntityId = null;
   trimExtendState.endpointProperty = null;
+  trimExtendState.sourcePickWorld = null;
   cadCanvas.classList.remove("trim-extend");
   cadCanvas.classList.remove("trim-extend-source-pick");
   renderEntities();
@@ -1678,8 +1973,9 @@ function deactivateTrimExtend(statusMessage) {
 }
 
 function resetTrimExtendSource(statusMessage) {
-  trimExtendState.sourceLineId = null;
+  trimExtendState.sourceEntityId = null;
   trimExtendState.endpointProperty = null;
+  trimExtendState.sourcePickWorld = null;
   cadCanvas.classList.add("trim-extend-source-pick");
   renderEntities();
   commandStatus.textContent = statusMessage;
@@ -1689,15 +1985,16 @@ function activateTrimExtend() {
   dismissModifyMenu();
   deactivateJoin();
   deactivateIntersectingPoint();
+  deactivatePointOnEntity();
   if (!circleRadiusWindow.hidden) closeCircleRadiusWindow(null);
   if (!offsetWindow.hidden) closeOffsetWindow(null);
   if (!pointCoordinatesWindow.hidden) closePointCoordinatesWindow(null);
 
-  const lineCount = documentModel.entities.filter(
-    (entity) => entity.type === "line",
+  const sourceEntityCount = documentModel.entities.filter(
+    (entity) => entity.type === "line" || entity.type === "circle",
   ).length;
-  if (lineCount < 1) {
-    commandStatus.textContent = "Trim/Extend needs an existing line.";
+  if (sourceEntityCount < 1) {
+    commandStatus.textContent = "Trim/Extend needs an existing line or circle.";
     return;
   }
 
@@ -1705,47 +2002,147 @@ function activateTrimExtend() {
   selectionState.selectedEntityId = null;
   cadCanvas.classList.remove("select-single");
   trimExtendState.active = true;
-  trimExtendState.sourceLineId = null;
+  trimExtendState.sourceEntityId = null;
   trimExtendState.endpointProperty = null;
+  trimExtendState.sourcePickWorld = null;
   cadCanvas.classList.add("trim-extend");
   cadCanvas.classList.add("trim-extend-source-pick");
   renderEntities();
   commandStatus.textContent =
-    "Trim/Extend: Select a line near the endpoint to keep.";
+    "Trim/Extend: Select a line near the endpoint to keep, or select the circle portion to keep.";
+}
+
+function trimCircleToArc(sourceCircle, targetEntity) {
+  const centerPoint = getPointById(sourceCircle.centerPointId);
+  const keepPoint = trimExtendState.sourcePickWorld;
+  if (!centerPoint || !keepPoint) {
+    deactivateTrimExtend("Trim/Extend canceled: source circle is not usable.");
+    return;
+  }
+
+  let intersections = [];
+  if (targetEntity.type === "point") {
+    commandStatus.textContent =
+      "A circle needs two cut points to create an arc; choose an intersecting line or circle.";
+    return;
+  }
+
+  if (targetEntity.type === "line") {
+    const targetEndpoints = getLineEndpointPair(targetEntity);
+    if (!targetEndpoints) {
+      commandStatus.textContent = "Trim/Extend: The target line is not usable.";
+      return;
+    }
+    intersections = intersectInfiniteLineCircle(
+      targetEndpoints.startPoint,
+      targetEndpoints.endPoint,
+      centerPoint,
+      sourceCircle.radius,
+    ).points;
+  } else if (targetEntity.type === "circle") {
+    const targetCenter = getPointById(targetEntity.centerPointId);
+    if (!targetCenter) {
+      commandStatus.textContent = "Trim/Extend: The target circle is not usable.";
+      return;
+    }
+    intersections = intersectCircles(
+      centerPoint,
+      sourceCircle.radius,
+      targetCenter,
+      targetEntity.radius,
+    ).points;
+  }
+
+  if (intersections.length !== 2) {
+    commandStatus.textContent =
+      "A circle needs two distinct intersections with the target to create an arc.";
+    return;
+  }
+
+  let startWorld = intersections[0];
+  let endWorld = intersections[1];
+  const startAngle = Math.atan2(
+    startWorld.y - centerPoint.y,
+    startWorld.x - centerPoint.x,
+  );
+  const endAngle = Math.atan2(
+    endWorld.y - centerPoint.y,
+    endWorld.x - centerPoint.x,
+  );
+  const keepAngle = Math.atan2(
+    keepPoint.y - centerPoint.y,
+    keepPoint.x - centerPoint.x,
+  );
+  if (!isAngleOnCounterClockwiseArc(keepAngle, startAngle, endAngle)) {
+    [startWorld, endWorld] = [endWorld, startWorld];
+  }
+
+  recordDocumentChange(`Trim circle ${sourceCircle.id} to arc`);
+  const startPoint = getOrCreatePointWithoutHistory(startWorld);
+  const endPoint = getOrCreatePointWithoutHistory(endWorld);
+  sourceCircle.type = "arc";
+  sourceCircle.startPointId = startPoint.id;
+  sourceCircle.endPointId = endPoint.id;
+
+  resetTrimExtendSource(
+    `Trimmed circle ${sourceCircle.id} into arc ${sourceCircle.id} with endpoint points ` +
+      `${startPoint.id} and ${endPoint.id}. Trim/Extend remains active; select the next line or circle.`,
+  );
 }
 
 function handleTrimExtendClick(event) {
-  if (trimExtendState.sourceLineId === null) {
-    const lineElement = event.target.closest(".line-entity");
-    if (!lineElement) {
+  if (trimExtendState.sourceEntityId === null) {
+    const sourceElement = event.target.closest(".line-entity, .circle-entity");
+    if (!sourceElement) {
       commandStatus.textContent =
-        "Trim/Extend: The first entity must be a line. Select near the endpoint to keep.";
+        "Trim/Extend: The first entity must be a line or circle.";
       return;
     }
 
-    const sourceLine = getEntityById(Number(lineElement.dataset.entityId));
-    const endpoints = sourceLine ? getLineEndpointPair(sourceLine) : null;
-    if (!sourceLine || sourceLine.type !== "line" || !endpoints) {
-      commandStatus.textContent = "Trim/Extend: The selected line is not usable.";
-      return;
-    }
-
+    const sourceEntity = getEntityById(Number(sourceElement.dataset.entityId));
     const clickWorld = screenToWorld(event);
-    const keepStart =
-      squaredDistance(clickWorld, endpoints.startPoint) <=
-      squaredDistance(clickWorld, endpoints.endPoint);
-    trimExtendState.sourceLineId = sourceLine.id;
-    trimExtendState.endpointProperty = keepStart
-      ? "endPointId"
-      : "startPointId";
-    const retainedPoint = keepStart
-      ? endpoints.startPoint
-      : endpoints.endPoint;
+    if (!sourceEntity) return;
+
+    trimExtendState.sourceEntityId = sourceEntity.id;
+    if (sourceEntity.type === "line") {
+      const endpoints = getLineEndpointPair(sourceEntity);
+      if (!endpoints) {
+        trimExtendState.sourceEntityId = null;
+        commandStatus.textContent = "Trim/Extend: The selected line is not usable.";
+        return;
+      }
+      const keepStart =
+        squaredDistance(clickWorld, endpoints.startPoint) <=
+        squaredDistance(clickWorld, endpoints.endPoint);
+      trimExtendState.endpointProperty = keepStart
+        ? "endPointId"
+        : "startPointId";
+      trimExtendState.sourcePickWorld = null;
+      const retainedPoint = keepStart
+        ? endpoints.startPoint
+        : endpoints.endPoint;
+      commandStatus.textContent =
+        `Trim/Extend: Line ${sourceEntity.id}, point ${retainedPoint.id} will be kept; ` +
+        "choose a target point, line, or circle for the opposite endpoint.";
+    } else {
+      const centerPoint = getPointById(sourceEntity.centerPointId);
+      if (!centerPoint) {
+        trimExtendState.sourceEntityId = null;
+        commandStatus.textContent = "Trim/Extend: The selected circle is not usable.";
+        return;
+      }
+      trimExtendState.endpointProperty = null;
+      trimExtendState.sourcePickWorld = {
+        x: clickWorld.x,
+        y: clickWorld.y,
+      };
+      commandStatus.textContent =
+        `Trim/Extend: Circle ${sourceEntity.id} selected; choose an intersecting line or circle. ` +
+        "The portion nearest the first click will be kept.";
+    }
+
     cadCanvas.classList.remove("trim-extend-source-pick");
     renderEntities();
-    commandStatus.textContent =
-      `Trim/Extend: Line ${sourceLine.id}, point ${retainedPoint.id} will be kept; ` +
-      "choose a target point, line, or circle for the opposite endpoint.";
     return;
   }
 
@@ -1758,11 +2155,9 @@ function handleTrimExtendClick(event) {
     return;
   }
 
-  const sourceLine = getEntityById(trimExtendState.sourceLineId);
-  const endpointProperty = trimExtendState.endpointProperty;
-  const endpoints = sourceLine ? getLineEndpointPair(sourceLine) : null;
-  if (!sourceLine || sourceLine.type !== "line" || !endpointProperty || !endpoints) {
-    deactivateTrimExtend("Trim/Extend canceled: source line is missing.");
+  const sourceEntity = getEntityById(trimExtendState.sourceEntityId);
+  if (!sourceEntity) {
+    deactivateTrimExtend("Trim/Extend canceled: source entity is missing.");
     return;
   }
 
@@ -1771,9 +2166,22 @@ function handleTrimExtendClick(event) {
     commandStatus.textContent = "Trim/Extend: The target entity is missing.";
     return;
   }
-  if (targetEntity.id === sourceLine.id) {
+  if (targetEntity.id === sourceEntity.id) {
     commandStatus.textContent =
       "Trim/Extend: Choose a different entity as the target.";
+    return;
+  }
+
+  if (sourceEntity.type === "circle") {
+    trimCircleToArc(sourceEntity, targetEntity);
+    return;
+  }
+
+  const sourceLine = sourceEntity;
+  const endpointProperty = trimExtendState.endpointProperty;
+  const endpoints = getLineEndpointPair(sourceLine);
+  if (sourceLine.type !== "line" || !endpointProperty || !endpoints) {
+    deactivateTrimExtend("Trim/Extend canceled: source line is not usable.");
     return;
   }
 
@@ -2029,10 +2437,433 @@ function handleOffsetClick(event) {
     `${resultMessage} Offset remains active; select the next line or circle.`;
 }
 
+function positionPointOnEntityWindowInitially() {
+  const windowBounds = pointOnEntityWindow.getBoundingClientRect();
+  const left = Math.max(8, window.innerWidth - windowBounds.width - 24);
+  const top = Math.min(
+    112,
+    Math.max(8, window.innerHeight - windowBounds.height - 36),
+  );
+
+  pointOnEntityWindow.style.left = `${left}px`;
+  pointOnEntityWindow.style.top = `${top}px`;
+  pointOnEntityWindowState.hasPosition = true;
+}
+
+function setPointOnEntityWindowMinimized(minimized) {
+  pointOnEntityWindow.classList.toggle("is-minimized", minimized);
+  pointOnEntityMinimizeButton.setAttribute(
+    "aria-label",
+    minimized ? "Restore Point on Entity" : "Minimize Point on Entity",
+  );
+  pointOnEntityMinimizeButton.title = minimized ? "Restore" : "Minimize";
+}
+
+function restorePointOnEntityWindow() {
+  pointOnEntityWindow.classList.remove("is-maximized");
+
+  if (pointOnEntityWindowState.restoreBounds) {
+    const { left, top, width } = pointOnEntityWindowState.restoreBounds;
+    pointOnEntityWindow.style.left = `${left}px`;
+    pointOnEntityWindow.style.top = `${top}px`;
+    pointOnEntityWindow.style.width = `${width}px`;
+  }
+
+  pointOnEntityMaximizeButton.setAttribute(
+    "aria-label",
+    "Maximize Point on Entity",
+  );
+  pointOnEntityMaximizeButton.title = "Maximize";
+  pointOnEntityMaximizeIcon.textContent = "□";
+}
+
+function togglePointOnEntityWindowMaximized() {
+  setPointOnEntityWindowMinimized(false);
+
+  if (pointOnEntityWindow.classList.contains("is-maximized")) {
+    restorePointOnEntityWindow();
+    return;
+  }
+
+  const bounds = pointOnEntityWindow.getBoundingClientRect();
+  pointOnEntityWindowState.restoreBounds = {
+    left: bounds.left,
+    top: bounds.top,
+    width: bounds.width,
+  };
+  pointOnEntityWindow.classList.add("is-maximized");
+  pointOnEntityMaximizeButton.setAttribute(
+    "aria-label",
+    "Restore Point on Entity",
+  );
+  pointOnEntityMaximizeButton.title = "Restore";
+  pointOnEntityMaximizeIcon.textContent = "❐";
+}
+
+function hidePointOnEntityWindow() {
+  if (pointOnEntityWindow.classList.contains("is-maximized")) {
+    restorePointOnEntityWindow();
+  }
+  setPointOnEntityWindowMinimized(false);
+  pointOnEntityWindow.hidden = true;
+}
+
+function clearPointOnEntitySource() {
+  pointOnEntityState.sourceEntityId = null;
+  pointOnEntityState.zeroPointId = null;
+  pointOnEntityState.zeroChoiceIndex = null;
+  pointOnEntityState.awaitingDirection = false;
+  pointOnEntityState.directionChoices = [];
+  pointOnEntitySourceReadout.textContent = "None selected";
+  pointOnEntityCreateButton.disabled = true;
+}
+
+function deactivatePointOnEntity(statusMessage) {
+  pointOnEntityState.active = false;
+  clearPointOnEntitySource();
+  cadCanvas.classList.remove("point-on-entity");
+  cadCanvas.classList.remove("point-on-entity-source-pick");
+  hidePointOnEntityWindow();
+  renderEntities();
+
+  if (statusMessage) {
+    commandStatus.textContent = statusMessage;
+  }
+}
+
+function resetPointOnEntityForNextSource(statusMessage) {
+  clearPointOnEntitySource();
+  hidePointOnEntityWindow();
+  cadCanvas.classList.add("point-on-entity-source-pick");
+  renderEntities();
+  commandStatus.textContent = statusMessage;
+}
+
+function activatePointOnEntity() {
+  dismissDrawMenu();
+  deactivateJoin();
+  deactivateIntersectingPoint();
+  deactivateTrimExtend();
+  if (!circleRadiusWindow.hidden) closeCircleRadiusWindow(null);
+  if (!offsetWindow.hidden) closeOffsetWindow(null);
+  if (!pointCoordinatesWindow.hidden) closePointCoordinatesWindow(null);
+
+  const eligibleEntityCount = documentModel.entities.filter(
+    (entity) =>
+      entity.type === "line" ||
+      entity.type === "circle" ||
+      entity.type === "arc",
+  ).length;
+  if (!eligibleEntityCount) {
+    commandStatus.textContent =
+      "Point on Entity needs an existing line, circle, or arc.";
+    return;
+  }
+
+  selectionState.mode = null;
+  selectionState.selectedEntityId = null;
+  cadCanvas.classList.remove("select-single");
+  pointOnEntityState.active = true;
+  clearPointOnEntitySource();
+  hidePointOnEntityWindow();
+  cadCanvas.classList.add("point-on-entity");
+  cadCanvas.classList.add("point-on-entity-source-pick");
+  renderEntities();
+  commandStatus.textContent =
+    "Point on Entity: Select a line, circle, or arc.";
+}
+
+function getLineDirectionChoices(line, lineElement) {
+  const startPoint = getPointById(line.startPointId);
+  const endPoint = getPointById(line.endPointId);
+  const lineGeometry = lineElement?.querySelector(".line-geometry");
+  const fallbackStart = lineGeometry
+    ? {
+        x: Number(lineGeometry.getAttribute("x1")),
+        y: Number(lineGeometry.getAttribute("y1")),
+      }
+    : null;
+  const fallbackEnd = lineGeometry
+    ? {
+        x: Number(lineGeometry.getAttribute("x2")),
+        y: Number(lineGeometry.getAttribute("y2")),
+      }
+    : null;
+  const start = startPoint ?? fallbackStart;
+  const end = endPoint ?? fallbackEnd;
+  if (
+    !start ||
+    !end ||
+    !Number.isFinite(start.x) ||
+    !Number.isFinite(start.y) ||
+    !Number.isFinite(end.x) ||
+    !Number.isFinite(end.y)
+  ) {
+    return [];
+  }
+
+  return [
+    {
+      pointId: startPoint?.id ?? null,
+      x: start.x,
+      y: start.y,
+    },
+    {
+      pointId: endPoint?.id ?? null,
+      x: end.x,
+      y: end.y,
+    },
+  ];
+}
+
+function showPointOnEntityWindow(sourceEntity) {
+  const isLine = sourceEntity.type === "line";
+  pointOnEntityValueLabel.textContent = isLine ? "Percentage" : "Degrees";
+  pointOnEntityUnit.textContent = isLine ? "%" : "°";
+  pointOnEntityValueInput.value = String(
+    isLine
+      ? pointOnEntityState.linePercentage
+      : pointOnEntityState.angleDegrees,
+  );
+
+  if (isLine) {
+    pointOnEntityValueInput.min = "0";
+    pointOnEntityValueInput.max = "100";
+    const zeroChoice =
+      pointOnEntityState.directionChoices[
+        pointOnEntityState.zeroChoiceIndex
+      ];
+    pointOnEntitySourceReadout.textContent = zeroChoice?.pointId
+      ? `Line ${sourceEntity.id} — Point ${zeroChoice.pointId} is 0%`
+      : `Line ${sourceEntity.id} — selected endpoint is 0%`;
+    pointOnEntityToolMessage.textContent =
+      "Enter a percentage from 0 to 100 along the line.";
+  } else {
+    pointOnEntityValueInput.removeAttribute("min");
+    pointOnEntityValueInput.removeAttribute("max");
+    const entityName = sourceEntity.type === "circle" ? "Circle" : "Arc";
+    pointOnEntitySourceReadout.textContent = `${entityName} ${sourceEntity.id}`;
+    pointOnEntityToolMessage.textContent =
+      "0° = right, 90° = up, 180° = left, 270° = down.";
+  }
+
+  pointOnEntityCreateButton.disabled = false;
+  pointOnEntityWindow.hidden = false;
+  setPointOnEntityWindowMinimized(false);
+  if (!pointOnEntityWindowState.hasPosition) {
+    positionPointOnEntityWindowInitially();
+  }
+  pointOnEntityValueInput.focus();
+  pointOnEntityValueInput.select();
+}
+
+function selectPointOnEntityLineDirection(choiceIndex) {
+  const sourceEntity = getEntityById(pointOnEntityState.sourceEntityId);
+  const choice = pointOnEntityState.directionChoices[choiceIndex];
+  if (!sourceEntity || sourceEntity.type !== "line" || !choice) return;
+
+  pointOnEntityState.awaitingDirection = false;
+  pointOnEntityState.zeroChoiceIndex = choiceIndex;
+  pointOnEntityState.zeroPointId = choice.pointId;
+  renderEntities();
+  showPointOnEntityWindow(sourceEntity);
+  commandStatus.textContent = choice.pointId
+    ? `Point on Entity: Point ${choice.pointId} is the 0% endpoint; enter a percentage.`
+    : "Point on Entity: The chosen temporary endpoint is 0%; enter a percentage.";
+}
+
+function handlePointOnEntityClick(event) {
+  if (pointOnEntityState.awaitingDirection) {
+    const pointElement = event.target.closest(".point-entity");
+    const temporaryElement = event.target.closest(".temporary-direction-point");
+    let choiceIndex = -1;
+    if (pointElement) {
+      const pointId = Number(pointElement.dataset.entityId);
+      choiceIndex = pointOnEntityState.directionChoices.findIndex(
+        (choice) => choice.pointId === pointId,
+      );
+    } else if (temporaryElement) {
+      choiceIndex = Number(temporaryElement.dataset.choiceIndex);
+    }
+
+    if (choiceIndex < 0) {
+      commandStatus.textContent =
+        "Point on Entity: Direction ambiguous; select the 0% endpoint.";
+      return;
+    }
+    selectPointOnEntityLineDirection(choiceIndex);
+    return;
+  }
+
+  if (pointOnEntityState.sourceEntityId !== null) {
+    commandStatus.textContent =
+      "Point on Entity: Enter the value in the tool window, then choose Create.";
+    return;
+  }
+
+  const sourceElement = event.target.closest(
+    ".line-entity, .circle-entity, .arc-entity",
+  );
+  if (!sourceElement) {
+    commandStatus.textContent =
+      "Point on Entity: Select a line, circle, or arc.";
+    return;
+  }
+
+  const sourceEntity = getEntityById(Number(sourceElement.dataset.entityId));
+  if (!sourceEntity) return;
+  pointOnEntityState.sourceEntityId = sourceEntity.id;
+  cadCanvas.classList.remove("point-on-entity-source-pick");
+
+  if (sourceEntity.type === "line") {
+    const choices = getLineDirectionChoices(sourceEntity, sourceElement);
+    if (choices.length !== 2) {
+      pointOnEntityState.sourceEntityId = null;
+      cadCanvas.classList.add("point-on-entity-source-pick");
+      commandStatus.textContent =
+        "Point on Entity: The selected line endpoints are not usable.";
+      return;
+    }
+
+    pointOnEntityState.directionChoices = choices;
+    const clickWorld = screenToWorld(event);
+    const distanceToStart = Math.hypot(
+      clickWorld.x - choices[0].x,
+      clickWorld.y - choices[0].y,
+    );
+    const distanceToEnd = Math.hypot(
+      clickWorld.x - choices[1].x,
+      clickWorld.y - choices[1].y,
+    );
+    const lineLength = Math.hypot(
+      choices[1].x - choices[0].x,
+      choices[1].y - choices[0].y,
+    );
+    if (
+      lineLength <= GEOMETRY_EPSILON ||
+      !Number.isFinite(distanceToStart) ||
+      !Number.isFinite(distanceToEnd)
+    ) {
+      pointOnEntityState.sourceEntityId = null;
+      pointOnEntityState.directionChoices = [];
+      cadCanvas.classList.add("point-on-entity-source-pick");
+      commandStatus.textContent =
+        "Point on Entity: The selected line has no usable length.";
+      return;
+    }
+
+    if (Math.abs(distanceToStart - distanceToEnd) <= lineLength * 0.02) {
+      pointOnEntityState.awaitingDirection = true;
+      pointOnEntityState.zeroPointId = null;
+      pointOnEntityState.zeroChoiceIndex = null;
+      hidePointOnEntityWindow();
+      renderEntities();
+      commandStatus.textContent =
+        "Point on Entity: Direction ambiguous; select the 0% endpoint.";
+      return;
+    }
+
+    selectPointOnEntityLineDirection(
+      distanceToStart < distanceToEnd ? 0 : 1,
+    );
+    return;
+  }
+
+  pointOnEntityState.directionChoices = [];
+  pointOnEntityState.zeroPointId = null;
+  pointOnEntityState.zeroChoiceIndex = null;
+  renderEntities();
+  showPointOnEntityWindow(sourceEntity);
+  const entityName = sourceEntity.type === "circle" ? "Circle" : "Arc";
+  commandStatus.textContent =
+    `Point on Entity: ${entityName} ${sourceEntity.id} selected; enter degrees.`;
+}
+
+function createPointOnEntity() {
+  if (!pointOnEntityForm.reportValidity()) return;
+  const sourceEntity = getEntityById(pointOnEntityState.sourceEntityId);
+  const value = Number(pointOnEntityValueInput.value);
+  if (!sourceEntity || !Number.isFinite(value)) {
+    pointOnEntityToolMessage.textContent = "Enter a valid numeric value.";
+    return;
+  }
+
+  let worldPoint;
+  let placementDescription;
+  if (sourceEntity.type === "line") {
+    if (value < 0 || value > 100) {
+      pointOnEntityToolMessage.textContent =
+        "Enter a percentage from 0 to 100.";
+      return;
+    }
+    const zeroChoice =
+      pointOnEntityState.directionChoices[
+        pointOnEntityState.zeroChoiceIndex
+      ];
+    const oppositeChoice =
+      pointOnEntityState.directionChoices[
+        pointOnEntityState.zeroChoiceIndex === 0 ? 1 : 0
+      ];
+    if (!zeroChoice || !oppositeChoice) {
+      pointOnEntityToolMessage.textContent =
+        "Choose the line's 0% endpoint again.";
+      return;
+    }
+    const fraction = value / 100;
+    worldPoint = {
+      x: zeroChoice.x + (oppositeChoice.x - zeroChoice.x) * fraction,
+      y: zeroChoice.y + (oppositeChoice.y - zeroChoice.y) * fraction,
+    };
+    pointOnEntityState.linePercentage = value;
+    placementDescription =
+      `line ${sourceEntity.id} at ${formatCoordinate(value)}%`;
+  } else if (sourceEntity.type === "circle" || sourceEntity.type === "arc") {
+    const centerPoint = getPointById(sourceEntity.centerPointId);
+    if (!centerPoint) {
+      pointOnEntityToolMessage.textContent =
+        "The selected entity has no usable center point.";
+      return;
+    }
+    const normalizedDegrees = normalizeAngle((value * Math.PI) / 180) *
+      (180 / Math.PI);
+    const radians = (normalizedDegrees * Math.PI) / 180;
+    const rawCosine = Math.cos(radians);
+    const rawSine = Math.sin(radians);
+    const cosine = Math.abs(rawCosine) <= 1e-12 ? 0 : rawCosine;
+    const sine = Math.abs(rawSine) <= 1e-12 ? 0 : rawSine;
+    worldPoint = {
+      x: centerPoint.x + sourceEntity.radius * cosine,
+      y: centerPoint.y + sourceEntity.radius * sine,
+    };
+    pointOnEntityState.angleDegrees = value;
+    placementDescription =
+      `${sourceEntity.type} ${sourceEntity.id} at ${formatCoordinate(normalizedDegrees)}°`;
+  } else {
+    pointOnEntityToolMessage.textContent = "The selected entity is not supported.";
+    return;
+  }
+
+  const existingPoint = findExistingPointAt(worldPoint);
+  if (existingPoint) {
+    resetPointOnEntityForNextSource(
+      `Point ${existingPoint.id} already exists on ${placementDescription}. ` +
+        "Point on Entity remains active; select the next entity.",
+    );
+    return;
+  }
+
+  const point = addPoint(worldPoint.x, worldPoint.y);
+  resetPointOnEntityForNextSource(
+    `Created point ${point.id} on ${placementDescription}. ` +
+      "Point on Entity remains active; select the next entity.",
+  );
+}
+
 function activatePointCoordinates() {
   deactivateJoin();
   deactivateIntersectingPoint();
   deactivateTrimExtend();
+  deactivatePointOnEntity();
   if (!circleRadiusWindow.hidden) closeCircleRadiusWindow(null);
   if (!offsetWindow.hidden) closeOffsetWindow(null);
   commandStatus.textContent = "Point: Coordinates";
@@ -2150,6 +2981,11 @@ pointCoordinatesForm.addEventListener("submit", (event) => {
   createPointFromInputs(false);
 });
 
+pointOnEntityForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  createPointOnEntity();
+});
+
 circleRadiusForm.addEventListener("submit", (event) => {
   event.preventDefault();
   createCircleFromInput();
@@ -2167,6 +3003,7 @@ circleRadiusInput.addEventListener("input", () => {
 
 pointCoordinatesMenu.addEventListener("click", activatePointCoordinates);
 pointIntersectMenu.addEventListener("click", activateIntersectingPoint);
+pointOnEntityMenu.addEventListener("click", activatePointOnEntity);
 lineJoinMenu.addEventListener("click", activateJoin);
 circleCenterRadiusMenu.addEventListener("click", activateCircleCenterRadius);
 offsetMenu.addEventListener("click", activateOffset);
@@ -2223,6 +3060,11 @@ cadCanvas.addEventListener("click", (event) => {
     return;
   }
 
+  if (pointOnEntityState.active) {
+    handlePointOnEntityClick(event);
+    return;
+  }
+
   if (intersectionState.active) {
     handleIntersectingPointClick(event);
     return;
@@ -2236,7 +3078,7 @@ cadCanvas.addEventListener("click", (event) => {
   if (selectionState.mode !== "single") return;
 
   const entityElement = event.target.closest(
-    ".point-entity, .line-entity, .circle-entity",
+    ".point-entity, .line-entity, .circle-entity, .arc-entity",
   );
 
   if (entityElement) {
@@ -2272,6 +3114,90 @@ pointContinueButton.addEventListener("click", () => {
 
 pointCancelButton.addEventListener("click", () => {
   closePointCoordinatesWindow();
+});
+
+pointOnEntityMinimizeButton.addEventListener("click", () => {
+  if (pointOnEntityWindow.classList.contains("is-maximized")) {
+    restorePointOnEntityWindow();
+  }
+
+  const minimized = !pointOnEntityWindow.classList.contains("is-minimized");
+  setPointOnEntityWindowMinimized(minimized);
+});
+
+pointOnEntityMaximizeButton.addEventListener(
+  "click",
+  togglePointOnEntityWindowMaximized,
+);
+
+pointOnEntityCloseButton.addEventListener("click", () => {
+  deactivatePointOnEntity("Point on Entity canceled.");
+});
+
+pointOnEntityCancelButton.addEventListener("click", () => {
+  deactivatePointOnEntity("Point on Entity canceled.");
+});
+
+pointOnEntityWindowTitleBar.addEventListener("pointerdown", (event) => {
+  if (
+    event.button !== 0 ||
+    event.target.closest(".window-control") ||
+    pointOnEntityWindow.classList.contains("is-maximized")
+  ) {
+    return;
+  }
+
+  const bounds = pointOnEntityWindow.getBoundingClientRect();
+  pointOnEntityWindowState.drag = {
+    pointerId: event.pointerId,
+    offsetX: event.clientX - bounds.left,
+    offsetY: event.clientY - bounds.top,
+  };
+  pointOnEntityWindowTitleBar.classList.add("is-dragging");
+  pointOnEntityWindowTitleBar.setPointerCapture(event.pointerId);
+});
+
+pointOnEntityWindowTitleBar.addEventListener("pointermove", (event) => {
+  const drag = pointOnEntityWindowState.drag;
+  if (!drag || drag.pointerId !== event.pointerId) return;
+
+  const bounds = pointOnEntityWindow.getBoundingClientRect();
+  const maxLeft = Math.max(0, window.innerWidth - bounds.width);
+  const maxTop = Math.max(
+    0,
+    window.innerHeight - pointOnEntityWindowTitleBar.offsetHeight,
+  );
+  const left = Math.min(maxLeft, Math.max(0, event.clientX - drag.offsetX));
+  const top = Math.min(maxTop, Math.max(0, event.clientY - drag.offsetY));
+
+  pointOnEntityWindow.style.left = `${left}px`;
+  pointOnEntityWindow.style.top = `${top}px`;
+  pointOnEntityWindowState.hasPosition = true;
+});
+
+function stopPointOnEntityWindowDrag(event) {
+  if (pointOnEntityWindowState.drag?.pointerId !== event.pointerId) return;
+
+  pointOnEntityWindowState.drag = null;
+  pointOnEntityWindowTitleBar.classList.remove("is-dragging");
+  if (pointOnEntityWindowTitleBar.hasPointerCapture(event.pointerId)) {
+    pointOnEntityWindowTitleBar.releasePointerCapture(event.pointerId);
+  }
+}
+
+pointOnEntityWindowTitleBar.addEventListener(
+  "pointerup",
+  stopPointOnEntityWindowDrag,
+);
+pointOnEntityWindowTitleBar.addEventListener(
+  "pointercancel",
+  stopPointOnEntityWindowDrag,
+);
+
+pointOnEntityWindowTitleBar.addEventListener("dblclick", (event) => {
+  if (!event.target.closest(".window-control")) {
+    togglePointOnEntityWindowMaximized();
+  }
 });
 
 circleMinimizeButton.addEventListener("click", () => {
@@ -2507,6 +3433,11 @@ document.addEventListener("keydown", (event) => {
     return;
   }
 
+  if (event.key === "Escape" && pointOnEntityState.active) {
+    deactivatePointOnEntity("Point on Entity canceled.");
+    return;
+  }
+
   if (event.key === "Escape" && !circleRadiusWindow.hidden) {
     closeCircleRadiusWindow("Circle canceled.");
     return;
@@ -2550,6 +3481,10 @@ window.addEventListener("resize", () => {
   keepToolWindowInViewport(pointCoordinatesWindow, pointWindowTitleBar);
   keepToolWindowInViewport(circleRadiusWindow, circleWindowTitleBar);
   keepToolWindowInViewport(offsetWindow, offsetWindowTitleBar);
+  keepToolWindowInViewport(
+    pointOnEntityWindow,
+    pointOnEntityWindowTitleBar,
+  );
 });
 
 cadCanvas.addEventListener("mousemove", (event) => {

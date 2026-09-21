@@ -102,12 +102,19 @@
         <div class="dropdown-menu">
           <button type="button" id="pointCoordinatesMenu">Point - Coordinates</button>
           <button type="button" id="pointIntersectMenu">Point - Intersecting</button>
+          <button type="button" id="pointOnEntityMenu">Point - On Entity</button>
           <button type="button" disabled title="Planned for a future build">Point - Sketch</button>
           <button type="button" id="lineJoinMenu">Line - Join</button>
           <button type="button" id="circleCenterRadiusMenu">
             Circle - Point Center &amp; Radius
           </button>
-          <button type="button">Arc</button>
+          <button
+            type="button"
+            disabled
+            title="Additional arc creation methods will be added later"
+          >
+            Arc
+          </button>
         </div>
       </div>
 
@@ -269,6 +276,91 @@
               Create
             </button>
             <button type="button" id="circleCancelButton">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section
+      id="pointOnEntityWindow"
+      class="tool-window"
+      role="dialog"
+      aria-modal="false"
+      aria-labelledby="pointOnEntityTitle"
+      hidden
+    >
+      <div id="pointOnEntityWindowTitleBar" class="window-title-bar">
+        <h2 id="pointOnEntityTitle">Point on Entity</h2>
+        <div class="window-controls">
+          <button
+            type="button"
+            id="pointOnEntityMinimizeButton"
+            class="window-control"
+            aria-label="Minimize Point on Entity"
+            title="Minimize"
+          >
+            <span aria-hidden="true">&minus;</span>
+          </button>
+          <button
+            type="button"
+            id="pointOnEntityMaximizeButton"
+            class="window-control"
+            aria-label="Maximize Point on Entity"
+            title="Maximize"
+          >
+            <span id="pointOnEntityMaximizeIcon" aria-hidden="true">&#9633;</span>
+          </button>
+          <button
+            type="button"
+            id="pointOnEntityCloseButton"
+            class="window-control window-close"
+            aria-label="Close Point on Entity"
+            title="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="tool-window-body">
+        <form id="pointOnEntityForm" autocomplete="off">
+          <div class="point-on-entity-readout">
+            <span>Source entity</span>
+            <strong id="pointOnEntitySourceReadout">None selected</strong>
+          </div>
+
+          <label id="pointOnEntityValueLabel" for="pointOnEntityValue">Value</label>
+          <div class="coordinate-input">
+            <span id="pointOnEntityUnit" aria-hidden="true">%</span>
+            <input
+              id="pointOnEntityValue"
+              name="value"
+              type="number"
+              step="any"
+              value="50"
+              required
+            />
+          </div>
+
+          <p
+            id="pointOnEntityToolMessage"
+            class="tool-message"
+            role="status"
+            aria-live="polite"
+          >
+            Select a line, circle, or arc.
+          </p>
+
+          <div class="dialog-actions two-actions">
+            <button
+              type="submit"
+              id="pointOnEntityCreateButton"
+              class="primary-action"
+              disabled
+            >
+              Create
+            </button>
+            <button type="button" id="pointOnEntityCancelButton">Cancel</button>
           </div>
         </form>
       </div>

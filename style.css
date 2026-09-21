@@ -149,13 +149,15 @@ body[data-theme="matrix"] {
 
 .tool-window.is-maximized #pointCoordinatesForm,
 .tool-window.is-maximized #circleRadiusForm,
-.tool-window.is-maximized #offsetForm {
+.tool-window.is-maximized #offsetForm,
+.tool-window.is-maximized #pointOnEntityForm {
   max-width: 360px;
 }
 
 #pointCoordinatesForm,
 #circleRadiusForm,
-#offsetForm {
+#offsetForm,
+#pointOnEntityForm {
   display: grid;
   gap: 8px;
   padding: 14px 16px 16px;
@@ -163,14 +165,16 @@ body[data-theme="matrix"] {
 
 #pointCoordinatesForm label,
 #circleRadiusForm label,
-#offsetForm label {
+#offsetForm label,
+#pointOnEntityForm label {
   margin-top: 4px;
   color: #d0d0d0;
   font-size: 0.8rem;
 }
 
 .circle-center-readout,
-.offset-source-readout {
+.offset-source-readout,
+.point-on-entity-readout {
   display: grid;
   gap: 4px;
   padding: 9px 10px;
@@ -179,13 +183,15 @@ body[data-theme="matrix"] {
 }
 
 .circle-center-readout span,
-.offset-source-readout span {
+.offset-source-readout span,
+.point-on-entity-readout span {
   color: #bfc2c7;
   font-size: 0.75rem;
 }
 
 .circle-center-readout strong,
-.offset-source-readout strong {
+.offset-source-readout strong,
+.point-on-entity-readout strong {
   color: #f0d36c;
   font-size: 0.85rem;
   font-weight: 600;
@@ -365,6 +371,22 @@ body[data-theme="matrix"] {
   pointer-events: stroke;
 }
 
+.arc-geometry {
+  fill: none;
+  stroke: var(--entity-color);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.arc-hit-target {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 10;
+  vector-effect: non-scaling-stroke;
+  pointer-events: stroke;
+}
+
 .join-preview {
   fill: none;
   stroke: var(--entity-hover-color);
@@ -403,8 +425,13 @@ body[data-theme="matrix"] {
   cursor: pointer;
 }
 
+#cadCanvas.select-single .arc-entity {
+  cursor: pointer;
+}
+
 #cadCanvas.select-single .line-hit-target,
-#cadCanvas.select-single .circle-hit-target {
+#cadCanvas.select-single .circle-hit-target,
+#cadCanvas.select-single .arc-hit-target {
   pointer-events: stroke;
 }
 
@@ -429,6 +456,14 @@ body[data-theme="matrix"] {
 }
 
 #cadCanvas.select-single .circle-entity.is-selected .circle-geometry {
+  stroke: var(--entity-selected-color);
+}
+
+#cadCanvas.select-single .arc-entity:hover .arc-geometry {
+  stroke: var(--entity-hover-color);
+}
+
+#cadCanvas.select-single .arc-entity.is-selected .arc-geometry {
   stroke: var(--entity-selected-color);
 }
 
@@ -511,13 +546,53 @@ body[data-theme="matrix"] {
   stroke: var(--entity-hover-color);
 }
 
-#cadCanvas.trim-extend .line-entity.is-trim-extend-source .line-geometry {
+#cadCanvas.trim-extend .line-entity.is-trim-extend-source .line-geometry,
+#cadCanvas.trim-extend .circle-entity.is-trim-extend-source .circle-geometry {
   stroke: var(--entity-selected-color);
 }
 
 #cadCanvas.trim-extend-source-pick .point-entity,
 #cadCanvas.trim-extend-source-pick .point-entity .entity-hit-target {
   pointer-events: none;
+}
+
+#cadCanvas.point-on-entity {
+  cursor: crosshair;
+}
+
+#cadCanvas.point-on-entity .line-entity,
+#cadCanvas.point-on-entity .circle-entity,
+#cadCanvas.point-on-entity .arc-entity,
+#cadCanvas.point-on-entity .point-entity,
+#cadCanvas.point-on-entity .temporary-direction-point {
+  cursor: crosshair;
+}
+
+#cadCanvas.point-on-entity .line-entity:hover .line-geometry,
+#cadCanvas.point-on-entity .circle-entity:hover .circle-geometry,
+#cadCanvas.point-on-entity .arc-entity:hover .arc-geometry,
+#cadCanvas.point-on-entity .point-entity:hover .point-x {
+  stroke: var(--entity-hover-color);
+}
+
+#cadCanvas.point-on-entity .line-entity.is-point-on-entity-source .line-geometry,
+#cadCanvas.point-on-entity .circle-entity.is-point-on-entity-source .circle-geometry,
+#cadCanvas.point-on-entity .arc-entity.is-point-on-entity-source .arc-geometry,
+#cadCanvas.point-on-entity .point-entity.is-point-on-entity-direction .point-x,
+#cadCanvas.point-on-entity .point-entity.is-point-on-entity-zero .point-x,
+#cadCanvas.point-on-entity .temporary-direction-point .point-x {
+  stroke: var(--entity-selected-color);
+}
+
+#cadCanvas.point-on-entity-source-pick .point-entity,
+#cadCanvas.point-on-entity-source-pick .point-entity .entity-hit-target {
+  pointer-events: none;
+}
+
+.temporary-direction-point .entity-hit-target {
+  fill: transparent;
+  stroke: none;
+  pointer-events: all;
 }
 
 #gridLayer line {

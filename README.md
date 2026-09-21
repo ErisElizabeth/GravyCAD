@@ -448,7 +448,7 @@ Changes made since V0.0.23:
 
 Current limitation:
 
-- A full circle cannot yet be the source entity because trimming a circle requires the planned Arc entity model. Circles can be used as Trim/Extend targets.
+- At this build, a full circle could not yet be the source entity because the Arc entity model had not been added. This limitation is removed in V0.0.26.
 
 ## V0.0.25 Alpha Dev Build
 
@@ -461,3 +461,38 @@ Changes made since V0.0.24:
 - Point hit targets are disabled while Trim/Extend is waiting for its first selection, so endpoint points no longer block selection of the line beneath them.
 - Point hit targets are automatically restored after the source line is selected, allowing a point to be chosen as the second, target entity.
 - Trim/Extend prompts now describe the first click as selecting the endpoint to keep.
+
+## V0.0.26 Alpha Dev Build
+
+Arc Entity and Circle Trimming
+
+Changes made since V0.0.25:
+
+- Added the first native Arc entity to the geometry document model.
+- Modify > Trim/Extend can now use a full circle as its first, source entity.
+- The location of the first click on the circle identifies the portion of the circle to keep.
+- Selecting an intersecting line or circle as the second entity converts the source circle into an arc between the two intersections.
+- Arc endpoints are ordinary point entities and reuse existing points when exact intersection points already exist.
+- The circle-to-arc conversion and any generated endpoint points are recorded as one undoable document change.
+- Arcs render with the active theme colors and participate in hover information, Select > Single, and Delete.
+- Deleting an arc endpoint or center point also removes the dependent arc, preventing broken geometry references.
+- A point or tangent target is rejected because trimming a full circle into a finite arc requires two distinct cut points.
+- The Draw > Arc entry is disabled for now; additional standalone arc construction methods will be added later.
+
+## V0.0.27 Alpha Dev Build
+
+Point on Entity
+
+Changes made since V0.0.26:
+
+- Added Draw > Point - On Entity for creating exact points on lines, circles, and arcs.
+- Added a movable, minimizable, maximizable, and closable Point on Entity tool window.
+- Lines use a typed percentage from 0% to 100%.
+- The line endpoint nearest the first click becomes the 0% endpoint; the opposite endpoint is 100%.
+- A directionally ambiguous line click reports: `Point on Entity: Direction ambiguous; select the 0% endpoint.`
+- During an ambiguous line choice, both existing endpoint points are highlighted as selected until the 0% endpoint is chosen.
+- The direction-choice model also supports temporary endpoint markers that disappear after selection when persistent endpoint points are unavailable.
+- Circles and arcs use typed degrees with 0° at 3 o'clock, 90° at 12 o'clock, 180° at 9 o'clock, and 270° at 6 o'clock.
+- Arc degree placement uses the arc's underlying full circle, so a point can be created at an angle outside the visible arc without extending or modifying the arc.
+- Existing points at the calculated location are reused instead of duplicated.
+- Point on Entity remains active after creation and resets to selecting the next entity.
