@@ -307,3 +307,157 @@ Changes made since V0.0.14:
 - Dark uses a `#1E2022` background, `#9CA3AF` axes, `#F9FAFB` entities, `#F87171` hover, and `#60A5FA` selection.
 - Light and Dark axes use the visible `0.75px` line weight without a glow.
 - Until dedicated grid colors are chosen, Light and Dark grid lines inherit their respective axis colors.
+
+## V0.0.16 Alpha Dev Build
+
+Line - Join
+
+Changes made since V0.0.15:
+
+- Added Draw > Line - Join for creating an exact line between two existing points.
+- Added line entities to the geometry document model using references to their two endpoint point IDs.
+- Lines are rendered independently from their stored geometry data and inherit the active theme's entity color.
+- The Join command prompts for a first point and then a different second point.
+- After the first point is chosen, a dashed live preview follows the cursor and snaps exactly onto a hovered point.
+- The first endpoint is highlighted with the active theme's selection color while the command is in progress.
+- Join prevents duplicate lines between the same two points.
+- Escape cancels an active Join command.
+- Join exits after creating one line and reports the new line in the status bar.
+- Joined lines participate in Select > Single, including the active theme's hover and selection colors.
+
+## V0.0.17 Alpha Dev Build
+
+Delete, Undo, and Redo
+
+Changes made since V0.0.16:
+
+- Enabled Edit > Delete for the entity selected by Select > Single.
+- Deleting a point also removes any lines joined to that point so the document never contains broken endpoint references.
+- A single Undo restores a deleted point together with all of its joined lines.
+- Enabled Edit > Undo and Edit > Redo with a 100-change in-memory history.
+- Point creation, joined-line creation, and deletion are recorded as undoable document changes.
+- Starting a new document change after Undo clears the redo history.
+- Added Delete, Ctrl+Z, Ctrl+Y, and Ctrl+Shift+Z keyboard controls without intercepting normal editing inside coordinate fields.
+- Edit commands enable and disable automatically based on selection and history availability.
+
+## V0.0.18 Alpha Dev Build
+
+Circle - Point Center & Radius
+
+Changes made since V0.0.17:
+
+- Added Draw > Circle - Point Center & Radius.
+- The command uses an existing point entity as the exact circle center and a typed positive radius.
+- Added a movable, minimizable, maximizable, and closable Circle tool window matching the Point Coordinates window behavior.
+- The selected center point is highlighted and identified by point ID and exact coordinates in the tool window.
+- Added a dashed, theme-aware live circle preview that updates as the radius is typed.
+- Added circle entities to the geometry document model using a center point ID and numeric radius.
+- Created circles inherit the active theme's entity, hover, and selection colors.
+- Circles participate in Select > Single, Delete, Undo, and Redo.
+- Deleting a center point also removes its dependent circles; one Undo restores the point and circles together.
+- Escape, Cancel, and the window close button cancel the active Circle command.
+
+## V0.0.19 Alpha Dev Build
+
+Point - Intersecting
+
+Changes made since V0.0.18:
+
+- Added Draw > Point - Intersecting.
+- The command selects two line or circle entities in sequence and creates one exact point at their intersection.
+- Supports line-line, line-circle, and circle-circle intersections using finite line segments.
+- The first entity remains highlighted while the command waits for the second entity.
+- When two intersections are possible, the intersection nearest the second selection click is created.
+- Parallel, separated, degenerate, overlapping, and coincident geometry is handled without creating an invalid point.
+- An existing point at the chosen intersection is reused instead of creating a duplicate.
+- Intersecting points are ordinary point entities and participate in selection, deletion, Undo, Redo, Join, and Circle commands.
+- Escape cancels the active Intersecting Point command.
+
+## V0.0.20 Alpha Dev Build
+
+Continuous Geometry Commands
+
+Changes made since V0.0.19:
+
+- Line - Join remains active after a line is created and resets to selecting the first point for the next line.
+- Point - Intersecting remains active after a point is created and resets to selecting the first line or circle for the next point.
+- Circle - Point Center & Radius keeps its tool window open after creation and resets to selecting the next center point.
+- The Circle command preserves the last entered radius to make repeated same-size circles fast.
+- Duplicate Line and existing Intersecting Point results reset their commands for the next entity without ending the active method.
+- Choosing another drawing or selection command cleanly ends the previous command and removes its temporary highlights or previews.
+- Escape and the Circle window's Cancel or close controls still provide an explicit way to end the active command.
+
+## V0.0.21 Alpha Dev Build
+
+Modify Menu
+
+Changes made since V0.0.20:
+
+- Added a Modify dropdown to the main menu bar.
+- Added Trim/Extend and Offset entries as the first Modify commands.
+- These entries establish the menu structure for their geometry behavior in upcoming builds.
+
+## V0.0.22 Alpha Dev Build
+
+Offset
+
+Changes made since V0.0.21:
+
+- Implemented Modify > Offset for finite lines and circles; point entities cannot be selected as offset sources.
+- Added a movable, minimizable, maximizable, and closable Offset tool window with a default amount of 0.25.
+- Offset uses a two-click workflow: select the source entity, then click the desired side.
+- Line offsets create a parallel line of equal length plus two visible endpoint points.
+- A line and its generated endpoint points are recorded as one undoable document change.
+- Circle offsets reuse the source circle's center point; clicking outside enlarges the radius and clicking inside reduces it.
+- Inward circle offsets that would produce a zero or negative radius are rejected.
+- Offset remains active after each successful creation and preserves the last entered amount for repeated work.
+- Source entities use the active theme's selected color while waiting for the side click.
+- Choosing another drawing, selection, or Modify command ends Offset; Escape, Cancel, and Close also end it explicitly.
+
+## V0.0.23 Alpha Dev Build
+
+Stable Status Bar and Entity Hover Information
+
+Changes made since V0.0.22:
+
+- Fixed the status bar to a single-line height so long command messages no longer move the drawing surface up and down.
+- Long command messages are clipped with an ellipsis instead of wrapping.
+- The bottom-right information slot temporarily shows a hovered entity's description and restores the current command message when the pointer leaves.
+- Point descriptions show the point ID and exact X/Y coordinates.
+- Line descriptions show the line ID and calculated length.
+- Circle descriptions show the circle ID, center X/Y coordinates, and radius.
+- Line and circle hit targets now support information hover even when Select or another geometry command is not active.
+
+## V0.0.24 Alpha Dev Build
+
+Trim/Extend
+
+Changes made since V0.0.23:
+
+- Implemented Modify > Trim/Extend for line source entities.
+- The first click selects the source line; the end of the line nearest that click is the endpoint that will move.
+- The second click selects the point, line, or circle to trim or extend to.
+- Existing collinear point targets are reused as the line endpoint.
+- A point target that is not on the source line reports: `Target point is not on the selected line.`
+- Line targets use the apparent intersection of the two lines, and circle targets use the nearest valid intersection in the chosen endpoint direction.
+- Computed intersections reuse an existing point at that location or create one visible endpoint point when needed.
+- Each successful Trim/Extend operation is one undoable document change.
+- Trim/Extend remains active after a successful operation so another source line can be selected immediately.
+- Invalid targets leave the source line highlighted so a different target can be chosen.
+- Escape or choosing another drawing, selection, or Modify command ends Trim/Extend.
+
+Current limitation:
+
+- A full circle cannot yet be the source entity because trimming a circle requires the planned Arc entity model. Circles can be used as Trim/Extend targets.
+
+## V0.0.25 Alpha Dev Build
+
+Trim/Extend Direction and Source Selection Fix
+
+Changes made since V0.0.24:
+
+- Selecting a source line near one endpoint now keeps that endpoint fixed and moves the opposite endpoint to the target.
+- For example, selecting an X0 Y0 to X2 Y2 line near X0 Y0 and trimming to X1 Y1 now produces the intended X0 Y0 to X1 Y1 line.
+- Point hit targets are disabled while Trim/Extend is waiting for its first selection, so endpoint points no longer block selection of the line beneath them.
+- Point hit targets are automatically restored after the source line is selected, allowing a point to be chosen as the second, target entity.
+- Trim/Extend prompts now describe the first click as selecting the endpoint to keep.

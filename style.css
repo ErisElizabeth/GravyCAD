@@ -147,20 +147,48 @@ body[data-theme="matrix"] {
   overflow: auto;
 }
 
-.tool-window.is-maximized #pointCoordinatesForm {
+.tool-window.is-maximized #pointCoordinatesForm,
+.tool-window.is-maximized #circleRadiusForm,
+.tool-window.is-maximized #offsetForm {
   max-width: 360px;
 }
 
-#pointCoordinatesForm {
+#pointCoordinatesForm,
+#circleRadiusForm,
+#offsetForm {
   display: grid;
   gap: 8px;
   padding: 14px 16px 16px;
 }
 
-#pointCoordinatesForm label {
+#pointCoordinatesForm label,
+#circleRadiusForm label,
+#offsetForm label {
   margin-top: 4px;
   color: #d0d0d0;
   font-size: 0.8rem;
+}
+
+.circle-center-readout,
+.offset-source-readout {
+  display: grid;
+  gap: 4px;
+  padding: 9px 10px;
+  border: 1px solid #555;
+  background: #202124;
+}
+
+.circle-center-readout span,
+.offset-source-readout span {
+  color: #bfc2c7;
+  font-size: 0.75rem;
+}
+
+.circle-center-readout strong,
+.offset-source-readout strong {
+  color: #f0d36c;
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
 .coordinate-input {
@@ -219,6 +247,14 @@ body[data-theme="matrix"] {
   margin-top: 6px;
 }
 
+.dialog-actions.two-actions {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.dialog-actions.one-action {
+  grid-template-columns: 1fr;
+}
+
 .dialog-actions button {
   min-width: 0;
   padding: 9px 8px;
@@ -233,6 +269,13 @@ body[data-theme="matrix"] {
   background: #505259;
 }
 
+.dialog-actions button:disabled,
+.dialog-actions button:disabled:hover {
+  color: #999;
+  background: #35363a;
+  cursor: not-allowed;
+}
+
 .dialog-actions .primary-action {
   border-color: #17285f;
   background: #365bb8;
@@ -241,6 +284,13 @@ body[data-theme="matrix"] {
 .dialog-actions .primary-action:hover,
 .dialog-actions .primary-action:focus-visible {
   background: #426aca;
+}
+
+.dialog-actions .primary-action:disabled,
+.dialog-actions .primary-action:disabled:hover {
+  border-color: #555;
+  color: #999;
+  background: #35363a;
 }
 
 .drawing-area {
@@ -283,6 +333,58 @@ body[data-theme="matrix"] {
   pointer-events: none;
 }
 
+.line-geometry {
+  fill: none;
+  stroke: var(--entity-color);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.line-hit-target {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 10;
+  vector-effect: non-scaling-stroke;
+  pointer-events: stroke;
+}
+
+.circle-geometry {
+  fill: none;
+  stroke: var(--entity-color);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.circle-hit-target {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 10;
+  vector-effect: non-scaling-stroke;
+  pointer-events: stroke;
+}
+
+.join-preview {
+  fill: none;
+  stroke: var(--entity-hover-color);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 4;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.circle-preview {
+  fill: none;
+  stroke: var(--entity-hover-color);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 4;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
 .entity-hit-target {
   fill: transparent;
   stroke: none;
@@ -293,12 +395,129 @@ body[data-theme="matrix"] {
   cursor: pointer;
 }
 
+#cadCanvas.select-single .line-entity {
+  cursor: pointer;
+}
+
+#cadCanvas.select-single .circle-entity {
+  cursor: pointer;
+}
+
+#cadCanvas.select-single .line-hit-target,
+#cadCanvas.select-single .circle-hit-target {
+  pointer-events: stroke;
+}
+
 #cadCanvas.select-single .point-entity:hover .point-x {
   stroke: var(--entity-hover-color);
 }
 
 #cadCanvas.select-single .point-entity.is-selected .point-x {
   stroke: var(--entity-selected-color);
+}
+
+#cadCanvas.select-single .line-entity:hover .line-geometry {
+  stroke: var(--entity-hover-color);
+}
+
+#cadCanvas.select-single .line-entity.is-selected .line-geometry {
+  stroke: var(--entity-selected-color);
+}
+
+#cadCanvas.select-single .circle-entity:hover .circle-geometry {
+  stroke: var(--entity-hover-color);
+}
+
+#cadCanvas.select-single .circle-entity.is-selected .circle-geometry {
+  stroke: var(--entity-selected-color);
+}
+
+#cadCanvas.join-points .point-entity {
+  cursor: crosshair;
+}
+
+#cadCanvas.join-points .point-entity:hover .point-x {
+  stroke: var(--entity-hover-color);
+}
+
+#cadCanvas.join-points .point-entity.is-join-start .point-x {
+  stroke: var(--entity-selected-color);
+}
+
+#cadCanvas.circle-center-radius .point-entity {
+  cursor: crosshair;
+}
+
+#cadCanvas.circle-center-radius .point-entity:hover .point-x {
+  stroke: var(--entity-hover-color);
+}
+
+#cadCanvas.circle-center-radius .point-entity.is-circle-center .point-x {
+  stroke: var(--entity-selected-color);
+}
+
+#cadCanvas.intersect-entities .line-entity,
+#cadCanvas.intersect-entities .circle-entity {
+  cursor: crosshair;
+}
+
+#cadCanvas.intersect-entities .line-hit-target,
+#cadCanvas.intersect-entities .circle-hit-target {
+  pointer-events: stroke;
+}
+
+#cadCanvas.intersect-entities .line-entity:hover .line-geometry,
+#cadCanvas.intersect-entities .circle-entity:hover .circle-geometry {
+  stroke: var(--entity-hover-color);
+}
+
+#cadCanvas.intersect-entities .line-entity.is-intersection-first .line-geometry,
+#cadCanvas.intersect-entities .circle-entity.is-intersection-first .circle-geometry {
+  stroke: var(--entity-selected-color);
+}
+
+#cadCanvas.offset-entity {
+  cursor: crosshair;
+}
+
+#cadCanvas.offset-entity .line-hit-target,
+#cadCanvas.offset-entity .circle-hit-target {
+  pointer-events: stroke;
+}
+
+#cadCanvas.offset-entity .line-entity:hover .line-geometry,
+#cadCanvas.offset-entity .circle-entity:hover .circle-geometry {
+  stroke: var(--entity-hover-color);
+}
+
+#cadCanvas.offset-entity .line-entity.is-offset-source .line-geometry,
+#cadCanvas.offset-entity .circle-entity.is-offset-source .circle-geometry {
+  stroke: var(--entity-selected-color);
+}
+
+#cadCanvas.trim-extend {
+  cursor: crosshair;
+}
+
+#cadCanvas.trim-extend .line-entity,
+#cadCanvas.trim-extend .circle-entity,
+#cadCanvas.trim-extend .point-entity {
+  cursor: crosshair;
+}
+
+#cadCanvas.trim-extend .line-entity:hover .line-geometry,
+#cadCanvas.trim-extend .circle-entity:hover .circle-geometry,
+#cadCanvas.trim-extend .point-entity:hover .point-x {
+  stroke: var(--entity-hover-color);
+}
+
+#cadCanvas.trim-extend .line-entity.is-trim-extend-source .line-geometry {
+  stroke: var(--entity-selected-color);
+}
+
+#cadCanvas.trim-extend-source-pick .point-entity,
+#cadCanvas.trim-extend-source-pick .point-entity .entity-hit-target {
+  pointer-events: none;
 }
 
 #gridLayer line {
@@ -452,7 +671,12 @@ body {
 .status-bar {
   display: flex;
   align-items: center;
-  min-height: 26px;
+  box-sizing: border-box;
+  flex: 0 0 27px;
+  height: 27px;
+  min-height: 27px;
+  overflow: hidden;
+  white-space: nowrap;
   color: #e6e6e6;
   background: #303134;
   border-top: 1px solid #111;
@@ -460,12 +684,30 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-.status-bar span {
+.status-bar > span,
+.status-message-slot {
+  box-sizing: border-box;
+  height: 100%;
   min-width: 94px;
   padding: 4px 10px;
+  overflow: hidden;
   border-right: 1px solid #505155;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.status-bar span:last-child {
+.status-message-slot {
   flex: 1;
+  min-width: 0;
+}
+
+.status-message-slot > span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status-message-slot > [hidden] {
+  display: none;
 }

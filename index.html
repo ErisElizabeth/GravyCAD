@@ -30,9 +30,11 @@
       <div class="menu-item">
         <button type="button" class="menu-button">Edit</button>
         <div class="dropdown-menu">
-          <button type="button">Undo</button>
-          <button type="button">Redo</button>
-          <button type="button">Delete</button>
+          <button type="button" id="undoMenu" title="Undo (Ctrl+Z)" disabled>Undo</button>
+          <button type="button" id="redoMenu" title="Redo (Ctrl+Y)" disabled>Redo</button>
+          <button type="button" id="deleteMenu" title="Delete selected entity" disabled>
+            Delete
+          </button>
           <button type="button">Select All</button>
         </div>
       </div>
@@ -99,10 +101,21 @@
         <button type="button" class="menu-button">Draw</button>
         <div class="dropdown-menu">
           <button type="button" id="pointCoordinatesMenu">Point - Coordinates</button>
+          <button type="button" id="pointIntersectMenu">Point - Intersecting</button>
           <button type="button" disabled title="Planned for a future build">Point - Sketch</button>
-          <button type="button">Line</button>
-          <button type="button">Circle</button>
+          <button type="button" id="lineJoinMenu">Line - Join</button>
+          <button type="button" id="circleCenterRadiusMenu">
+            Circle - Point Center &amp; Radius
+          </button>
           <button type="button">Arc</button>
+        </div>
+      </div>
+
+      <div class="menu-item">
+        <button type="button" class="menu-button">Modify</button>
+        <div class="dropdown-menu">
+          <button type="button" id="trimExtendMenu">Trim/Extend</button>
+          <button type="button" id="offsetMenu">Offset</button>
         </div>
       </div>
 
@@ -185,6 +198,155 @@
       </div>
     </section>
 
+    <section
+      id="circleRadiusWindow"
+      class="tool-window"
+      role="dialog"
+      aria-modal="false"
+      aria-labelledby="circleRadiusTitle"
+      hidden
+    >
+      <div id="circleWindowTitleBar" class="window-title-bar">
+        <h2 id="circleRadiusTitle">Circle - Point Center &amp; Radius</h2>
+        <div class="window-controls">
+          <button
+            type="button"
+            id="circleMinimizeButton"
+            class="window-control"
+            aria-label="Minimize Circle"
+            title="Minimize"
+          >
+            <span aria-hidden="true">&minus;</span>
+          </button>
+          <button
+            type="button"
+            id="circleMaximizeButton"
+            class="window-control"
+            aria-label="Maximize Circle"
+            title="Maximize"
+          >
+            <span id="circleMaximizeIcon" aria-hidden="true">&#9633;</span>
+          </button>
+          <button
+            type="button"
+            id="circleCloseButton"
+            class="window-control window-close"
+            aria-label="Close Circle"
+            title="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="tool-window-body">
+        <form id="circleRadiusForm" autocomplete="off">
+          <div class="circle-center-readout">
+            <span>Center point</span>
+            <strong id="circleCenterReadout">None selected</strong>
+          </div>
+
+          <label for="circleRadius">Radius</label>
+          <div class="coordinate-input">
+            <span aria-hidden="true">R</span>
+            <input
+              id="circleRadius"
+              name="radius"
+              type="number"
+              step="any"
+              min="0.000001"
+              value="1"
+              required
+            />
+          </div>
+
+          <p id="circleToolMessage" class="tool-message" role="status" aria-live="polite">
+            Select an existing point for the center.
+          </p>
+
+          <div class="dialog-actions two-actions">
+            <button type="submit" id="circleCreateButton" class="primary-action" disabled>
+              Create
+            </button>
+            <button type="button" id="circleCancelButton">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section
+      id="offsetWindow"
+      class="tool-window"
+      role="dialog"
+      aria-modal="false"
+      aria-labelledby="offsetTitle"
+      hidden
+    >
+      <div id="offsetWindowTitleBar" class="window-title-bar">
+        <h2 id="offsetTitle">Offset</h2>
+        <div class="window-controls">
+          <button
+            type="button"
+            id="offsetMinimizeButton"
+            class="window-control"
+            aria-label="Minimize Offset"
+            title="Minimize"
+          >
+            <span aria-hidden="true">&minus;</span>
+          </button>
+          <button
+            type="button"
+            id="offsetMaximizeButton"
+            class="window-control"
+            aria-label="Maximize Offset"
+            title="Maximize"
+          >
+            <span id="offsetMaximizeIcon" aria-hidden="true">&#9633;</span>
+          </button>
+          <button
+            type="button"
+            id="offsetCloseButton"
+            class="window-control window-close"
+            aria-label="Close Offset"
+            title="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="tool-window-body">
+        <form id="offsetForm" autocomplete="off">
+          <label for="offsetAmount">Offset amount</label>
+          <div class="coordinate-input">
+            <span aria-hidden="true">D</span>
+            <input
+              id="offsetAmount"
+              name="amount"
+              type="number"
+              step="any"
+              min="0.000001"
+              value="0.25"
+              required
+            />
+          </div>
+
+          <div class="offset-source-readout">
+            <span>Source entity</span>
+            <strong id="offsetSourceReadout">None selected</strong>
+          </div>
+
+          <p id="offsetToolMessage" class="tool-message" role="status" aria-live="polite">
+            Enter an amount, then select a line or circle.
+          </p>
+
+          <div class="dialog-actions one-action">
+            <button type="button" id="offsetCancelButton">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
     <main class="app-shell">
       <section class="drawing-area" aria-label="Drawing surface">
         <svg id="cadCanvas" viewBox="-7.111 -4 14.222 8">
@@ -205,7 +367,10 @@
       <span>Snap: Off</span>
       <span id="zoomStatus">Zoom: 100%</span>
       <span id="entityCount">Entities: 0</span>
-      <span id="commandStatus">Ready</span>
+      <div class="status-message-slot">
+        <span id="commandStatus">Ready</span>
+        <span id="entityHoverInfo" hidden></span>
+      </div>
     </footer>
 
     <script src="main.js"></script>
