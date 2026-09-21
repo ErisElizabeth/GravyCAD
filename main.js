@@ -23,6 +23,9 @@ const pointCoordinatesForm = document.querySelector("#pointCoordinatesForm");
 const pointCoordinatesMenu = document.querySelector("#pointCoordinatesMenu");
 const pointIntersectMenu = document.querySelector("#pointIntersectMenu");
 const pointOnEntityMenu = document.querySelector("#pointOnEntityMenu");
+const exportDxfMenu = document.querySelector("#exportDxfMenu");
+const fileMenuItem = exportDxfMenu.closest(".menu-item");
+const fileMenuButton = fileMenuItem.querySelector(".menu-button");
 const lineJoinMenu = document.querySelector("#lineJoinMenu");
 const circleCenterRadiusMenu = document.querySelector("#circleCenterRadiusMenu");
 const drawMenuItem = lineJoinMenu.closest(".menu-item");
@@ -440,6 +443,237 @@ function getEntityDescription(entity) {
   }
 
   return `Entity ${entity.id}`;
+}
+
+function formatDxfNumber(value) {
+  const normalizedValue = Math.abs(value) <= 1e-12 ? 0 : value;
+  return normalizedValue
+    .toFixed(12)
+    .replace(/\.?0+$/, "");
+}
+
+function appendDxfPair(lines, code, value) {
+  lines.push(String(code), String(value));
+}
+
+function appendDxfEntity(lines, type, layer, values) {
+  appendDxfPair(lines, 0, type);
+  appendDxfPair(lines, 8, layer);
+  values.forEach(([code, value]) => appendDxfPair(lines, code, value));
+}
+
+function getDxfExportData() {
+  const records = [];
+  const extents = {
+    minX: Infinity,
+    minY: Infinity,
+    maxX: -Infinity,
+    maxY: -Infinity,
+  };
+
+  function includePoint(x, y) {
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+    extents.minX = Math.min(extents.minX, x);
+    extents.minY = Math.min(extents.minY, y);
+    extents.maxX = Math.max(extents.maxX, x);
+    extents.maxY = Math.max(extents.maxY, y);
+  }
+
+  documentModel.entities.forEach((entity) => {
+    if (entity.type === "point") {
+      if (!Number.isFinite(entity.x) || !Number.isFinite(entity.y)) return;
+      includePoint(entity.x, entity.y);
+      records.push({
+        type: "POINT",
+        layer: "POINTS",
+        values: [
+          [10, formatDxfNumber(entity.x)],
+          [20, formatDxfNumber(entity.y)],
+          [30, "0"],
+        ],
+      });
+      return;
+    }
+
+    if (entity.type === "line") {
+      const endpoints = getLineEndpointPair(entity);
+      if (!endpoints) return;
+      const { startPoint, endPoint } = endpoints;
+      includePoint(startPoint.x, startPoint.y);
+      includePoint(endPoint.x, endPoint.y);
+      records.push({
+        type: "LINE",
+        layer: "GEOMETRY",
+        values: [
+          [10, formatDxfNumber(startPoint.x)],
+          [20, formatDxfNumber(startPoint.y)],
+          [30, "0"],
+          [11, formatDxfNumber(endPoint.x)],
+          [21, formatDxfNumber(endPoint.y)],
+          [31, "0"],
+        ],
+      });
+      return;
+    }
+
+    if (entity.type === "circle") {
+      const centerPoint = getPointById(entity.centerPointId);
+      if (!centerPoint || !Number.isFinite(entity.radius) || entity.radius <= 0) {
+        return;
+      }
+      includePoint(centerPoint.x - entity.radius, centerPoint.y - entity.radius);
+      includePoint(centerPoint.x + entity.radius, centerPoint.y + entity.radius);
+      records.push({
+        type: "CIRCLE",
+        layer: "GEOMETRY",
+        values: [
+          [10, formatDxfNumber(centerPoint.x)],
+          [20, formatDxfNumber(centerPoint.y)],
+          [30, "0"],
+          [40, formatDxfNumber(entity.radius)],
+        ],
+      });
+      return;
+    }
+
+    if (entity.type === "arc") {
+      const centerPoint = getPointById(entity.centerPointId);
+      const startPoint = getPointById(entity.startPointId);
+      const endPoint = getPointById(entity.endPointId);
+      if (
+        !centerPoint ||
+        !startPoint ||
+        !endPoint ||
+        !Number.isFinite(entity.radius) ||
+        entity.radius <= 0
+      ) {
+        return;
+      }
+
+      const startAngle =
+        (normalizeAngle(
+          Math.atan2(
+            startPoint.y - centerPoint.y,
+            startPoint.x - centerPoint.x,
+          ),
+        ) *
+          180) /
+        Math.PI;
+      const endAngle =
+        (normalizeAngle(
+          Math.atan2(endPoint.y - centerPoint.y, endPoint.x - centerPoint.x),
+        ) *
+          180) /
+        Math.PI;
+      includePoint(centerPoint.x - entity.radius, centerPoint.y - entity.radius);
+      includePoint(centerPoint.x + entity.radius, centerPoint.y + entity.radius);
+      records.push({
+        type: "ARC",
+        layer: "GEOMETRY",
+        values: [
+          [10, formatDxfNumber(centerPoint.x)],
+          [20, formatDxfNumber(centerPoint.y)],
+          [30, "0"],
+          [40, formatDxfNumber(entity.radius)],
+          [50, formatDxfNumber(startAngle)],
+          [51, formatDxfNumber(endAngle)],
+        ],
+      });
+    }
+  });
+
+  if (!records.length) return { records, extents: null };
+  return { records, extents };
+}
+
+function createDxfDocument() {
+  const { records, extents } = getDxfExportData();
+  if (!extents) return { content: null, entityCount: 0 };
+
+  const lines = [];
+  appendDxfPair(lines, 999, "GravyCAD R12 ASCII DXF - drawing units are inches");
+  appendDxfPair(lines, 0, "SECTION");
+  appendDxfPair(lines, 2, "HEADER");
+  appendDxfPair(lines, 9, "$ACADVER");
+  appendDxfPair(lines, 1, "AC1009");
+  appendDxfPair(lines, 9, "$MEASUREMENT");
+  appendDxfPair(lines, 70, 0);
+  appendDxfPair(lines, 9, "$EXTMIN");
+  appendDxfPair(lines, 10, formatDxfNumber(extents.minX));
+  appendDxfPair(lines, 20, formatDxfNumber(extents.minY));
+  appendDxfPair(lines, 30, 0);
+  appendDxfPair(lines, 9, "$EXTMAX");
+  appendDxfPair(lines, 10, formatDxfNumber(extents.maxX));
+  appendDxfPair(lines, 20, formatDxfNumber(extents.maxY));
+  appendDxfPair(lines, 30, 0);
+  appendDxfPair(lines, 0, "ENDSEC");
+
+  appendDxfPair(lines, 0, "SECTION");
+  appendDxfPair(lines, 2, "TABLES");
+  appendDxfPair(lines, 0, "TABLE");
+  appendDxfPair(lines, 2, "LTYPE");
+  appendDxfPair(lines, 70, 1);
+  appendDxfPair(lines, 0, "LTYPE");
+  appendDxfPair(lines, 2, "CONTINUOUS");
+  appendDxfPair(lines, 70, 0);
+  appendDxfPair(lines, 3, "Solid line");
+  appendDxfPair(lines, 72, 65);
+  appendDxfPair(lines, 73, 0);
+  appendDxfPair(lines, 40, 0);
+  appendDxfPair(lines, 0, "ENDTAB");
+  appendDxfPair(lines, 0, "TABLE");
+  appendDxfPair(lines, 2, "LAYER");
+  appendDxfPair(lines, 70, 2);
+  ["POINTS", "GEOMETRY"].forEach((layerName) => {
+    appendDxfPair(lines, 0, "LAYER");
+    appendDxfPair(lines, 2, layerName);
+    appendDxfPair(lines, 70, 0);
+    appendDxfPair(lines, 62, 7);
+    appendDxfPair(lines, 6, "CONTINUOUS");
+  });
+  appendDxfPair(lines, 0, "ENDTAB");
+  appendDxfPair(lines, 0, "ENDSEC");
+
+  appendDxfPair(lines, 0, "SECTION");
+  appendDxfPair(lines, 2, "ENTITIES");
+  records.forEach((record) => {
+    appendDxfEntity(lines, record.type, record.layer, record.values);
+  });
+  appendDxfPair(lines, 0, "ENDSEC");
+  appendDxfPair(lines, 0, "EOF");
+
+  return {
+    content: `${lines.join("\r\n")}\r\n`,
+    entityCount: records.length,
+  };
+}
+
+function dismissFileMenu() {
+  fileMenuItem.classList.add("is-dismissed");
+  document.activeElement?.blur();
+}
+
+function exportDxf() {
+  dismissFileMenu();
+  clearEntityHoverInfo();
+  const { content, entityCount: exportedEntityCount } = createDxfDocument();
+  if (!content) {
+    commandStatus.textContent = "Export DXF: There are no entities to export.";
+    return;
+  }
+
+  const blob = new Blob([content], { type: "application/dxf;charset=utf-8" });
+  const downloadUrl = URL.createObjectURL(blob);
+  const downloadLink = document.createElement("a");
+  downloadLink.href = downloadUrl;
+  downloadLink.download = "GravyCAD.dxf";
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  downloadLink.remove();
+  setTimeout(() => URL.revokeObjectURL(downloadUrl), 0);
+  commandStatus.textContent =
+    `Exported ${exportedEntityCount} ${exportedEntityCount === 1 ? "entity" : "entities"} ` +
+    "to GravyCAD.dxf.";
 }
 
 function clearEntityHoverInfo() {
@@ -3004,10 +3238,17 @@ circleRadiusInput.addEventListener("input", () => {
 pointCoordinatesMenu.addEventListener("click", activatePointCoordinates);
 pointIntersectMenu.addEventListener("click", activateIntersectingPoint);
 pointOnEntityMenu.addEventListener("click", activatePointOnEntity);
+exportDxfMenu.addEventListener("click", exportDxf);
 lineJoinMenu.addEventListener("click", activateJoin);
 circleCenterRadiusMenu.addEventListener("click", activateCircleCenterRadius);
 offsetMenu.addEventListener("click", activateOffset);
 trimExtendMenu.addEventListener("click", activateTrimExtend);
+fileMenuButton.addEventListener("click", () => {
+  fileMenuItem.classList.remove("is-dismissed");
+});
+fileMenuItem.addEventListener("pointerleave", () => {
+  fileMenuItem.classList.remove("is-dismissed");
+});
 drawMenuButton.addEventListener("click", () => {
   drawMenuItem.classList.remove("is-dismissed");
 });

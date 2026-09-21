@@ -496,3 +496,19 @@ Changes made since V0.0.26:
 - Arc degree placement uses the arc's underlying full circle, so a point can be created at an angle outside the visible arc without extending or modifying the arc.
 - Existing points at the calculated location are reused instead of duplicated.
 - Point on Entity remains active after creation and resets to selecting the next entity.
+
+## V0.0.28 Alpha Dev Build
+
+DXF Export
+
+Changes made since V0.0.27:
+
+- Implemented File > Export DXF as a direct browser download named `GravyCAD.dxf`.
+- Exports the geometry document model rather than SVG screen coordinates, so zoom and display orientation do not affect the result.
+- Uses the broadly compatible ASCII DXF R12 format (`AC1009`).
+- Exports GravyCAD points as DXF `POINT` entities on a `POINTS` layer.
+- Exports lines, circles, and arcs on a `GEOMETRY` layer.
+- Arc start and end angles retain GravyCAD's counterclockwise CAD orientation.
+- Includes drawing extents and marks the drawing as English measurement; coordinate values are intended as inches.
+- Reports the number of exported entities in the status bar.
+- An empty drawing reports that there are no entities to export instead of downloading an empty file.
