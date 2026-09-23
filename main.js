@@ -12,7 +12,7 @@
 // Any SVG weirdness must be handled internally.
 
 const APP_NAME = "PrometheusCAD";
-const APP_VERSION = "0.1.1";
+const APP_VERSION = "0.1.21";
 
 const cadCanvas = document.querySelector("#cadCanvas");
 const gridLayer = document.querySelector("#gridLayer");
@@ -46,13 +46,21 @@ const fileMenuItem = exportDxfMenu.closest(".menu-item");
 const fileMenuButton = fileMenuItem.querySelector(".menu-button");
 const lineJoinMenu = document.querySelector("#lineJoinMenu");
 const circleCenterRadiusMenu = document.querySelector("#circleCenterRadiusMenu");
+const circleCoordinateCenterMenu = document.querySelector(
+  "#circleCoordinateCenterMenu",
+);
 const circleSketchCenterMenu = document.querySelector("#circleSketchCenterMenu");
 const circleThreeEntitiesMenu = document.querySelector("#circleThreeEntitiesMenu");
 const hexagonMenu = document.querySelector("#hexagonMenu");
+const rectangleMenu = document.querySelector("#rectangleMenu");
+const boltHoleCircleMenu = document.querySelector("#boltHoleCircleMenu");
 const drawMenuItem = lineJoinMenu.closest(".menu-item");
 const drawMenuButton = drawMenuItem.querySelector(".menu-button");
 const undoMenu = document.querySelector("#undoMenu");
 const redoMenu = document.querySelector("#redoMenu");
+const copyMenu = document.querySelector("#copyMenu");
+const pasteMenu = document.querySelector("#pasteMenu");
+const cutMenu = document.querySelector("#cutMenu");
 const deleteMenu = document.querySelector("#deleteMenu");
 const editMenuItem = undoMenu.closest(".menu-item");
 const editMenuButton = editMenuItem.querySelector(".menu-button");
@@ -100,9 +108,19 @@ const circleWindowTitleBar = document.querySelector("#circleWindowTitleBar");
 const circleRadiusTitle = document.querySelector("#circleRadiusTitle");
 const circleRadiusForm = document.querySelector("#circleRadiusForm");
 const circleRadiusInput = document.querySelector("#circleRadius");
+const circleCenterReadoutGroup = document.querySelector(
+  "#circleCenterReadoutGroup",
+);
 const circleCenterReadout = document.querySelector("#circleCenterReadout");
+const circleCoordinateCenterFields = document.querySelector(
+  "#circleCoordinateCenterFields",
+);
+const circleCenterXInput = document.querySelector("#circleCenterX");
+const circleCenterYInput = document.querySelector("#circleCenterY");
 const circleToolMessage = document.querySelector("#circleToolMessage");
 const circleCreateButton = document.querySelector("#circleCreateButton");
+const circleContinueButton = document.querySelector("#circleContinueButton");
+const circleDialogActions = document.querySelector("#circleDialogActions");
 const circleMinimizeButton = document.querySelector("#circleMinimizeButton");
 const circleMaximizeButton = document.querySelector("#circleMaximizeButton");
 const circleMaximizeIcon = document.querySelector("#circleMaximizeIcon");
@@ -129,12 +147,80 @@ const hexagonMaximizeButton = document.querySelector(
 const hexagonMaximizeIcon = document.querySelector("#hexagonMaximizeIcon");
 const hexagonCloseButton = document.querySelector("#hexagonCloseButton");
 const hexagonCancelButton = document.querySelector("#hexagonCancelButton");
+const rectangleWindow = document.querySelector("#rectangleWindow");
+const rectangleWindowTitleBar = document.querySelector(
+  "#rectangleWindowTitleBar",
+);
+const rectangleForm = document.querySelector("#rectangleForm");
+const rectangleCenterXInput = document.querySelector("#rectangleCenterX");
+const rectangleCenterYInput = document.querySelector("#rectangleCenterY");
+const rectangleXInput = document.querySelector("#rectangleX");
+const rectangleYInput = document.querySelector("#rectangleY");
+const rectangleRadiusInput = document.querySelector("#rectangleRadius");
+const rectangleToolMessage = document.querySelector("#rectangleToolMessage");
+const rectangleCreateButton = document.querySelector(
+  "#rectangleCreateButton",
+);
+const rectangleMinimizeButton = document.querySelector(
+  "#rectangleMinimizeButton",
+);
+const rectangleMaximizeButton = document.querySelector(
+  "#rectangleMaximizeButton",
+);
+const rectangleMaximizeIcon = document.querySelector(
+  "#rectangleMaximizeIcon",
+);
+const rectangleCloseButton = document.querySelector("#rectangleCloseButton");
+const rectangleCancelButton = document.querySelector("#rectangleCancelButton");
+const boltHoleCircleWindow = document.querySelector("#boltHoleCircleWindow");
+const boltHoleCircleWindowTitleBar = document.querySelector(
+  "#boltHoleCircleWindowTitleBar",
+);
+const boltHoleCircleForm = document.querySelector("#boltHoleCircleForm");
+const boltHoleDiameterInput = document.querySelector("#boltHoleDiameter");
+const boltHoleCountInput = document.querySelector("#boltHoleCount");
+const boltHoleFeatureDiameterInput = document.querySelector(
+  "#boltHoleFeatureDiameter",
+);
+const boltHoleCircleToolMessage = document.querySelector(
+  "#boltHoleCircleToolMessage",
+);
+const boltHoleCircleCreateButton = document.querySelector(
+  "#boltHoleCircleCreateButton",
+);
+const boltHoleCircleMinimizeButton = document.querySelector(
+  "#boltHoleCircleMinimizeButton",
+);
+const boltHoleCircleMaximizeButton = document.querySelector(
+  "#boltHoleCircleMaximizeButton",
+);
+const boltHoleCircleMaximizeIcon = document.querySelector(
+  "#boltHoleCircleMaximizeIcon",
+);
+const boltHoleCircleCloseButton = document.querySelector(
+  "#boltHoleCircleCloseButton",
+);
+const boltHoleCircleCancelButton = document.querySelector(
+  "#boltHoleCircleCancelButton",
+);
 const trimExtendMenu = document.querySelector("#trimExtendMenu");
 const filletRadiusMenu = document.querySelector("#filletRadiusMenu");
 const offsetMenu = document.querySelector("#offsetMenu");
 const rotateMenu = document.querySelector("#rotateMenu");
+const mirrorXAxisMenu = document.querySelector("#mirrorXAxisMenu");
+const mirrorYAxisMenu = document.querySelector("#mirrorYAxisMenu");
+const mirrorBothAxesMenu = document.querySelector("#mirrorBothAxesMenu");
+const mirrorCopyInput = document.querySelector("#mirrorCopyInput");
 const modifyMenuItem = offsetMenu.closest(".menu-item");
 const modifyMenuButton = modifyMenuItem.querySelector(".menu-button");
+const linearDimensionMenu = document.querySelector("#linearDimensionMenu");
+const diameterDimensionMenu = document.querySelector(
+  "#diameterDimensionMenu",
+);
+const radiusDimensionMenu = document.querySelector("#radiusDimensionMenu");
+const angleDimensionMenu = document.querySelector("#angleDimensionMenu");
+const dimensionMenuItem = linearDimensionMenu.closest(".menu-item");
+const dimensionMenuButton = dimensionMenuItem.querySelector(".menu-button");
 const offsetWindow = document.querySelector("#offsetWindow");
 const offsetWindowTitleBar = document.querySelector("#offsetWindowTitleBar");
 const offsetForm = document.querySelector("#offsetForm");
@@ -215,6 +301,7 @@ const zoomInMenu = document.querySelector("#zoomInMenu");
 const zoomOutMenu = document.querySelector("#zoomOutMenu");
 const windowZoomMenu = document.querySelector("#windowZoomMenu");
 const homeViewMenu = document.querySelector("#homeViewMenu");
+const fitViewMenu = document.querySelector("#fitViewMenu");
 const viewMenuItem = windowZoomMenu.closest(".menu-item");
 const viewMenuButton = viewMenuItem.querySelector(".menu-button");
 const layerCurrentMenu = document.querySelector("#layerCurrentMenu");
@@ -235,6 +322,8 @@ const quickZoomOutButton = document.querySelector("#quickZoomOutButton");
 const quickZoomWindowButton = document.querySelector(
   "#quickZoomWindowButton",
 );
+const quickHomeButton = document.querySelector("#quickHomeButton");
+const quickFitButton = document.querySelector("#quickFitButton");
 const quickCalculatorButton = document.querySelector(
   "#quickCalculatorButton",
 );
@@ -244,7 +333,16 @@ const darkThemeMenu = document.querySelector("#darkThemeMenu");
 const matrixThemeMenu = document.querySelector("#matrixThemeMenu");
 const themeMenuItem = graniteThemeMenu.closest(".menu-item");
 const themeMenuButton = themeMenuItem.querySelector(".menu-button");
+const selectAllMenu = document.querySelector("#selectAllMenu");
 const singleSelectMenu = document.querySelector("#singleSelectMenu");
+const selectChainMenu = document.querySelector("#selectChainMenu");
+const selectPointsMenu = document.querySelector("#selectPointsMenu");
+const selectLinesMenu = document.querySelector("#selectLinesMenu");
+const selectArcsMenu = document.querySelector("#selectArcsMenu");
+const selectDimensionsMenu = document.querySelector("#selectDimensionsMenu");
+const deselectAllMenu = document.querySelector("#deselectAllMenu");
+const selectMenuItem = singleSelectMenu.closest(".menu-item");
+const selectMenuButton = selectMenuItem.querySelector(".menu-button");
 const cursorX = document.querySelector("#cursorX");
 const cursorY = document.querySelector("#cursorY");
 const zoomStatus = document.querySelector("#zoomStatus");
@@ -261,6 +359,11 @@ const HISTORY_LIMIT = 100;
 const historyState = {
   undoStack: [],
   redoStack: [],
+};
+
+const clipboardState = {
+  entities: [],
+  rootEntityIds: [],
 };
 
 const BASE_VIEW = {
@@ -318,10 +421,37 @@ const windowZoomState = {
 
 const selectionState = {
   mode: null,
-  selectedEntityId: null,
+  _selectedEntityId: null,
+  selectedEntityIds: new Set(),
+  get selectedEntityId() {
+    return this._selectedEntityId;
+  },
+  set selectedEntityId(entityId) {
+    this._selectedEntityId = entityId;
+    this.selectedEntityIds.clear();
+    if (entityId !== null) this.selectedEntityIds.add(entityId);
+  },
   hoveredEntityId: null,
   pickCycle: null,
 };
+
+const chainSelectionState = {
+  candidateEntityId: null,
+  exitEndpointIndex: null,
+  lastChainEntityIds: [],
+};
+
+function isEntitySelected(entityId) {
+  return selectionState.selectedEntityIds.has(entityId);
+}
+
+function addEntityIdsToSelection(entityIds) {
+  entityIds.forEach((entityId) => selectionState.selectedEntityIds.add(entityId));
+  selectionState._selectedEntityId =
+    selectionState.selectedEntityIds.size === 1
+      ? selectionState.selectedEntityIds.values().next().value
+      : null;
+}
 
 const joinState = {
   active: false,
@@ -386,6 +516,13 @@ const rotateState = {
   awaitingPivot: false,
 };
 
+const dimensionState = {
+  activeType: null,
+  firstPointId: null,
+  firstLineId: null,
+  firstPickWorld: null,
+};
+
 const pointOnEntityState = {
   active: false,
   sourceEntityId: null,
@@ -398,6 +535,8 @@ const pointOnEntityState = {
 };
 
 const GEOMETRY_EPSILON = 1e-9;
+const CHAIN_CONNECTION_TOLERANCE = 1e-6;
+const MAX_BOLT_HOLE_COUNT = 1000;
 
 const pointWindowState = {
   hasPosition: false,
@@ -418,6 +557,18 @@ const circleWindowState = {
 };
 
 const hexagonWindowState = {
+  hasPosition: false,
+  restoreBounds: null,
+  drag: null,
+};
+
+const rectangleWindowState = {
+  hasPosition: false,
+  restoreBounds: null,
+  drag: null,
+};
+
+const boltHoleCircleWindowState = {
   hasPosition: false,
   restoreBounds: null,
   drag: null,
@@ -573,6 +724,24 @@ function getDocumentGeometryBounds() {
       if (!centerPoint || !Number.isFinite(entity.radius)) return;
       includePoint(centerPoint.x - entity.radius, centerPoint.y - entity.radius);
       includePoint(centerPoint.x + entity.radius, centerPoint.y + entity.radius);
+      return;
+    }
+
+    if (entity.type === "dimension") {
+      if (entity.dimensionType === "linear") {
+        includePoint(entity.startX, entity.startY);
+        includePoint(entity.endX, entity.endY);
+        includePoint(entity.dimensionStartX, entity.dimensionStartY);
+        includePoint(entity.dimensionEndX, entity.dimensionEndY);
+      } else if (
+        entity.dimensionType === "radius" ||
+        entity.dimensionType === "diameter" ||
+        entity.dimensionType === "angle"
+      ) {
+        const displayRadius = entity.radius + 0.3 / viewState.zoom;
+        includePoint(entity.centerX - displayRadius, entity.centerY - displayRadius);
+        includePoint(entity.centerX + displayRadius, entity.centerY + displayRadius);
+      }
       return;
     }
 
@@ -792,11 +961,8 @@ function syncViewportToDocument() {
   updateCadScrollbarUi(metrics);
 }
 
-function fitViewToCanvas() {
-  const pixelWidth = cadCanvas.clientWidth;
-  const pixelHeight = cadCanvas.clientHeight;
-  if (pixelWidth === 0 || pixelHeight === 0) return;
-
+function getCanvasBaseViewSize(pixelWidth, pixelHeight) {
+  if (pixelWidth <= 0 || pixelHeight <= 0) return null;
   const canvasAspect = pixelWidth / pixelHeight;
   const baseAspect = BASE_VIEW.width / BASE_VIEW.height;
   let viewWidth = BASE_VIEW.width;
@@ -808,10 +974,44 @@ function fitViewToCanvas() {
     viewHeight = viewWidth / canvasAspect;
   }
 
-  viewWidth /= viewState.zoom;
-  viewHeight /= viewState.zoom;
-  viewState.viewWidth = viewWidth;
-  viewState.viewHeight = viewHeight;
+  return { width: viewWidth, height: viewHeight };
+}
+
+function getFitViewParameters(bounds, pixelWidth, pixelHeight) {
+  const baseView = getCanvasBaseViewSize(pixelWidth, pixelHeight);
+  if (!bounds || !baseView) return null;
+
+  const geometryWidth = Math.max(0, bounds.maxX - bounds.minX);
+  const geometryHeight = Math.max(0, bounds.maxY - bounds.minY);
+  const largestSpan = Math.max(geometryWidth, geometryHeight, 1);
+  const minimumSpan = Math.max(largestSpan * 0.05, 0.5);
+  const paddedWidth = Math.max(geometryWidth * 1.15, minimumSpan);
+  const paddedHeight = Math.max(geometryHeight * 1.15, minimumSpan);
+  const zoom = Math.max(
+    1e-6,
+    Math.min(
+      MAX_ZOOM,
+      baseView.width / paddedWidth,
+      baseView.height / paddedHeight,
+    ),
+  );
+
+  return {
+    centerX: (bounds.minX + bounds.maxX) / 2,
+    centerY: (bounds.minY + bounds.maxY) / 2,
+    zoom,
+  };
+}
+
+function fitViewToCanvas() {
+  const baseView = getCanvasBaseViewSize(
+    cadCanvas.clientWidth,
+    cadCanvas.clientHeight,
+  );
+  if (!baseView) return;
+
+  viewState.viewWidth = baseView.width / viewState.zoom;
+  viewState.viewHeight = baseView.height / viewState.zoom;
   renderEntities();
 }
 
@@ -843,6 +1043,46 @@ function homeView() {
   viewState.centerY = ORIGIN.y;
   viewState.navigationAnchor = null;
   setZoom(1, "Home");
+}
+
+function fitAllGeometry() {
+  deactivateWindowZoom();
+  let bounds = getDocumentGeometryBounds();
+
+  if (!bounds) {
+    homeView();
+    commandStatus.textContent =
+      "View - Fit: Drawing is empty; returned to Home.";
+    return;
+  }
+
+  let fittedView = null;
+  for (let pass = 0; pass < 3; pass += 1) {
+    fittedView = getFitViewParameters(
+      bounds,
+      cadCanvas.clientWidth,
+      cadCanvas.clientHeight,
+    );
+    if (!fittedView) {
+      commandStatus.textContent =
+        "View - Fit is unavailable until the drawing canvas has a size.";
+      return;
+    }
+
+    viewState.zoom = fittedView.zoom;
+    viewState.centerX = fittedView.centerX;
+    viewState.centerY = fittedView.centerY;
+    viewState.navigationAnchor = {
+      x: fittedView.centerX,
+      y: fittedView.centerY,
+    };
+    bounds = getDocumentGeometryBounds();
+  }
+
+  fitViewToCanvas();
+  const zoomPercent = Math.round(viewState.zoom * 100);
+  zoomStatus.textContent = `Zoom: ${zoomPercent}%`;
+  commandStatus.textContent = `View - Fit: All geometry fitted (${zoomPercent}%).`;
 }
 
 function dismissViewMenu() {
@@ -1315,7 +1555,15 @@ function openCalculatorWindow() {
   commandStatus.textContent = "Calculator opened.";
 }
 
+function dismissSelectMenu() {
+  selectMenuItem.classList.add("is-dismissed");
+  document.activeElement?.blur();
+}
+
 function activateSingleSelect() {
+  dismissSelectMenu();
+  resetChainSelectionPreview();
+  deactivateDimension();
   deactivatePointSketch();
   deactivateJoin();
   deactivateIntersectingPoint();
@@ -1332,7 +1580,406 @@ function activateSingleSelect() {
   selectionState.hoveredEntityId = null;
   selectionState.pickCycle = null;
   cadCanvas.classList.add("select-single");
-  commandStatus.textContent = "Select: Single";
+  commandStatus.textContent =
+    "Select - Single: Click entities one at a time to add them; click empty space to clear the selection.";
+}
+
+function resetChainSelectionPreview() {
+  chainSelectionState.candidateEntityId = null;
+  chainSelectionState.exitEndpointIndex = null;
+  chainSelectionState.lastChainEntityIds = [];
+}
+
+function getChainEntityEndpoints(entity) {
+  if (entity?.type === "line") {
+    const endpoints = getLineEndpointPair(entity);
+    if (!endpoints) return null;
+    return [
+      { x: endpoints.startPoint.x, y: endpoints.startPoint.y },
+      { x: endpoints.endPoint.x, y: endpoints.endPoint.y },
+    ];
+  }
+
+  if (entity?.type === "arc") {
+    const startPoint = getPointById(entity.startPointId);
+    const endPoint = getPointById(entity.endPointId);
+    if (!startPoint || !endPoint) return null;
+    return [
+      { x: startPoint.x, y: startPoint.y },
+      { x: endPoint.x, y: endPoint.y },
+    ];
+  }
+
+  return null;
+}
+
+function getChainExitEndpointIndex(entity, worldPoint) {
+  const endpoints = getChainEntityEndpoints(entity);
+  if (!endpoints) return null;
+
+  if (entity.type === "arc") {
+    const centerPoint = getPointById(entity.centerPointId);
+    if (centerPoint) {
+      const startAngle = Math.atan2(
+        endpoints[0].y - centerPoint.y,
+        endpoints[0].x - centerPoint.x,
+      );
+      const endAngle = Math.atan2(
+        endpoints[1].y - centerPoint.y,
+        endpoints[1].x - centerPoint.x,
+      );
+      const pointerAngle = Math.atan2(
+        worldPoint.y - centerPoint.y,
+        worldPoint.x - centerPoint.x,
+      );
+      const sweep = getCounterClockwiseSweep(startAngle, endAngle);
+      const pointerSweep = getCounterClockwiseSweep(startAngle, pointerAngle);
+      if (
+        sweep > GEOMETRY_EPSILON &&
+        pointerSweep <= sweep + CHAIN_CONNECTION_TOLERANCE
+      ) {
+        return pointerSweep < sweep / 2 ? 0 : 1;
+      }
+    }
+  }
+
+  return squaredDistance(worldPoint, endpoints[0]) <=
+    squaredDistance(worldPoint, endpoints[1])
+    ? 0
+    : 1;
+}
+
+function areChainPointsConnected(firstPoint, secondPoint) {
+  return (
+    squaredDistance(firstPoint, secondPoint) <=
+    CHAIN_CONNECTION_TOLERANCE ** 2
+  );
+}
+
+function collectDirectionalChain(startEntity, exitEndpointIndex) {
+  const startEndpoints = getChainEntityEndpoints(startEntity);
+  if (!startEndpoints || ![0, 1].includes(exitEndpointIndex)) {
+    return { entityIds: [], closed: false, stoppedAtBranch: false };
+  }
+
+  const chainEntities = documentModel.entities
+    .filter((entity) => entity.type === "line" || entity.type === "arc")
+    .map((entity) => ({ entity, endpoints: getChainEntityEndpoints(entity) }))
+    .filter(({ endpoints }) => endpoints !== null);
+  const visitedEntityIds = new Set([startEntity.id]);
+  const entityIds = [startEntity.id];
+  const chainStartPoint = startEndpoints[1 - exitEndpointIndex];
+  let connectionPoint = startEndpoints[exitEndpointIndex];
+  let stoppedAtBranch = false;
+
+  while (!areChainPointsConnected(connectionPoint, chainStartPoint)) {
+    const connectedCandidates = chainEntities
+      .filter(({ entity }) => !visitedEntityIds.has(entity.id))
+      .map(({ entity, endpoints }) => {
+        const connectsAtStart = areChainPointsConnected(
+          connectionPoint,
+          endpoints[0],
+        );
+        const connectsAtEnd = areChainPointsConnected(
+          connectionPoint,
+          endpoints[1],
+        );
+        if (!connectsAtStart && !connectsAtEnd) return null;
+        return {
+          entity,
+          endpoints,
+          entryEndpointIndex: connectsAtStart ? 0 : 1,
+        };
+      })
+      .filter(Boolean);
+
+    if (connectedCandidates.length !== 1) {
+      stoppedAtBranch = connectedCandidates.length > 1;
+      break;
+    }
+
+    const next = connectedCandidates[0];
+    visitedEntityIds.add(next.entity.id);
+    entityIds.push(next.entity.id);
+    connectionPoint = next.endpoints[1 - next.entryEndpointIndex];
+  }
+
+  return {
+    entityIds,
+    closed: areChainPointsConnected(connectionPoint, chainStartPoint),
+    stoppedAtBranch,
+  };
+}
+
+function getChainDirectionArrowData(entity, exitEndpointIndex) {
+  const endpoints = getChainEntityEndpoints(entity);
+  if (!endpoints || ![0, 1].includes(exitEndpointIndex)) return null;
+
+  if (entity.type === "line") {
+    const direction =
+      exitEndpointIndex === 1
+        ? {
+            x: endpoints[1].x - endpoints[0].x,
+            y: endpoints[1].y - endpoints[0].y,
+          }
+        : {
+            x: endpoints[0].x - endpoints[1].x,
+            y: endpoints[0].y - endpoints[1].y,
+          };
+    const length = Math.hypot(direction.x, direction.y);
+    if (length <= GEOMETRY_EPSILON) return null;
+    return {
+      position: {
+        x: (endpoints[0].x + endpoints[1].x) / 2,
+        y: (endpoints[0].y + endpoints[1].y) / 2,
+      },
+      direction: { x: direction.x / length, y: direction.y / length },
+    };
+  }
+
+  const centerPoint = getPointById(entity.centerPointId);
+  if (!centerPoint) return null;
+  const startAngle = Math.atan2(
+    endpoints[0].y - centerPoint.y,
+    endpoints[0].x - centerPoint.x,
+  );
+  const endAngle = Math.atan2(
+    endpoints[1].y - centerPoint.y,
+    endpoints[1].x - centerPoint.x,
+  );
+  const sweep = getCounterClockwiseSweep(startAngle, endAngle);
+  if (sweep <= GEOMETRY_EPSILON) return null;
+  const midpointAngle = startAngle + sweep / 2;
+  const counterClockwiseTangent = {
+    x: -Math.sin(midpointAngle),
+    y: Math.cos(midpointAngle),
+  };
+  return {
+    position: {
+      x: centerPoint.x + Math.cos(midpointAngle) * entity.radius,
+      y: centerPoint.y + Math.sin(midpointAngle) * entity.radius,
+    },
+    direction:
+      exitEndpointIndex === 1
+        ? counterClockwiseTangent
+        : {
+            x: -counterClockwiseTangent.x,
+            y: -counterClockwiseTangent.y,
+          },
+  };
+}
+
+function getChainSelectionCandidate(worldPoint, target) {
+  const candidate = getSelectionHitCandidates(worldPoint, target).find(
+    ({ entity }) => entity.type === "line" || entity.type === "arc",
+  )?.entity;
+  if (!candidate) return null;
+  const exitEndpointIndex = getChainExitEndpointIndex(candidate, worldPoint);
+  return exitEndpointIndex === null
+    ? null
+    : { entity: candidate, exitEndpointIndex };
+}
+
+function updateChainSelectionPreview(worldPoint, target) {
+  const candidate = getChainSelectionCandidate(worldPoint, target);
+  const candidateEntityId = candidate?.entity.id ?? null;
+  const exitEndpointIndex = candidate?.exitEndpointIndex ?? null;
+  const previewChanged =
+    chainSelectionState.candidateEntityId !== candidateEntityId ||
+    chainSelectionState.exitEndpointIndex !== exitEndpointIndex;
+  chainSelectionState.candidateEntityId = candidateEntityId;
+  chainSelectionState.exitEndpointIndex = exitEndpointIndex;
+  setSelectionProximityHover(candidateEntityId);
+  if (candidateEntityId === null) updateEntityHoverInfo(target);
+  else updateEntityHoverInfoById(candidateEntityId);
+  if (previewChanged) renderToolPreview();
+}
+
+function handleChainSelectClick(event) {
+  const worldPoint = screenToWorld(event);
+  const candidate = getChainSelectionCandidate(worldPoint, event.target);
+  if (!candidate) {
+    const clickedEntity = getSelectionHitCandidates(worldPoint, event.target)[0]
+      ?.entity;
+    if (clickedEntity) {
+      commandStatus.textContent = "Select - Chain: Choose a line or arc.";
+      return;
+    }
+    const selectionCount = selectionState.selectedEntityIds.size;
+    selectionState.selectedEntityId = null;
+    resetChainSelectionPreview();
+    renderEntities();
+    commandStatus.textContent = selectionCount
+      ? "Chain selection cleared."
+      : "Select - Chain: Choose a line or arc.";
+    return;
+  }
+
+  const chain = collectDirectionalChain(
+    candidate.entity,
+    candidate.exitEndpointIndex,
+  );
+  const previousSelectionCount = selectionState.selectedEntityIds.size;
+  addEntityIdsToSelection(chain.entityIds);
+  const addedCount =
+    selectionState.selectedEntityIds.size - previousSelectionCount;
+  chainSelectionState.candidateEntityId = candidate.entity.id;
+  chainSelectionState.exitEndpointIndex = candidate.exitEndpointIndex;
+  chainSelectionState.lastChainEntityIds = [...chain.entityIds];
+  selectionState.pickCycle = null;
+  renderEntities();
+  commandStatus.textContent =
+    `Select - Chain: ${chain.entityIds.length} ` +
+    `${chain.entityIds.length === 1 ? "entity" : "entities"} in the ` +
+    `${chain.closed ? "closed shape" : "directional chain"} selected` +
+    ` (${addedCount} newly added; ${selectionState.selectedEntityIds.size} total)` +
+    (chain.stoppedAtBranch ? "; stopped at a branch." : ".");
+}
+
+function activateChainSelect() {
+  activateSingleSelect();
+  selectionState.mode = "chain";
+  resetChainSelectionPreview();
+  renderEntities();
+  commandStatus.textContent =
+    "Select - Chain: Move across a line or arc to set the arrow direction, then click to confirm.";
+}
+
+function selectAllPoints() {
+  dismissSelectMenu();
+  activateSingleSelect();
+  selectionState.mode = null;
+  selectionState.hoveredEntityId = null;
+  selectionState.pickCycle = null;
+  cadCanvas.classList.remove("select-single");
+  const pointIds = documentModel.entities
+    .filter((entity) => entity.type === "point" && !entity.isConstruction)
+    .map((entity) => entity.id);
+  if (!pointIds.length) {
+    commandStatus.textContent =
+      "Select - Points: No visible points found; the current selection was kept.";
+    return;
+  }
+  const previousSelectionCount = selectionState.selectedEntityIds.size;
+  addEntityIdsToSelection(pointIds);
+  const addedCount = selectionState.selectedEntityIds.size - previousSelectionCount;
+  renderEntities();
+  commandStatus.textContent =
+    `Select - Points: ${pointIds.length} ${pointIds.length === 1 ? "point" : "points"} selected` +
+    ` (${addedCount} newly added; ${selectionState.selectedEntityIds.size} total).`;
+}
+
+function selectAllLines() {
+  dismissSelectMenu();
+  activateSingleSelect();
+  selectionState.mode = null;
+  selectionState.hoveredEntityId = null;
+  selectionState.pickCycle = null;
+  cadCanvas.classList.remove("select-single");
+  const lineIds = documentModel.entities
+    .filter((entity) => entity.type === "line")
+    .map((entity) => entity.id);
+  if (!lineIds.length) {
+    commandStatus.textContent =
+      "Select - Lines: No lines found; the current selection was kept.";
+    return;
+  }
+  const previousSelectionCount = selectionState.selectedEntityIds.size;
+  addEntityIdsToSelection(lineIds);
+  const addedCount = selectionState.selectedEntityIds.size - previousSelectionCount;
+  renderEntities();
+  commandStatus.textContent =
+    `Select - Lines: ${lineIds.length} ${lineIds.length === 1 ? "line" : "lines"} selected` +
+    ` (${addedCount} newly added; ${selectionState.selectedEntityIds.size} total).`;
+}
+
+function selectAllArcsAndCircles() {
+  dismissSelectMenu();
+  activateSingleSelect();
+  selectionState.mode = null;
+  selectionState.hoveredEntityId = null;
+  selectionState.pickCycle = null;
+  cadCanvas.classList.remove("select-single");
+  const curvedEntities = documentModel.entities.filter(
+    (entity) => entity.type === "arc" || entity.type === "circle",
+  );
+  if (!curvedEntities.length) {
+    commandStatus.textContent =
+      "Select - Arcs: No arcs or circles found; the current selection was kept.";
+    return;
+  }
+  const arcCount = curvedEntities.filter((entity) => entity.type === "arc").length;
+  const circleCount = curvedEntities.length - arcCount;
+  const previousSelectionCount = selectionState.selectedEntityIds.size;
+  addEntityIdsToSelection(curvedEntities.map((entity) => entity.id));
+  const addedCount = selectionState.selectedEntityIds.size - previousSelectionCount;
+  renderEntities();
+  commandStatus.textContent =
+    `Select - Arcs: Selected ${arcCount} ${arcCount === 1 ? "arc" : "arcs"} and ` +
+    `${circleCount} ${circleCount === 1 ? "circle" : "circles"}` +
+    ` (${addedCount} newly added; ${selectionState.selectedEntityIds.size} total).`;
+}
+
+function selectAllDimensions() {
+  dismissSelectMenu();
+  activateSingleSelect();
+  selectionState.mode = null;
+  selectionState.hoveredEntityId = null;
+  selectionState.pickCycle = null;
+  cadCanvas.classList.remove("select-single");
+  const dimensionIds = documentModel.entities
+    .filter((entity) => entity.type === "dimension")
+    .map((entity) => entity.id);
+  if (!dimensionIds.length) {
+    commandStatus.textContent =
+      "Select - Dimensions: No dimensions found; the current selection was kept.";
+    return;
+  }
+  const previousSelectionCount = selectionState.selectedEntityIds.size;
+  addEntityIdsToSelection(dimensionIds);
+  const addedCount = selectionState.selectedEntityIds.size - previousSelectionCount;
+  renderEntities();
+  commandStatus.textContent =
+    `Select - Dimensions: ${dimensionIds.length} ` +
+    `${dimensionIds.length === 1 ? "dimension" : "dimensions"} selected` +
+    ` (${addedCount} newly added; ${selectionState.selectedEntityIds.size} total).`;
+}
+
+function selectAllEntities() {
+  dismissSelectMenu();
+  activateSingleSelect();
+  selectionState.mode = null;
+  selectionState.hoveredEntityId = null;
+  selectionState.pickCycle = null;
+  cadCanvas.classList.remove("select-single");
+  const visibleEntityIds = documentModel.entities
+    .filter((entity) => entity.type !== "point" || !entity.isConstruction)
+    .map((entity) => entity.id);
+  if (!visibleEntityIds.length) {
+    commandStatus.textContent = "Select - All: No visible entities found.";
+    return;
+  }
+  const previousSelectionCount = selectionState.selectedEntityIds.size;
+  addEntityIdsToSelection(visibleEntityIds);
+  const addedCount = selectionState.selectedEntityIds.size - previousSelectionCount;
+  renderEntities();
+  commandStatus.textContent =
+    `Select - All: ${visibleEntityIds.length} ` +
+    `${visibleEntityIds.length === 1 ? "entity" : "entities"} selected` +
+    ` (${addedCount} newly added).`;
+}
+
+function deselectAllEntities() {
+  dismissSelectMenu();
+  const selectionCount = selectionState.selectedEntityIds.size;
+  selectionState.selectedEntityId = null;
+  selectionState.hoveredEntityId = null;
+  selectionState.pickCycle = null;
+  resetChainSelectionPreview();
+  renderEntities();
+  commandStatus.textContent = selectionCount
+    ? `Deselected ${selectionCount} ${selectionCount === 1 ? "entity" : "entities"}.`
+    : "Deselect All: No entities were selected.";
 }
 
 function formatCoordinate(value) {
@@ -1511,6 +2158,21 @@ function getEntityDescription(entity) {
       `Y${formatCoordinate(centerPoint.y)} R${formatCoordinate(entity.radius)} ` +
       `Sweep ${formatCoordinate(sweepDegrees)}°`
     );
+  }
+
+  if (entity.type === "dimension") {
+    if (entity.dimensionType === "linear") {
+      return `Linear Dimension ${entity.id}: ${formatCoordinate(entity.value)}`;
+    }
+    if (entity.dimensionType === "radius") {
+      return `Radius Dimension ${entity.id}: R${formatCoordinate(entity.radius)}`;
+    }
+    if (entity.dimensionType === "diameter") {
+      return `Diameter Dimension ${entity.id}: ⌀${formatCoordinate(entity.radius * 2)}`;
+    }
+    if (entity.dimensionType === "angle") {
+      return `Angle Dimension ${entity.id}: ${formatCoordinate(entity.valueDegrees)}°`;
+    }
   }
 
   return `Entity ${entity.id}`;
@@ -1761,7 +2423,7 @@ function clearEntityHoverInfo() {
 
 function updateEntityHoverInfo(target) {
   const entityElement = target.closest(
-    ".point-entity, .line-entity, .circle-entity, .arc-entity",
+    ".point-entity, .line-entity, .circle-entity, .arc-entity, .dimension-entity",
   );
   if (!entityElement) {
     clearEntityHoverInfo();
@@ -1808,7 +2470,7 @@ function renderPoint(point) {
   const pointGroup = createSvgElement("g", {
     class: [
       "point-entity",
-      selectionState.selectedEntityId === point.id ? "is-selected" : "",
+      isEntitySelected(point.id) ? "is-selected" : "",
       threeEntityCircleState.entityIds.includes(point.id)
         ? "is-apollonius-source"
         : "",
@@ -1816,6 +2478,7 @@ function renderPoint(point) {
       lineSketchState.startPointId === point.id ? "is-line-sketch-start" : "",
       circleState.centerPointId === point.id ? "is-circle-center" : "",
       hexagonState.centerPointId === point.id ? "is-hexagon-center" : "",
+      dimensionState.firstPointId === point.id ? "is-dimension-first" : "",
       pointOnEntityState.awaitingDirection && isDirectionChoice
         ? "is-point-on-entity-direction"
         : "",
@@ -1878,7 +2541,7 @@ function renderLineEntity(lineEntity) {
   const lineGroup = createSvgElement("g", {
     class: [
       "line-entity",
-      selectionState.selectedEntityId === lineEntity.id ? "is-selected" : "",
+      isEntitySelected(lineEntity.id) ? "is-selected" : "",
       threeEntityCircleState.entityIds.includes(lineEntity.id)
         ? "is-apollonius-source"
         : "",
@@ -1893,6 +2556,9 @@ function renderLineEntity(lineEntity) {
         ? "is-point-on-entity-source"
         : "",
       filletState.firstEntityId === lineEntity.id ? "is-fillet-first" : "",
+      dimensionState.firstLineId === lineEntity.id
+        ? "is-dimension-first"
+        : "",
     ]
       .filter(Boolean)
       .join(" "),
@@ -1930,7 +2596,7 @@ function renderCircleEntity(circleEntity) {
   const circleGroup = createSvgElement("g", {
     class: [
       "circle-entity",
-      selectionState.selectedEntityId === circleEntity.id ? "is-selected" : "",
+      isEntitySelected(circleEntity.id) ? "is-selected" : "",
       threeEntityCircleState.entityIds.includes(circleEntity.id)
         ? "is-apollonius-source"
         : "",
@@ -1999,7 +2665,7 @@ function renderArcEntity(arcEntity) {
   const arcGroup = createSvgElement("g", {
     class: [
       "arc-entity",
-      selectionState.selectedEntityId === arcEntity.id ? "is-selected" : "",
+      isEntitySelected(arcEntity.id) ? "is-selected" : "",
       pointOnEntityState.sourceEntityId === arcEntity.id
         ? "is-point-on-entity-source"
         : "",
@@ -2032,6 +2698,243 @@ function renderArcEntity(arcEntity) {
   entityLayer.appendChild(arcGroup);
 }
 
+function appendDimensionArrow(parent, tip, inwardDirection) {
+  const directionLength = Math.hypot(inwardDirection.x, inwardDirection.y);
+  if (directionLength <= GEOMETRY_EPSILON) return;
+  const direction = {
+    x: inwardDirection.x / directionLength,
+    y: inwardDirection.y / directionLength,
+  };
+  const normal = { x: -direction.y, y: direction.x };
+  const arrowLength = 0.11 / viewState.zoom;
+  const halfWidth = 0.045 / viewState.zoom;
+  const base = {
+    x: tip.x + direction.x * arrowLength,
+    y: tip.y + direction.y * arrowLength,
+  };
+  const firstWing = {
+    x: base.x + normal.x * halfWidth,
+    y: base.y + normal.y * halfWidth,
+  };
+  const secondWing = {
+    x: base.x - normal.x * halfWidth,
+    y: base.y - normal.y * halfWidth,
+  };
+  parent.appendChild(
+    createSvgElement("path", {
+      d: `M ${firstWing.x} ${firstWing.y} L ${tip.x} ${tip.y} L ${secondWing.x} ${secondWing.y}`,
+      class: "dimension-geometry",
+    }),
+  );
+}
+
+function appendDimensionText(parent, x, y, value) {
+  const text = createSvgElement("text", {
+    x,
+    y: -y,
+    transform: "scale(1 -1)",
+    class: "dimension-text",
+    "font-size": 0.17 / viewState.zoom,
+    "text-anchor": "middle",
+    "dominant-baseline": "middle",
+  });
+  text.textContent = value;
+  parent.appendChild(text);
+}
+
+function renderDimensionEntity(dimension) {
+  const group = createSvgElement("g", {
+    class: [
+      "dimension-entity",
+      isEntitySelected(dimension.id) ? "is-selected" : "",
+    ]
+      .filter(Boolean)
+      .join(" "),
+    "data-entity-id": dimension.id,
+    "data-entity-type": dimension.type,
+  });
+  let hitPath = "";
+  let titleText = `Dimension ${dimension.id}`;
+
+  if (dimension.dimensionType === "linear") {
+    drawLine(
+      group,
+      dimension.startX,
+      dimension.startY,
+      dimension.dimensionStartX,
+      dimension.dimensionStartY,
+      "dimension-geometry",
+    );
+    drawLine(
+      group,
+      dimension.endX,
+      dimension.endY,
+      dimension.dimensionEndX,
+      dimension.dimensionEndY,
+      "dimension-geometry",
+    );
+    drawLine(
+      group,
+      dimension.dimensionStartX,
+      dimension.dimensionStartY,
+      dimension.dimensionEndX,
+      dimension.dimensionEndY,
+      "dimension-geometry",
+    );
+    const direction = {
+      x: dimension.dimensionEndX - dimension.dimensionStartX,
+      y: dimension.dimensionEndY - dimension.dimensionStartY,
+    };
+    appendDimensionArrow(
+      group,
+      { x: dimension.dimensionStartX, y: dimension.dimensionStartY },
+      direction,
+    );
+    appendDimensionArrow(
+      group,
+      { x: dimension.dimensionEndX, y: dimension.dimensionEndY },
+      { x: -direction.x, y: -direction.y },
+    );
+    const labelX =
+      (dimension.dimensionStartX + dimension.dimensionEndX) / 2;
+    const labelY =
+      (dimension.dimensionStartY + dimension.dimensionEndY) / 2;
+    appendDimensionText(
+      group,
+      labelX,
+      labelY,
+      formatCoordinate(dimension.value),
+    );
+    hitPath =
+      `M ${dimension.dimensionStartX} ${dimension.dimensionStartY} ` +
+      `L ${dimension.dimensionEndX} ${dimension.dimensionEndY}`;
+    titleText =
+      `Linear dimension ${dimension.id}: ${formatCoordinate(dimension.value)}`;
+  } else if (
+    dimension.dimensionType === "radius" ||
+    dimension.dimensionType === "diameter"
+  ) {
+    const direction = {
+      x: Math.cos(dimension.angle),
+      y: Math.sin(dimension.angle),
+    };
+    const positiveEnd = {
+      x: dimension.centerX + direction.x * dimension.radius,
+      y: dimension.centerY + direction.y * dimension.radius,
+    };
+    const negativeEnd =
+      dimension.dimensionType === "diameter"
+        ? {
+            x: dimension.centerX - direction.x * dimension.radius,
+            y: dimension.centerY - direction.y * dimension.radius,
+          }
+        : { x: dimension.centerX, y: dimension.centerY };
+    drawLine(
+      group,
+      negativeEnd.x,
+      negativeEnd.y,
+      positiveEnd.x,
+      positiveEnd.y,
+      "dimension-geometry",
+    );
+    appendDimensionArrow(group, positiveEnd, {
+      x: -direction.x,
+      y: -direction.y,
+    });
+    if (dimension.dimensionType === "diameter") {
+      appendDimensionArrow(group, negativeEnd, direction);
+    }
+    const labelDistance = dimension.radius + 0.22 / viewState.zoom;
+    appendDimensionText(
+      group,
+      dimension.centerX + direction.x * labelDistance,
+      dimension.centerY + direction.y * labelDistance,
+      dimension.dimensionType === "diameter"
+        ? `⌀${formatCoordinate(dimension.radius * 2)}`
+        : `R${formatCoordinate(dimension.radius)}`,
+    );
+    hitPath =
+      `M ${negativeEnd.x} ${negativeEnd.y} ` +
+      `L ${positiveEnd.x} ${positiveEnd.y}`;
+    titleText =
+      `${dimension.dimensionType === "diameter" ? "Diameter" : "Radius"} ` +
+      `dimension ${dimension.id}: ${formatCoordinate(
+        dimension.dimensionType === "diameter"
+          ? dimension.radius * 2
+          : dimension.radius,
+      )}`;
+  } else if (dimension.dimensionType === "angle") {
+    const startPoint = {
+      x: dimension.centerX + Math.cos(dimension.startAngle) * dimension.radius,
+      y: dimension.centerY + Math.sin(dimension.startAngle) * dimension.radius,
+    };
+    const endPoint = {
+      x: dimension.centerX + Math.cos(dimension.endAngle) * dimension.radius,
+      y: dimension.centerY + Math.sin(dimension.endAngle) * dimension.radius,
+    };
+    hitPath =
+      `M ${startPoint.x} ${startPoint.y} ` +
+      `A ${dimension.radius} ${dimension.radius} 0 0 1 ${endPoint.x} ${endPoint.y}`;
+    group.appendChild(
+      createSvgElement("path", {
+        d: hitPath,
+        class: "dimension-geometry",
+      }),
+    );
+    drawLine(
+      group,
+      dimension.centerX,
+      dimension.centerY,
+      startPoint.x,
+      startPoint.y,
+      "dimension-geometry",
+    );
+    drawLine(
+      group,
+      dimension.centerX,
+      dimension.centerY,
+      endPoint.x,
+      endPoint.y,
+      "dimension-geometry",
+    );
+    appendDimensionArrow(group, startPoint, {
+      x: -Math.sin(dimension.startAngle),
+      y: Math.cos(dimension.startAngle),
+    });
+    appendDimensionArrow(group, endPoint, {
+      x: Math.sin(dimension.endAngle),
+      y: -Math.cos(dimension.endAngle),
+    });
+    const middleAngle =
+      dimension.startAngle +
+      getCounterClockwiseSweep(dimension.startAngle, dimension.endAngle) / 2;
+    const labelRadius = dimension.radius + 0.18 / viewState.zoom;
+    appendDimensionText(
+      group,
+      dimension.centerX + Math.cos(middleAngle) * labelRadius,
+      dimension.centerY + Math.sin(middleAngle) * labelRadius,
+      `${formatCoordinate(dimension.valueDegrees)}°`,
+    );
+    titleText =
+      `Angle dimension ${dimension.id}: ${formatCoordinate(
+        dimension.valueDegrees,
+      )}°`;
+  }
+
+  if (!hitPath) return;
+  group.insertBefore(
+    createSvgElement("path", {
+      d: hitPath,
+      class: "dimension-hit-target",
+    }),
+    group.firstChild,
+  );
+  const title = createSvgElement("title", {});
+  title.textContent = titleText;
+  group.appendChild(title);
+  entityLayer.appendChild(group);
+}
+
 function getCircleRadiusInputValue() {
   const radius = getArithmeticInputValue(circleRadiusInput);
   return Number.isFinite(radius) && radius > 0 ? radius : null;
@@ -2052,6 +2955,127 @@ function getHexagonCornerRadiusInputValue(acrossFlats) {
     cornerRadius < acrossFlats / 2
     ? cornerRadius
     : null;
+}
+
+function getRectangleCenterXInputValue() {
+  const centerX = getArithmeticInputValue(rectangleCenterXInput);
+  return Number.isFinite(centerX) ? centerX : null;
+}
+
+function getRectangleCenterYInputValue() {
+  const centerY = getArithmeticInputValue(rectangleCenterYInput);
+  return Number.isFinite(centerY) ? centerY : null;
+}
+
+function getRectangleXInputValue() {
+  const xSize = getArithmeticInputValue(rectangleXInput);
+  return Number.isFinite(xSize) && xSize > 0 ? xSize : null;
+}
+
+function getRectangleYInputValue() {
+  const ySize = getArithmeticInputValue(rectangleYInput);
+  return Number.isFinite(ySize) && ySize > 0 ? ySize : null;
+}
+
+function getRectangleRadiusInputValue(xSize, ySize) {
+  const radius = getArithmeticInputValue(rectangleRadiusInput);
+  if (!Number.isFinite(xSize) || !Number.isFinite(ySize)) return null;
+  const maximumRadius = Math.min(xSize, ySize) / 2;
+  return Number.isFinite(radius) &&
+    radius >= 0 &&
+    Number.isFinite(maximumRadius) &&
+    radius <= maximumRadius
+    ? radius
+    : null;
+}
+
+function getBoltHoleDiameterInputValue() {
+  const diameter = getArithmeticInputValue(boltHoleDiameterInput);
+  return Number.isFinite(diameter) && diameter > 0 ? diameter : null;
+}
+
+function getBoltHoleCountInputValue() {
+  const holeCount = getArithmeticInputValue(boltHoleCountInput);
+  return Number.isSafeInteger(holeCount) &&
+    holeCount > 0 &&
+    holeCount <= MAX_BOLT_HOLE_COUNT
+    ? holeCount
+    : null;
+}
+
+function getBoltHoleFeatureDiameterInputValue() {
+  const diameter = getArithmeticInputValue(boltHoleFeatureDiameterInput);
+  return Number.isFinite(diameter) && diameter >= 0 ? diameter : null;
+}
+
+function getRectangleGeometry(center, xSize, ySize, radius) {
+  const left = center.x - xSize / 2;
+  const right = center.x + xSize / 2;
+  const bottom = center.y - ySize / 2;
+  const top = center.y + ySize / 2;
+
+  if (radius <= GEOMETRY_EPSILON) {
+    const bottomLeft = { x: left, y: bottom };
+    const bottomRight = { x: right, y: bottom };
+    const topRight = { x: right, y: top };
+    const topLeft = { x: left, y: top };
+    return {
+      lines: [
+        { start: bottomLeft, end: bottomRight },
+        { start: bottomRight, end: topRight },
+        { start: topRight, end: topLeft },
+        { start: topLeft, end: bottomLeft },
+      ],
+      arcs: [],
+    };
+  }
+
+  const lines = [
+    {
+      start: { x: left + radius, y: bottom },
+      end: { x: right - radius, y: bottom },
+    },
+    {
+      start: { x: right, y: bottom + radius },
+      end: { x: right, y: top - radius },
+    },
+    {
+      start: { x: right - radius, y: top },
+      end: { x: left + radius, y: top },
+    },
+    {
+      start: { x: left, y: top - radius },
+      end: { x: left, y: bottom + radius },
+    },
+  ].filter(
+    ({ start, end }) =>
+      Math.hypot(end.x - start.x, end.y - start.y) > GEOMETRY_EPSILON,
+  );
+
+  const arcs = [
+    {
+      center: { x: right - radius, y: bottom + radius },
+      start: { x: right - radius, y: bottom },
+      end: { x: right, y: bottom + radius },
+    },
+    {
+      center: { x: right - radius, y: top - radius },
+      start: { x: right, y: top - radius },
+      end: { x: right - radius, y: top },
+    },
+    {
+      center: { x: left + radius, y: top - radius },
+      start: { x: left + radius, y: top },
+      end: { x: left, y: top - radius },
+    },
+    {
+      center: { x: left + radius, y: bottom + radius },
+      start: { x: left, y: bottom + radius },
+      end: { x: left + radius, y: bottom },
+    },
+  ];
+
+  return { lines, arcs };
 }
 
 function getHexagonGeometry(centerPoint, acrossFlats, cornerRadius) {
@@ -2149,6 +3173,67 @@ function renderToolPreview() {
         }),
       );
     }
+    return;
+  }
+
+  if (
+    selectionState.mode === "chain" &&
+    chainSelectionState.candidateEntityId !== null &&
+    chainSelectionState.exitEndpointIndex !== null
+  ) {
+    const candidate = getEntityById(chainSelectionState.candidateEntityId);
+    const arrow = getChainDirectionArrowData(
+      candidate,
+      chainSelectionState.exitEndpointIndex,
+    );
+    if (!arrow) return;
+    const arrowGroup = createSvgElement("g", {
+      class: "chain-direction-preview",
+    });
+    const halfShaftLength = 0.24 / viewState.zoom;
+    const headLength = 0.13 / viewState.zoom;
+    const halfHeadWidth = 0.075 / viewState.zoom;
+    const normal = {
+      x: -arrow.direction.y,
+      y: arrow.direction.x,
+    };
+    const tail = {
+      x: arrow.position.x - arrow.direction.x * halfShaftLength,
+      y: arrow.position.y - arrow.direction.y * halfShaftLength,
+    };
+    const tip = {
+      x: arrow.position.x + arrow.direction.x * halfShaftLength,
+      y: arrow.position.y + arrow.direction.y * halfShaftLength,
+    };
+    const headBase = {
+      x: tip.x - arrow.direction.x * headLength,
+      y: tip.y - arrow.direction.y * headLength,
+    };
+    drawLine(
+      arrowGroup,
+      tail.x,
+      tail.y,
+      tip.x,
+      tip.y,
+      "chain-direction-arrow",
+    );
+    drawLine(
+      arrowGroup,
+      tip.x,
+      tip.y,
+      headBase.x + normal.x * halfHeadWidth,
+      headBase.y + normal.y * halfHeadWidth,
+      "chain-direction-arrow",
+    );
+    drawLine(
+      arrowGroup,
+      tip.x,
+      tip.y,
+      headBase.x - normal.x * halfHeadWidth,
+      headBase.y - normal.y * halfHeadWidth,
+      "chain-direction-arrow",
+    );
+    previewLayer.appendChild(arrowGroup);
     return;
   }
 
@@ -2270,6 +3355,10 @@ function renderEntities() {
     if (entity.type === "point" && !entity.isConstruction) renderPoint(entity);
   });
 
+  documentModel.entities.forEach((entity) => {
+    if (entity.type === "dimension") renderDimensionEntity(entity);
+  });
+
   renderToolPreview();
   const visibleEntityCount = documentModel.entities.filter(
     (entity) => entity.type !== "point" || !entity.isConstruction,
@@ -2346,6 +3435,24 @@ function addCircle(centerPointId, radius) {
   documentModel.entities.push(circle);
   renderEntities();
   return circle;
+}
+
+function addCoordinateCircle(center, radius) {
+  const existingCenterPoint = findExistingPointAt(center);
+  const circleId = documentModel.nextEntityId + (existingCenterPoint ? 0 : 1);
+  recordDocumentChange(`Create coordinate-center circle ${circleId}`);
+  const centerPoint =
+    existingCenterPoint ?? getOrCreatePointWithoutHistory(center);
+  const circle = {
+    id: documentModel.nextEntityId,
+    type: "circle",
+    centerPointId: centerPoint.id,
+    radius,
+  };
+  documentModel.nextEntityId += 1;
+  documentModel.entities.push(circle);
+  renderEntities();
+  return { circle, centerPoint };
 }
 
 function addApolloniusCircle(center, radius) {
@@ -2434,6 +3541,238 @@ function addHexagon(centerPoint, acrossFlats, cornerRadius) {
 
   renderEntities();
   return { lines: createdLines, arcs: createdArcs };
+}
+
+function addRectangle(center, xSize, ySize, radius) {
+  recordDocumentChange(
+    `Create ${formatArithmeticResult(xSize)} x ${formatArithmeticResult(ySize)} rectangle at X${formatArithmeticResult(center.x)} Y${formatArithmeticResult(center.y)}`,
+  );
+  const geometry = getRectangleGeometry(center, xSize, ySize, radius);
+  const createdLines = geometry.lines.map(
+    ({ start, end }) => createIndependentLineWithoutHistory(start, end).line,
+  );
+  const createdArcs = geometry.arcs.map(({ center, start, end }) => {
+    const centerReference = createConstructionPointWithoutHistory(center);
+    const startReference = createConstructionPointWithoutHistory(start);
+    const endReference = createConstructionPointWithoutHistory(end);
+    const arc = {
+      id: documentModel.nextEntityId,
+      type: "arc",
+      centerPointId: centerReference.id,
+      startPointId: startReference.id,
+      endPointId: endReference.id,
+      radius,
+    };
+    documentModel.nextEntityId += 1;
+    documentModel.entities.push(arc);
+    return arc;
+  });
+
+  renderEntities();
+  return { lines: createdLines, arcs: createdArcs };
+}
+
+function getBoltHoleCenters(boltHoleDiameter, holeCount) {
+  const boltHoleRadius = boltHoleDiameter / 2;
+  return Array.from({ length: holeCount }, (_, index) => {
+    const angle = (index * Math.PI * 2) / holeCount;
+    const rawX = boltHoleRadius * Math.cos(angle);
+    const rawY = boltHoleRadius * Math.sin(angle);
+    return {
+      x: Math.abs(rawX) <= 1e-12 ? 0 : rawX,
+      y: Math.abs(rawY) <= 1e-12 ? 0 : rawY,
+    };
+  });
+}
+
+function addBoltHoleCircle(boltHoleDiameter, holeCount, holeDiameter) {
+  recordDocumentChange(`Create ${holeCount}-position bolt hole circle`);
+  const centers = getBoltHoleCenters(boltHoleDiameter, holeCount);
+  const createdPoints = [];
+  const createdCircles = [];
+
+  centers.forEach((center) => {
+    if (holeDiameter === 0) {
+      const point = {
+        id: documentModel.nextEntityId,
+        type: "point",
+        x: center.x,
+        y: center.y,
+      };
+      documentModel.nextEntityId += 1;
+      documentModel.entities.push(point);
+      createdPoints.push(point);
+      return;
+    }
+
+    const centerReference = createConstructionPointWithoutHistory(center);
+    const circle = {
+      id: documentModel.nextEntityId,
+      type: "circle",
+      centerPointId: centerReference.id,
+      radius: holeDiameter / 2,
+    };
+    documentModel.nextEntityId += 1;
+    documentModel.entities.push(circle);
+    createdCircles.push(circle);
+  });
+
+  renderEntities();
+  return { points: createdPoints, circles: createdCircles };
+}
+
+function addLinearDimension(startPoint, endPoint) {
+  const deltaX = endPoint.x - startPoint.x;
+  const deltaY = endPoint.y - startPoint.y;
+  const length = Math.hypot(deltaX, deltaY);
+  if (length <= GEOMETRY_EPSILON) return null;
+
+  const normal = { x: -deltaY / length, y: deltaX / length };
+  const midpoint = {
+    x: (startPoint.x + endPoint.x) / 2,
+    y: (startPoint.y + endPoint.y) / 2,
+  };
+  const outwardSign = dotProduct(midpoint, normal) < 0 ? -1 : 1;
+  const offset = Math.max(0.25, Math.min(0.75, length * 0.15));
+  const offsetX = normal.x * offset * outwardSign;
+  const offsetY = normal.y * offset * outwardSign;
+  const dimension = {
+    id: documentModel.nextEntityId,
+    type: "dimension",
+    dimensionType: "linear",
+    startX: startPoint.x,
+    startY: startPoint.y,
+    endX: endPoint.x,
+    endY: endPoint.y,
+    dimensionStartX: startPoint.x + offsetX,
+    dimensionStartY: startPoint.y + offsetY,
+    dimensionEndX: endPoint.x + offsetX,
+    dimensionEndY: endPoint.y + offsetY,
+    value: length,
+  };
+  recordDocumentChange(`Create linear dimension ${dimension.id}`);
+  documentModel.nextEntityId += 1;
+  documentModel.entities.push(dimension);
+  renderEntities();
+  return dimension;
+}
+
+function addRadialDimension(sourceEntity, dimensionType, angle) {
+  const centerPoint = getPointById(sourceEntity.centerPointId);
+  if (!centerPoint || !Number.isFinite(sourceEntity.radius)) return null;
+  const dimension = {
+    id: documentModel.nextEntityId,
+    type: "dimension",
+    dimensionType,
+    centerX: centerPoint.x,
+    centerY: centerPoint.y,
+    radius: sourceEntity.radius,
+    angle: normalizeAngle(angle),
+  };
+  recordDocumentChange(`Create ${dimensionType} dimension ${dimension.id}`);
+  documentModel.nextEntityId += 1;
+  documentModel.entities.push(dimension);
+  renderEntities();
+  return dimension;
+}
+
+function getDimensionRayDirection(line, center, pickPoint) {
+  const endpoints = getLineEndpointPair(line);
+  if (!endpoints) return null;
+  const lineDirection = {
+    x: endpoints.endPoint.x - endpoints.startPoint.x,
+    y: endpoints.endPoint.y - endpoints.startPoint.y,
+  };
+  const lineLength = Math.hypot(lineDirection.x, lineDirection.y);
+  if (lineLength <= GEOMETRY_EPSILON) return null;
+  const unit = {
+    x: lineDirection.x / lineLength,
+    y: lineDirection.y / lineLength,
+  };
+  const pickDirection = {
+    x: pickPoint.x - center.x,
+    y: pickPoint.y - center.y,
+  };
+  let sign = dotProduct(unit, pickDirection) < 0 ? -1 : 1;
+  if (Math.hypot(pickDirection.x, pickDirection.y) <= GEOMETRY_EPSILON) {
+    sign =
+      squaredDistance(pickPoint, endpoints.startPoint) <=
+      squaredDistance(pickPoint, endpoints.endPoint)
+        ? -1
+        : 1;
+  }
+  return { x: unit.x * sign, y: unit.y * sign };
+}
+
+function addAngleDimension(firstLine, secondLine, firstPick, secondPick) {
+  const firstEndpoints = getLineEndpointPair(firstLine);
+  const secondEndpoints = getLineEndpointPair(secondLine);
+  if (!firstEndpoints || !secondEndpoints) {
+    return { dimension: null, reason: "degenerate" };
+  }
+  const firstDirection = {
+    x: firstEndpoints.endPoint.x - firstEndpoints.startPoint.x,
+    y: firstEndpoints.endPoint.y - firstEndpoints.startPoint.y,
+  };
+  const intersection = intersectInfiniteLines(
+    firstEndpoints.startPoint,
+    firstDirection,
+    secondEndpoints.startPoint,
+    secondEndpoints.endPoint,
+  );
+  if (!intersection.point) {
+    return { dimension: null, reason: intersection.kind };
+  }
+
+  const firstRay = getDimensionRayDirection(
+    firstLine,
+    intersection.point,
+    firstPick,
+  );
+  const secondRay = getDimensionRayDirection(
+    secondLine,
+    intersection.point,
+    secondPick,
+  );
+  if (!firstRay || !secondRay) {
+    return { dimension: null, reason: "degenerate" };
+  }
+
+  let startAngle = Math.atan2(firstRay.y, firstRay.x);
+  let endAngle = Math.atan2(secondRay.y, secondRay.x);
+  let sweep = getCounterClockwiseSweep(startAngle, endAngle);
+  if (sweep > Math.PI) {
+    [startAngle, endAngle] = [endAngle, startAngle];
+    sweep = getCounterClockwiseSweep(startAngle, endAngle);
+  }
+  if (sweep <= GEOMETRY_EPSILON) {
+    return { dimension: null, reason: "collinear" };
+  }
+
+  const firstPickRadius = Math.sqrt(squaredDistance(firstPick, intersection.point));
+  const secondPickRadius = Math.sqrt(
+    squaredDistance(secondPick, intersection.point),
+  );
+  const radius = Math.max(
+    0.3,
+    Math.min(1.25, Math.min(firstPickRadius, secondPickRadius) * 0.55),
+  );
+  const dimension = {
+    id: documentModel.nextEntityId,
+    type: "dimension",
+    dimensionType: "angle",
+    centerX: intersection.point.x,
+    centerY: intersection.point.y,
+    radius,
+    startAngle: normalizeAngle(startAngle),
+    endAngle: normalizeAngle(endAngle),
+    valueDegrees: (sweep * 180) / Math.PI,
+  };
+  recordDocumentChange(`Create angle dimension ${dimension.id}`);
+  documentModel.nextEntityId += 1;
+  documentModel.entities.push(dimension);
+  renderEntities();
+  return { dimension, reason: null };
 }
 
 function addOffsetLine(start, end) {
@@ -2998,6 +4337,66 @@ function distanceToEntityGeometry(entity, worldPoint) {
     );
   }
 
+  if (entity.type === "dimension") {
+    if (entity.dimensionType === "linear") {
+      return distanceToLineSegment(
+        worldPoint,
+        { x: entity.dimensionStartX, y: entity.dimensionStartY },
+        { x: entity.dimensionEndX, y: entity.dimensionEndY },
+      );
+    }
+    if (
+      entity.dimensionType === "radius" ||
+      entity.dimensionType === "diameter"
+    ) {
+      const direction = { x: Math.cos(entity.angle), y: Math.sin(entity.angle) };
+      const positiveEnd = {
+        x: entity.centerX + direction.x * entity.radius,
+        y: entity.centerY + direction.y * entity.radius,
+      };
+      const negativeEnd =
+        entity.dimensionType === "diameter"
+          ? {
+              x: entity.centerX - direction.x * entity.radius,
+              y: entity.centerY - direction.y * entity.radius,
+            }
+          : { x: entity.centerX, y: entity.centerY };
+      return distanceToLineSegment(worldPoint, negativeEnd, positiveEnd);
+    }
+    if (entity.dimensionType === "angle") {
+      const pointAngle = Math.atan2(
+        worldPoint.y - entity.centerY,
+        worldPoint.x - entity.centerX,
+      );
+      const startPoint = {
+        x: entity.centerX + Math.cos(entity.startAngle) * entity.radius,
+        y: entity.centerY + Math.sin(entity.startAngle) * entity.radius,
+      };
+      const endPoint = {
+        x: entity.centerX + Math.cos(entity.endAngle) * entity.radius,
+        y: entity.centerY + Math.sin(entity.endAngle) * entity.radius,
+      };
+      if (
+        isAngleOnCounterClockwiseArc(
+          pointAngle,
+          entity.startAngle,
+          entity.endAngle,
+        )
+      ) {
+        return Math.abs(
+          Math.hypot(
+            worldPoint.x - entity.centerX,
+            worldPoint.y - entity.centerY,
+          ) - entity.radius,
+        );
+      }
+      return Math.min(
+        Math.sqrt(squaredDistance(worldPoint, startPoint)),
+        Math.sqrt(squaredDistance(worldPoint, endPoint)),
+      );
+    }
+  }
+
   return Number.POSITIVE_INFINITY;
 }
 
@@ -3019,12 +4418,12 @@ function getWorldUnitsPerScreenPixel() {
 function getSelectionHitCandidates(worldPoint, target) {
   const tolerance = 10 * getWorldUnitsPerScreenPixel();
   const directEntityElement = target?.closest?.(
-    ".point-entity, .line-entity, .circle-entity, .arc-entity",
+    ".point-entity, .line-entity, .circle-entity, .arc-entity, .dimension-entity",
   );
   const directEntityId = directEntityElement
     ? Number(directEntityElement.dataset.entityId)
     : null;
-  const typePriority = { point: 0, arc: 1, line: 2, circle: 3 };
+  const typePriority = { point: 0, arc: 1, line: 2, circle: 3, dimension: 4 };
 
   return documentModel.entities
     .filter((entity) => entity.type !== "point" || !entity.isConstruction)
@@ -3826,6 +5225,7 @@ function restoreDocumentSnapshot(snapshot) {
   selectionState.selectedEntityId = null;
   selectionState.hoveredEntityId = null;
   selectionState.pickCycle = null;
+  resetChainSelectionPreview();
   pointSketchState.active = false;
   lineSketchState.active = false;
   lineSketchState.startPointId = null;
@@ -3856,6 +5256,10 @@ function restoreDocumentSnapshot(snapshot) {
   rotateState.entityId = null;
   rotateState.pivotPointId = null;
   rotateState.awaitingPivot = false;
+  dimensionState.activeType = null;
+  dimensionState.firstPointId = null;
+  dimensionState.firstLineId = null;
+  dimensionState.firstPickWorld = null;
   pointOnEntityState.active = false;
   pointOnEntityState.sourceEntityId = null;
   pointOnEntityState.zeroPointId = null;
@@ -3876,6 +5280,10 @@ function restoreDocumentSnapshot(snapshot) {
   cadCanvas.classList.remove("fillet-entity");
   cadCanvas.classList.remove("rotate-active");
   cadCanvas.classList.remove("rotate-pivot-pick");
+  cadCanvas.classList.remove("dimension-linear");
+  cadCanvas.classList.remove("dimension-diameter");
+  cadCanvas.classList.remove("dimension-radius");
+  cadCanvas.classList.remove("dimension-angle");
   cadCanvas.classList.remove("point-on-entity");
   cadCanvas.classList.remove("point-on-entity-source-pick");
   previewLayer.innerHTML = "";
@@ -3889,6 +5297,16 @@ function restoreDocumentSnapshot(snapshot) {
   }
   setHexagonWindowMinimized(false);
   hexagonWindow.hidden = true;
+  if (rectangleWindow.classList.contains("is-maximized")) {
+    restoreRectangleWindow();
+  }
+  setRectangleWindowMinimized(false);
+  rectangleWindow.hidden = true;
+  if (boltHoleCircleWindow.classList.contains("is-maximized")) {
+    restoreBoltHoleCircleWindow();
+  }
+  setBoltHoleCircleWindowMinimized(false);
+  boltHoleCircleWindow.hidden = true;
   if (offsetWindow.classList.contains("is-maximized")) {
     restoreOffsetWindow();
   }
@@ -3913,14 +5331,19 @@ function restoreDocumentSnapshot(snapshot) {
 }
 
 function updateEditMenuState() {
-  const selectedEntityExists = documentModel.entities.some(
-    (entity) => entity.id === selectionState.selectedEntityId,
-  );
+  const selectedEntityCount = documentModel.entities.filter(
+    (entity) =>
+      selectionState.selectedEntityIds.has(entity.id) &&
+      (entity.type !== "point" || !entity.isConstruction),
+  ).length;
   undoMenu.disabled = historyState.undoStack.length === 0;
   redoMenu.disabled = historyState.redoStack.length === 0;
   quickUndoButton.disabled = historyState.undoStack.length === 0;
   quickRedoButton.disabled = historyState.redoStack.length === 0;
-  deleteMenu.disabled = !selectedEntityExists;
+  copyMenu.disabled = selectedEntityCount === 0;
+  pasteMenu.disabled = clipboardState.rootEntityIds.length === 0;
+  cutMenu.disabled = selectedEntityCount === 0;
+  deleteMenu.disabled = selectedEntityCount === 0;
 }
 
 function dismissEditMenu() {
@@ -3998,88 +5421,207 @@ function redoDocumentChange() {
         : "");
 }
 
-function deleteSelectedEntity() {
-  dismissEditMenu();
-  const selectedEntity = documentModel.entities.find(
-    (entity) => entity.id === selectionState.selectedEntityId,
+const CLIPBOARD_POINT_REFERENCE_PROPERTIES = [
+  "startPointId",
+  "endPointId",
+  "centerPointId",
+];
+
+function getSelectedClipboardRoots() {
+  return documentModel.entities.filter(
+    (entity) =>
+      selectionState.selectedEntityIds.has(entity.id) &&
+      (entity.type !== "point" || !entity.isConstruction),
   );
-  if (!selectedEntity) {
-    commandStatus.textContent = "Select an entity to delete.";
+}
+
+function captureSelectionToClipboard() {
+  const rootEntities = getSelectedClipboardRoots();
+  if (!rootEntities.length) return 0;
+
+  const copiedEntityIds = new Set(rootEntities.map((entity) => entity.id));
+  rootEntities.forEach((entity) => {
+    CLIPBOARD_POINT_REFERENCE_PROPERTIES.forEach((property) => {
+      if (Number.isInteger(entity[property])) {
+        copiedEntityIds.add(entity[property]);
+      }
+    });
+  });
+
+  clipboardState.entities = documentModel.entities
+    .filter((entity) => copiedEntityIds.has(entity.id))
+    .map((entity) => ({ ...entity }));
+  clipboardState.rootEntityIds = rootEntities.map((entity) => entity.id);
+  updateEditMenuState();
+  return rootEntities.length;
+}
+
+function copySelectedEntities() {
+  dismissEditMenu();
+  const copiedCount = captureSelectionToClipboard();
+  if (!copiedCount) {
+    commandStatus.textContent = "Copy: Select one or more entities first.";
+    return;
+  }
+
+  commandStatus.textContent =
+    `Copied ${copiedCount} ${copiedCount === 1 ? "entity" : "entities"}.`;
+}
+
+function pasteCopiedEntities() {
+  dismissEditMenu();
+  if (!clipboardState.rootEntityIds.length || !clipboardState.entities.length) {
+    commandStatus.textContent = "Paste: The PrometheusCAD clipboard is empty.";
     updateEditMenuState();
     return;
   }
 
-  recordDocumentChange(`Delete ${selectedEntity.type} ${selectedEntity.id}`);
+  const rootCount = clipboardState.rootEntityIds.length;
+  recordDocumentChange(
+    `Paste ${rootCount} ${rootCount === 1 ? "entity" : "entities"}`,
+  );
+  const rootEntityIdSet = new Set(clipboardState.rootEntityIds);
+  const pastedIdBySourceId = new Map();
+  clipboardState.entities.forEach((entity) => {
+    pastedIdBySourceId.set(entity.id, documentModel.nextEntityId);
+    documentModel.nextEntityId += 1;
+  });
 
-  if (selectedEntity.type === "point") {
-    const connectedLines = documentModel.entities.filter(
-      (entity) =>
-        entity.type === "line" &&
-        (entity.startPointId === selectedEntity.id ||
-          entity.endPointId === selectedEntity.id),
-    );
-    const centeredCircleCount = documentModel.entities.filter(
-      (entity) =>
-        entity.type === "circle" && entity.centerPointId === selectedEntity.id,
-    ).length;
-    const dependentArcCount = documentModel.entities.filter(
-      (entity) =>
-        entity.type === "arc" &&
-        (entity.centerPointId === selectedEntity.id ||
-          entity.startPointId === selectedEntity.id ||
-          entity.endPointId === selectedEntity.id),
-    ).length;
-
-    connectedLines.forEach((line) => {
-      if (line.startPointId === selectedEntity.id) {
-        line.startPointId = createConstructionPointWithoutHistory(selectedEntity).id;
-      }
-      if (line.endPointId === selectedEntity.id) {
-        line.endPointId = createConstructionPointWithoutHistory(selectedEntity).id;
+  const pastedEntities = clipboardState.entities.map((sourceEntity) => {
+    const pastedEntity = {
+      ...sourceEntity,
+      id: pastedIdBySourceId.get(sourceEntity.id),
+    };
+    CLIPBOARD_POINT_REFERENCE_PROPERTIES.forEach((property) => {
+      if (pastedIdBySourceId.has(sourceEntity[property])) {
+        pastedEntity[property] = pastedIdBySourceId.get(sourceEntity[property]);
       }
     });
+    if (pastedEntity.type === "point" && !rootEntityIdSet.has(sourceEntity.id)) {
+      pastedEntity.isConstruction = true;
+    }
+    return pastedEntity;
+  });
+  const pastedRootIds = clipboardState.rootEntityIds
+    .map((sourceId) => pastedIdBySourceId.get(sourceId))
+    .filter((entityId) => Number.isInteger(entityId));
 
-    documentModel.entities = documentModel.entities.filter(
-      (entity) =>
-        entity.id !== selectedEntity.id &&
-        !(entity.type === "circle" && entity.centerPointId === selectedEntity.id) &&
-        !(
-          entity.type === "arc" &&
-          (entity.centerPointId === selectedEntity.id ||
-            entity.startPointId === selectedEntity.id ||
-            entity.endPointId === selectedEntity.id)
-        ),
-    );
-    pruneUnusedConstructionPoints();
-    selectionState.selectedEntityId = null;
-    renderEntities();
-    const dependentDescriptions = [];
-    if (centeredCircleCount) {
-      dependentDescriptions.push(
-        `${centeredCircleCount} centered ${centeredCircleCount === 1 ? "circle" : "circles"}`,
-      );
-    }
-    if (dependentArcCount) {
-      dependentDescriptions.push(
-        `${dependentArcCount} dependent ${dependentArcCount === 1 ? "arc" : "arcs"}`,
-      );
-    }
-    const deletionMessage = dependentDescriptions.length
-      ? `Deleted point ${selectedEntity.id} and ${dependentDescriptions.join(" and ")}.`
-      : `Deleted point ${selectedEntity.id}.`;
-    commandStatus.textContent = connectedLines.length
-      ? `${deletionMessage} ${connectedLines.length} connected ${connectedLines.length === 1 ? "line was" : "lines were"} kept unchanged.`
-      : deletionMessage;
+  documentModel.entities.push(...pastedEntities);
+  selectionState.selectedEntityIds.clear();
+  pastedRootIds.forEach((entityId) =>
+    selectionState.selectedEntityIds.add(entityId),
+  );
+  selectionState._selectedEntityId =
+    pastedRootIds.length === 1 ? pastedRootIds[0] : null;
+  selectionState.hoveredEntityId = null;
+  selectionState.pickCycle = null;
+  renderEntities();
+  commandStatus.textContent =
+    `Pasted ${pastedRootIds.length} ` +
+    `${pastedRootIds.length === 1 ? "entity" : "entities"} at the copied coordinates.`;
+}
+
+function detachEntityReferencesFromPoints(entityIdsToRemove, pointIdsToDetach) {
+  const replacementPointBySourceId = new Map();
+  documentModel.entities.forEach((entity) => {
+    if (entityIdsToRemove.has(entity.id)) return;
+    CLIPBOARD_POINT_REFERENCE_PROPERTIES.forEach((property) => {
+      const sourcePointId = entity[property];
+      if (!pointIdsToDetach.has(sourcePointId)) return;
+      let replacementPoint = replacementPointBySourceId.get(sourcePointId);
+      if (!replacementPoint) {
+        const sourcePoint = getPointById(sourcePointId);
+        if (!sourcePoint) return;
+        replacementPoint = createConstructionPointWithoutHistory(sourcePoint);
+        replacementPointBySourceId.set(sourcePointId, replacementPoint);
+      }
+      entity[property] = replacementPoint.id;
+    });
+  });
+}
+
+function cutSelectedEntities() {
+  dismissEditMenu();
+  const rootEntities = getSelectedClipboardRoots();
+  if (!rootEntities.length) {
+    commandStatus.textContent = "Cut: Select one or more entities first.";
+    updateEditMenuState();
     return;
   }
 
+  const cutCount = captureSelectionToClipboard();
+  const cutEntityIds = new Set(rootEntities.map((entity) => entity.id));
+  const cutPointIds = new Set(
+    rootEntities
+      .filter((entity) => entity.type === "point")
+      .map((entity) => entity.id),
+  );
+  recordDocumentChange(
+    `Cut ${cutCount} ${cutCount === 1 ? "entity" : "entities"}`,
+  );
+  detachEntityReferencesFromPoints(cutEntityIds, cutPointIds);
+
   documentModel.entities = documentModel.entities.filter(
-    (entity) => entity.id !== selectedEntity.id,
+    (entity) => !cutEntityIds.has(entity.id),
   );
   pruneUnusedConstructionPoints();
   selectionState.selectedEntityId = null;
   renderEntities();
-  commandStatus.textContent = `Deleted ${selectedEntity.type} ${selectedEntity.id}.`;
+  commandStatus.textContent =
+    `Cut ${cutCount} ${cutCount === 1 ? "entity" : "entities"}.`;
+}
+
+function deleteSelectedEntity() {
+  dismissEditMenu();
+  const selectedEntities = documentModel.entities.filter(
+    (entity) =>
+      selectionState.selectedEntityIds.has(entity.id) &&
+      (entity.type !== "point" || !entity.isConstruction),
+  );
+  if (!selectedEntities.length) {
+    commandStatus.textContent = "Select one or more entities to delete.";
+    updateEditMenuState();
+    return;
+  }
+
+  const selectedEntityIds = new Set(
+    selectedEntities.map((entity) => entity.id),
+  );
+  const selectedPointIds = new Set(
+    selectedEntities
+      .filter((entity) => entity.type === "point")
+      .map((entity) => entity.id),
+  );
+  const entityIdsToDelete = new Set(selectedEntityIds);
+  documentModel.entities.forEach((entity) => {
+    if (selectedEntityIds.has(entity.id)) return;
+    const dependsOnSelectedPoint =
+      (entity.type === "circle" && selectedPointIds.has(entity.centerPointId)) ||
+      (entity.type === "arc" &&
+        (selectedPointIds.has(entity.centerPointId) ||
+          selectedPointIds.has(entity.startPointId) ||
+          selectedPointIds.has(entity.endPointId)));
+    if (dependsOnSelectedPoint) entityIdsToDelete.add(entity.id);
+  });
+  const dependentDeleteCount =
+    entityIdsToDelete.size - selectedEntityIds.size;
+  recordDocumentChange(
+    `Delete ${selectedEntities.length} selected ` +
+      `${selectedEntities.length === 1 ? "entity" : "entities"}`,
+  );
+  detachEntityReferencesFromPoints(entityIdsToDelete, selectedPointIds);
+  documentModel.entities = documentModel.entities.filter(
+    (entity) => !entityIdsToDelete.has(entity.id),
+  );
+  pruneUnusedConstructionPoints();
+  selectionState.selectedEntityId = null;
+  renderEntities();
+  commandStatus.textContent =
+    `Deleted ${selectedEntities.length} selected ` +
+    `${selectedEntities.length === 1 ? "entity" : "entities"}` +
+    (dependentDeleteCount
+      ? ` and ${dependentDeleteCount} dependent ${dependentDeleteCount === 1 ? "entity" : "entities"}.`
+      : ".");
 }
 
 function dismissDrawMenu() {
@@ -4502,6 +6044,21 @@ function toggleCircleWindowMaximized() {
   circleMaximizeIcon.textContent = "❐";
 }
 
+function updateCircleCreateState() {
+  if (circleState.centerMode === "coordinate") {
+    const centerX = getArithmeticInputValue(circleCenterXInput);
+    const centerY = getArithmeticInputValue(circleCenterYInput);
+    circleCreateButton.disabled =
+      !Number.isFinite(centerX) ||
+      !Number.isFinite(centerY) ||
+      getCircleRadiusInputValue() === null;
+    circleContinueButton.disabled = circleCreateButton.disabled;
+    return;
+  }
+  circleCreateButton.disabled =
+    circleState.centerPointId === null || getCircleRadiusInputValue() === null;
+}
+
 function closeCircleRadiusWindow(statusMessage = "Ready") {
   if (circleRadiusWindow.classList.contains("is-maximized")) {
     restoreCircleWindow();
@@ -4550,23 +6107,41 @@ function activateCircleCenterMode(centerMode) {
   selectionState.mode = null;
   selectionState.selectedEntityId = null;
   cadCanvas.classList.remove("select-single");
-  circleState.active = true;
+  circleState.active = centerMode !== "coordinate";
   circleState.centerPointId = null;
   circleState.centerMode = centerMode;
   cadCanvas.classList.toggle("circle-center-radius", centerMode === "point");
   cadCanvas.classList.toggle("circle-sketch-center", centerMode === "sketch");
   circleRadiusTitle.textContent =
-    centerMode === "sketch"
-      ? "Circle - Sketch Center & Radius"
-      : "Circle - Point Center & Radius";
+    centerMode === "coordinate"
+      ? "Circle - Coordinate Center & Radius"
+      : centerMode === "sketch"
+        ? "Circle - Sketch Center & Radius"
+        : "Circle - Point Center & Radius";
+  const usesCoordinateCenter = centerMode === "coordinate";
+  circleCenterReadoutGroup.hidden = usesCoordinateCenter;
+  circleCoordinateCenterFields.hidden = !usesCoordinateCenter;
+  circleCoordinateCenterFields.disabled = !usesCoordinateCenter;
+  circleContinueButton.hidden = !usesCoordinateCenter;
+  circleDialogActions.classList.toggle("two-actions", !usesCoordinateCenter);
   circleCenterReadout.textContent = "None selected";
   circleToolMessage.textContent =
-    centerMode === "sketch"
-      ? "Set the radius if needed, then click the drawing to sketch the center."
-      : "Select an existing point for the center.";
-  circleCreateButton.disabled = true;
+    usesCoordinateCenter
+      ? "Enter the center coordinates and a positive radius."
+      : centerMode === "sketch"
+        ? "Set the radius if needed, then click the drawing to sketch the center."
+        : "Select an existing point for the center.";
   if (getCircleRadiusInputValue() === null) circleRadiusInput.value = "1";
+  if (!Number.isFinite(getArithmeticInputValue(circleCenterXInput))) {
+    circleCenterXInput.value = "0";
+  }
+  if (!Number.isFinite(getArithmeticInputValue(circleCenterYInput))) {
+    circleCenterYInput.value = "0";
+  }
+  circleCenterXInput.setCustomValidity("");
+  circleCenterYInput.setCustomValidity("");
   circleRadiusInput.setCustomValidity("");
+  updateCircleCreateState();
   circleRadiusWindow.hidden = false;
   setCircleWindowMinimized(false);
 
@@ -4575,14 +6150,24 @@ function activateCircleCenterMode(centerMode) {
   }
 
   renderEntities();
-  commandStatus.textContent =
-    centerMode === "sketch"
-      ? "Circle - Sketch Center: Click the drawing to create the center point."
-      : "Circle: Select the center point.";
+  if (usesCoordinateCenter) {
+    circleCenterXInput.focus();
+    circleCenterXInput.select();
+    commandStatus.textContent = "Circle - Coordinate Center";
+  } else {
+    commandStatus.textContent =
+      centerMode === "sketch"
+        ? "Circle - Sketch Center: Click the drawing to create the center point."
+        : "Circle: Select the center point.";
+  }
 }
 
 function activateCircleCenterRadius() {
   activateCircleCenterMode("point");
+}
+
+function activateCircleCoordinateCenter() {
+  activateCircleCenterMode("coordinate");
 }
 
 function activateCircleSketchCenter() {
@@ -4618,6 +6203,44 @@ function handleCircleCenterClick(event) {
     `Circle: Center point ${centerPoint.id}; enter the radius.`;
 }
 
+function createCoordinateCircleFromInputs(keepDialogOpen) {
+  const centerX = resolveArithmeticInput(circleCenterXInput, {
+    messageElement: circleToolMessage,
+    invalidMessage: "Enter a valid arithmetic expression for center X.",
+    successMessage: "Enter the center coordinates and a positive radius.",
+  });
+  const centerY = resolveArithmeticInput(circleCenterYInput, {
+    messageElement: circleToolMessage,
+    invalidMessage: "Enter a valid arithmetic expression for center Y.",
+    successMessage: "Enter the center coordinates and a positive radius.",
+  });
+  const radius = resolveArithmeticInput(circleRadiusInput, {
+    messageElement: circleToolMessage,
+    invalidMessage: "Enter a valid arithmetic expression for the radius.",
+    validationMessage: (value) =>
+      value > 0 ? null : "Enter a radius greater than zero.",
+    successMessage: "Enter the center coordinates and a positive radius.",
+  });
+  if (!circleRadiusForm.reportValidity()) return;
+  if (centerX === null || centerY === null || radius === null) return;
+
+  const { circle, centerPoint } = addCoordinateCircle(
+    { x: centerX, y: centerY },
+    radius,
+  );
+  const resultMessage =
+    `Created circle ${circle.id} centered at X${formatCoordinate(centerPoint.x)} ` +
+    `Y${formatCoordinate(centerPoint.y)} with radius ${formatCoordinate(radius)}.`;
+  if (keepDialogOpen) {
+    circleToolMessage.textContent = resultMessage;
+    commandStatus.textContent = `${resultMessage} Circle - Coordinate Center remains open.`;
+    circleCenterXInput.focus();
+    circleCenterXInput.select();
+    return;
+  }
+  closeCircleRadiusWindow(resultMessage);
+}
+
 function createCircleFromInput() {
   const centerPoint = getPointById(circleState.centerPointId);
   const radius = resolveArithmeticInput(circleRadiusInput, {
@@ -4627,9 +6250,11 @@ function createCircleFromInput() {
       value > 0 ? null : "Enter a radius greater than zero.",
     successMessage: () =>
       circleState.centerPointId === null
-        ? circleState.centerMode === "sketch"
-          ? "Click the drawing to sketch the center point."
-          : "Select an existing point for the center."
+        ? circleState.centerMode === "coordinate"
+          ? "Enter the center coordinates and a positive radius."
+          : circleState.centerMode === "sketch"
+            ? "Click the drawing to sketch the center point."
+            : "Select an existing point for the center."
         : "Enter a positive radius, then choose Create.",
   });
   if (!circleRadiusForm.reportValidity()) return;
@@ -4980,6 +6605,373 @@ function createHexagonFromInputs() {
   renderEntities();
   commandStatus.textContent =
     `${resultMessage} Hexagon remains active; select the next center point.`;
+}
+
+function positionRectangleWindowInitially() {
+  const windowBounds = rectangleWindow.getBoundingClientRect();
+  const left = Math.max(8, window.innerWidth - windowBounds.width - 24);
+  const top = Math.min(
+    112,
+    Math.max(8, window.innerHeight - windowBounds.height - 36),
+  );
+  rectangleWindow.style.left = `${left}px`;
+  rectangleWindow.style.top = `${top}px`;
+  rectangleWindowState.hasPosition = true;
+}
+
+function setRectangleWindowMinimized(minimized) {
+  rectangleWindow.classList.toggle("is-minimized", minimized);
+  rectangleMinimizeButton.setAttribute(
+    "aria-label",
+    minimized ? "Restore Rectangle" : "Minimize Rectangle",
+  );
+  rectangleMinimizeButton.title = minimized ? "Restore" : "Minimize";
+}
+
+function restoreRectangleWindow() {
+  rectangleWindow.classList.remove("is-maximized");
+  if (rectangleWindowState.restoreBounds) {
+    const { left, top, width } = rectangleWindowState.restoreBounds;
+    rectangleWindow.style.left = `${left}px`;
+    rectangleWindow.style.top = `${top}px`;
+    rectangleWindow.style.width = `${width}px`;
+  }
+  rectangleMaximizeButton.setAttribute("aria-label", "Maximize Rectangle");
+  rectangleMaximizeButton.title = "Maximize";
+  rectangleMaximizeIcon.textContent = "□";
+}
+
+function toggleRectangleWindowMaximized() {
+  setRectangleWindowMinimized(false);
+  if (rectangleWindow.classList.contains("is-maximized")) {
+    restoreRectangleWindow();
+    return;
+  }
+  const bounds = rectangleWindow.getBoundingClientRect();
+  rectangleWindowState.restoreBounds = {
+    left: bounds.left,
+    top: bounds.top,
+    width: bounds.width,
+  };
+  rectangleWindow.classList.add("is-maximized");
+  rectangleMaximizeButton.setAttribute("aria-label", "Restore Rectangle");
+  rectangleMaximizeButton.title = "Restore";
+  rectangleMaximizeIcon.textContent = "❐";
+}
+
+function closeRectangleWindow(statusMessage = "Ready") {
+  if (rectangleWindow.classList.contains("is-maximized")) {
+    restoreRectangleWindow();
+  }
+  setRectangleWindowMinimized(false);
+  rectangleWindow.hidden = true;
+  if (statusMessage !== null) commandStatus.textContent = statusMessage;
+}
+
+function updateRectangleCreateState() {
+  const xSize = getRectangleXInputValue();
+  const ySize = getRectangleYInputValue();
+  rectangleCreateButton.disabled =
+    getRectangleCenterXInputValue() === null ||
+    getRectangleCenterYInputValue() === null ||
+    xSize === null ||
+    ySize === null ||
+    getRectangleRadiusInputValue(xSize, ySize) === null;
+}
+
+function activateRectangle() {
+  dismissDrawMenu();
+  deactivatePointSketch();
+  deactivateJoin();
+  deactivateIntersectingPoint();
+  deactivateTrimExtend();
+  deactivatePointOnEntity();
+  deactivateFillet();
+  deactivateRotate();
+  if (!circleRadiusWindow.hidden) closeCircleRadiusWindow(null);
+  if (!hexagonWindow.hidden) closeHexagonWindow(null);
+  if (!boltHoleCircleWindow.hidden) closeBoltHoleCircleWindow(null);
+  if (!offsetWindow.hidden) closeOffsetWindow(null);
+  if (!pointCoordinatesWindow.hidden) closePointCoordinatesWindow(null);
+  if (!lineCoordinatesWindow.hidden) closeLineCoordinatesWindow(null);
+
+  selectionState.mode = null;
+  selectionState.selectedEntityId = null;
+  selectionState.pickCycle = null;
+  cadCanvas.classList.remove("select-single");
+  if (getRectangleCenterXInputValue() === null) {
+    rectangleCenterXInput.value = "0";
+  }
+  if (getRectangleCenterYInputValue() === null) {
+    rectangleCenterYInput.value = "0";
+  }
+  if (getRectangleXInputValue() === null) rectangleXInput.value = "2.000";
+  if (getRectangleYInputValue() === null) rectangleYInput.value = "1.000";
+  const xSize = getRectangleXInputValue();
+  const ySize = getRectangleYInputValue();
+  if (getRectangleRadiusInputValue(xSize, ySize) === null) {
+    rectangleRadiusInput.value = formatArithmeticResult(
+      Math.min(0.25, Math.min(xSize, ySize) / 2),
+    );
+  }
+  [
+    rectangleCenterXInput,
+    rectangleCenterYInput,
+    rectangleXInput,
+    rectangleYInput,
+    rectangleRadiusInput,
+  ].forEach((input) => input.setCustomValidity(""));
+  rectangleToolMessage.textContent =
+    "Enter the center location, overall dimensions, and corner radius.";
+  updateRectangleCreateState();
+  rectangleWindow.hidden = false;
+  setRectangleWindowMinimized(false);
+  if (!rectangleWindowState.hasPosition) positionRectangleWindowInitially();
+  rectangleCenterXInput.focus();
+  rectangleCenterXInput.select();
+  renderEntities();
+  commandStatus.textContent =
+    "Rectangle: Enter the center location, X and Y dimensions, and radius.";
+}
+
+function createRectangleFromInputs() {
+  const centerX = resolveArithmeticInput(rectangleCenterXInput, {
+    messageElement: rectangleToolMessage,
+    invalidMessage: "Enter a valid arithmetic expression for center X.",
+    successMessage:
+      "Enter the center location, overall dimensions, and corner radius.",
+  });
+  const centerY = resolveArithmeticInput(rectangleCenterYInput, {
+    messageElement: rectangleToolMessage,
+    invalidMessage: "Enter a valid arithmetic expression for center Y.",
+    successMessage:
+      "Enter the center location, overall dimensions, and corner radius.",
+  });
+  const xSize = resolveArithmeticInput(rectangleXInput, {
+    messageElement: rectangleToolMessage,
+    invalidMessage: "Enter a valid arithmetic expression for X.",
+    validationMessage: (value) =>
+      value > 0 ? null : "X must be greater than zero.",
+    successMessage:
+      "Enter the center location, overall dimensions, and corner radius.",
+  });
+  const ySize = resolveArithmeticInput(rectangleYInput, {
+    messageElement: rectangleToolMessage,
+    invalidMessage: "Enter a valid arithmetic expression for Y.",
+    validationMessage: (value) =>
+      value > 0 ? null : "Y must be greater than zero.",
+    successMessage:
+      "Enter the center location, overall dimensions, and corner radius.",
+  });
+  const radius = resolveArithmeticInput(rectangleRadiusInput, {
+    messageElement: rectangleToolMessage,
+    invalidMessage: "Enter a valid arithmetic expression for the radius.",
+    validationMessage: (value) => {
+      if (value < 0) return "Radius must be zero or greater.";
+      if (
+        Number.isFinite(xSize) &&
+        Number.isFinite(ySize) &&
+        value > Math.min(xSize, ySize) / 2
+      ) {
+        return "Radius cannot exceed half of the smaller dimension.";
+      }
+      return null;
+    },
+    successMessage:
+      "Enter the center location, overall dimensions, and corner radius.",
+  });
+  if (!rectangleForm.reportValidity()) return;
+  if (
+    centerX === null ||
+    centerY === null ||
+    xSize === null ||
+    ySize === null ||
+    radius === null
+  ) {
+    return;
+  }
+
+  const center = { x: centerX, y: centerY };
+  const result = addRectangle(center, xSize, ySize, radius);
+  const centerDescription =
+    `centered at X${formatCoordinate(centerX)} Y${formatCoordinate(centerY)}`;
+  const resultMessage =
+    radius <= GEOMETRY_EPSILON
+      ? `Created sharp rectangle X${formatCoordinate(xSize)} by Y${formatCoordinate(ySize)}, ${centerDescription}.`
+      : `Created rectangle X${formatCoordinate(xSize)} by Y${formatCoordinate(ySize)} with R${formatCoordinate(radius)} corners (${result.lines.length} lines and ${result.arcs.length} arcs), ${centerDescription}.`;
+  closeRectangleWindow(resultMessage);
+}
+
+function positionBoltHoleCircleWindowInitially() {
+  const windowBounds = boltHoleCircleWindow.getBoundingClientRect();
+  const left = Math.max(8, window.innerWidth - windowBounds.width - 24);
+  const top = Math.min(
+    112,
+    Math.max(8, window.innerHeight - windowBounds.height - 36),
+  );
+  boltHoleCircleWindow.style.left = `${left}px`;
+  boltHoleCircleWindow.style.top = `${top}px`;
+  boltHoleCircleWindowState.hasPosition = true;
+}
+
+function setBoltHoleCircleWindowMinimized(minimized) {
+  boltHoleCircleWindow.classList.toggle("is-minimized", minimized);
+  boltHoleCircleMinimizeButton.setAttribute(
+    "aria-label",
+    minimized ? "Restore Bolt Hole Circle" : "Minimize Bolt Hole Circle",
+  );
+  boltHoleCircleMinimizeButton.title = minimized ? "Restore" : "Minimize";
+}
+
+function restoreBoltHoleCircleWindow() {
+  boltHoleCircleWindow.classList.remove("is-maximized");
+  if (boltHoleCircleWindowState.restoreBounds) {
+    const { left, top, width } = boltHoleCircleWindowState.restoreBounds;
+    boltHoleCircleWindow.style.left = `${left}px`;
+    boltHoleCircleWindow.style.top = `${top}px`;
+    boltHoleCircleWindow.style.width = `${width}px`;
+  }
+  boltHoleCircleMaximizeButton.setAttribute(
+    "aria-label",
+    "Maximize Bolt Hole Circle",
+  );
+  boltHoleCircleMaximizeButton.title = "Maximize";
+  boltHoleCircleMaximizeIcon.textContent = "□";
+}
+
+function toggleBoltHoleCircleWindowMaximized() {
+  setBoltHoleCircleWindowMinimized(false);
+  if (boltHoleCircleWindow.classList.contains("is-maximized")) {
+    restoreBoltHoleCircleWindow();
+    return;
+  }
+  const bounds = boltHoleCircleWindow.getBoundingClientRect();
+  boltHoleCircleWindowState.restoreBounds = {
+    left: bounds.left,
+    top: bounds.top,
+    width: bounds.width,
+  };
+  boltHoleCircleWindow.classList.add("is-maximized");
+  boltHoleCircleMaximizeButton.setAttribute(
+    "aria-label",
+    "Restore Bolt Hole Circle",
+  );
+  boltHoleCircleMaximizeButton.title = "Restore";
+  boltHoleCircleMaximizeIcon.textContent = "❐";
+}
+
+function closeBoltHoleCircleWindow(statusMessage = "Ready") {
+  if (boltHoleCircleWindow.classList.contains("is-maximized")) {
+    restoreBoltHoleCircleWindow();
+  }
+  setBoltHoleCircleWindowMinimized(false);
+  boltHoleCircleWindow.hidden = true;
+  if (statusMessage !== null) commandStatus.textContent = statusMessage;
+}
+
+function updateBoltHoleCircleCreateState() {
+  boltHoleCircleCreateButton.disabled =
+    getBoltHoleDiameterInputValue() === null ||
+    getBoltHoleCountInputValue() === null ||
+    getBoltHoleFeatureDiameterInputValue() === null;
+}
+
+function activateBoltHoleCircle() {
+  dismissDrawMenu();
+  deactivatePointSketch();
+  deactivateJoin();
+  deactivateIntersectingPoint();
+  deactivateTrimExtend();
+  deactivatePointOnEntity();
+  deactivateFillet();
+  deactivateRotate();
+  if (!circleRadiusWindow.hidden) closeCircleRadiusWindow(null);
+  if (!hexagonWindow.hidden) closeHexagonWindow(null);
+  if (!offsetWindow.hidden) closeOffsetWindow(null);
+  if (!pointCoordinatesWindow.hidden) closePointCoordinatesWindow(null);
+  if (!lineCoordinatesWindow.hidden) closeLineCoordinatesWindow(null);
+
+  selectionState.mode = null;
+  selectionState.selectedEntityId = null;
+  selectionState.pickCycle = null;
+  cadCanvas.classList.remove("select-single");
+  if (getBoltHoleDiameterInputValue() === null) {
+    boltHoleDiameterInput.value = "3.000";
+  }
+  if (getBoltHoleCountInputValue() === null) {
+    boltHoleCountInput.value = "6";
+  }
+  if (getBoltHoleFeatureDiameterInputValue() === null) {
+    boltHoleFeatureDiameterInput.value = "0";
+  }
+  [
+    boltHoleDiameterInput,
+    boltHoleCountInput,
+    boltHoleFeatureDiameterInput,
+  ].forEach((input) => input.setCustomValidity(""));
+  boltHoleCircleToolMessage.textContent =
+    "Center X0 Y0; the first hole is at 0°.";
+  updateBoltHoleCircleCreateState();
+  boltHoleCircleWindow.hidden = false;
+  setBoltHoleCircleWindowMinimized(false);
+  if (!boltHoleCircleWindowState.hasPosition) {
+    positionBoltHoleCircleWindowInitially();
+  }
+  boltHoleDiameterInput.focus();
+  boltHoleDiameterInput.select();
+  renderEntities();
+  commandStatus.textContent =
+    "Bolt Hole Circle: Center X0 Y0; enter the pattern dimensions.";
+}
+
+function createBoltHoleCircleFromInputs() {
+  const boltHoleDiameter = resolveArithmeticInput(boltHoleDiameterInput, {
+    messageElement: boltHoleCircleToolMessage,
+    invalidMessage:
+      "Enter a valid arithmetic expression for the bolt hole diameter.",
+    validationMessage: (value) =>
+      value > 0 ? null : "Bolt hole diameter must be greater than zero.",
+    successMessage: "Center X0 Y0; the first hole is at 0°.",
+  });
+  const holeCount = resolveArithmeticInput(boltHoleCountInput, {
+    messageElement: boltHoleCircleToolMessage,
+    invalidMessage:
+      "Enter a valid arithmetic expression for the number of holes.",
+    validationMessage: (value) =>
+      Number.isSafeInteger(value) &&
+      value > 0 &&
+      value <= MAX_BOLT_HOLE_COUNT
+        ? null
+        : `Number of holes must be a whole number from 1 to ${MAX_BOLT_HOLE_COUNT}.`,
+    successMessage: "Center X0 Y0; the first hole is at 0°.",
+  });
+  const holeDiameter = resolveArithmeticInput(boltHoleFeatureDiameterInput, {
+    messageElement: boltHoleCircleToolMessage,
+    invalidMessage:
+      "Enter a valid arithmetic expression for the hole diameter.",
+    validationMessage: (value) =>
+      value >= 0 ? null : "Hole diameter must be zero or greater.",
+    successMessage: "Center X0 Y0; the first hole is at 0°.",
+  });
+  if (!boltHoleCircleForm.reportValidity()) return;
+  if (
+    boltHoleDiameter === null ||
+    holeCount === null ||
+    holeDiameter === null
+  ) {
+    return;
+  }
+
+  addBoltHoleCircle(boltHoleDiameter, holeCount, holeDiameter);
+  const featureDescription =
+    holeDiameter === 0
+      ? `${holeCount} ${holeCount === 1 ? "point" : "points"}`
+      : `${holeCount} ${holeCount === 1 ? "hole" : "holes"} at Ø${formatCoordinate(holeDiameter)}`;
+  const resultMessage =
+    `Created bolt hole circle with ${featureDescription} on ` +
+    `Ø${formatCoordinate(boltHoleDiameter)}, centered at X0 Y0; ` +
+    "the first position is at 0°.";
+  closeBoltHoleCircleWindow(resultMessage);
 }
 
 function getOffsetAmount() {
@@ -6093,6 +8085,449 @@ function rotateSelectedEntity() {
   commandStatus.textContent = resultMessage;
 }
 
+function mirrorWorldPoint(worldPoint, axisMode) {
+  const mirrorX = axisMode === "y" || axisMode === "both";
+  const mirrorY = axisMode === "x" || axisMode === "both";
+  const x = mirrorX ? -worldPoint.x : worldPoint.x;
+  const y = mirrorY ? -worldPoint.y : worldPoint.y;
+  return {
+    x: Math.abs(x) <= 1e-12 ? 0 : x,
+    y: Math.abs(y) <= 1e-12 ? 0 : y,
+  };
+}
+
+function getEntityPointProperties(entity) {
+  if (entity.type === "point") {
+    return [{ property: null, point: entity }];
+  }
+  if (entity.type === "line") {
+    return [
+      { property: "startPointId", point: getPointById(entity.startPointId) },
+      { property: "endPointId", point: getPointById(entity.endPointId) },
+    ];
+  }
+  if (entity.type === "circle") {
+    return [
+      { property: "centerPointId", point: getPointById(entity.centerPointId) },
+    ];
+  }
+  if (entity.type === "arc") {
+    return [
+      { property: "centerPointId", point: getPointById(entity.centerPointId) },
+      { property: "startPointId", point: getPointById(entity.startPointId) },
+      { property: "endPointId", point: getPointById(entity.endPointId) },
+    ];
+  }
+  return [];
+}
+
+function addMirroredEntityCopy(entity, axisMode) {
+  if (entity.type === "point") {
+    const mirrored = mirrorWorldPoint(entity, axisMode);
+    const point = {
+      id: documentModel.nextEntityId,
+      type: "point",
+      x: mirrored.x,
+      y: mirrored.y,
+    };
+    documentModel.nextEntityId += 1;
+    documentModel.entities.push(point);
+    return point;
+  }
+
+  if (entity.type === "line") {
+    const startPoint = getPointById(entity.startPointId);
+    const endPoint = getPointById(entity.endPointId);
+    if (!startPoint || !endPoint) return null;
+    return createIndependentLineWithoutHistory(
+      mirrorWorldPoint(startPoint, axisMode),
+      mirrorWorldPoint(endPoint, axisMode),
+    ).line;
+  }
+
+  if (entity.type === "circle") {
+    const centerPoint = getPointById(entity.centerPointId);
+    if (!centerPoint) return null;
+    const centerReference = createConstructionPointWithoutHistory(
+      mirrorWorldPoint(centerPoint, axisMode),
+    );
+    const circle = {
+      id: documentModel.nextEntityId,
+      type: "circle",
+      centerPointId: centerReference.id,
+      radius: entity.radius,
+    };
+    documentModel.nextEntityId += 1;
+    documentModel.entities.push(circle);
+    return circle;
+  }
+
+  if (entity.type === "arc") {
+    const centerPoint = getPointById(entity.centerPointId);
+    const startPoint = getPointById(entity.startPointId);
+    const endPoint = getPointById(entity.endPointId);
+    if (!centerPoint || !startPoint || !endPoint) return null;
+    const centerReference = createConstructionPointWithoutHistory(
+      mirrorWorldPoint(centerPoint, axisMode),
+    );
+    let mirroredStart = mirrorWorldPoint(startPoint, axisMode);
+    let mirroredEnd = mirrorWorldPoint(endPoint, axisMode);
+    if (axisMode !== "both") {
+      [mirroredStart, mirroredEnd] = [mirroredEnd, mirroredStart];
+    }
+    const startReference = createConstructionPointWithoutHistory(mirroredStart);
+    const endReference = createConstructionPointWithoutHistory(mirroredEnd);
+    const arc = {
+      id: documentModel.nextEntityId,
+      type: "arc",
+      centerPointId: centerReference.id,
+      startPointId: startReference.id,
+      endPointId: endReference.id,
+      radius: entity.radius,
+    };
+    documentModel.nextEntityId += 1;
+    documentModel.entities.push(arc);
+    return arc;
+  }
+
+  return null;
+}
+
+function mirrorSelectedEntity(axisMode) {
+  dismissModifyMenu();
+  const entity = getEntityById(selectionState.selectedEntityId);
+  const axisDescription =
+    axisMode === "x"
+      ? "X axis"
+      : axisMode === "y"
+        ? "Y axis"
+        : "X and Y axes";
+  if (!entity) {
+    commandStatus.textContent =
+      `Mirror - ${axisDescription}: Select an entity first.`;
+    return;
+  }
+
+  const pointProperties = getEntityPointProperties(entity);
+  if (!pointProperties.length || pointProperties.some(({ point }) => !point)) {
+    commandStatus.textContent =
+      `Mirror - ${axisDescription}: The selected entity has unusable geometry.`;
+    return;
+  }
+
+  if (mirrorCopyInput.checked) {
+    recordDocumentChange(
+      `Mirror and copy ${entity.type} ${entity.id} across ${axisDescription}`,
+    );
+    const mirroredCopy = addMirroredEntityCopy(entity, axisMode);
+    if (!mirroredCopy) {
+      historyState.undoStack.pop();
+      updateEditMenuState();
+      commandStatus.textContent =
+        `Mirror - ${axisDescription}: The selected entity could not be copied.`;
+      return;
+    }
+    selectionState.selectedEntityId = mirroredCopy.id;
+    selectionState.hoveredEntityId = null;
+    selectionState.pickCycle = null;
+    renderEntities();
+    commandStatus.textContent =
+      `Mirrored and copied ${entity.type} ${entity.id} across ${axisDescription} ` +
+      `as ${mirroredCopy.type} ${mirroredCopy.id}.`;
+    return;
+  }
+
+  const transformations = pointProperties.map(({ property, point }) => ({
+    property,
+    point,
+    mirrored: mirrorWorldPoint(point, axisMode),
+  }));
+  const reflectionReversesArc = entity.type === "arc" && axisMode !== "both";
+  const changed =
+    reflectionReversesArc ||
+    transformations.some(
+      ({ point, mirrored }) =>
+        Math.hypot(point.x - mirrored.x, point.y - mirrored.y) >
+        GEOMETRY_EPSILON,
+    );
+  if (!changed) {
+    commandStatus.textContent =
+      `Mirror - ${axisDescription}: ${entity.type} ${entity.id} already lies symmetrically on that axis.`;
+    return;
+  }
+
+  recordDocumentChange(
+    `Mirror ${entity.type} ${entity.id} across ${axisDescription}`,
+  );
+  if (entity.type === "point") {
+    entity.x = transformations[0].mirrored.x;
+    entity.y = transformations[0].mirrored.y;
+  } else {
+    transformations.forEach(({ property, point, mirrored }) => {
+      entity[property] = point.isConstruction
+        ? createConstructionPointWithoutHistory(mirrored).id
+        : getOrCreatePointWithoutHistory(mirrored).id;
+    });
+    if (reflectionReversesArc) {
+      [entity.startPointId, entity.endPointId] = [
+        entity.endPointId,
+        entity.startPointId,
+      ];
+    }
+  }
+
+  pruneUnusedConstructionPoints();
+  selectionState.hoveredEntityId = null;
+  selectionState.pickCycle = null;
+  renderEntities();
+  commandStatus.textContent =
+    `Mirrored ${entity.type} ${entity.id} across ${axisDescription}.`;
+}
+
+function dismissDimensionMenu() {
+  dimensionMenuItem.classList.add("is-dismissed");
+  document.activeElement?.blur();
+}
+
+function resetDimensionPickState() {
+  dimensionState.firstPointId = null;
+  dimensionState.firstLineId = null;
+  dimensionState.firstPickWorld = null;
+}
+
+function deactivateDimension(statusMessage) {
+  const wasActive = dimensionState.activeType !== null;
+  dimensionState.activeType = null;
+  resetDimensionPickState();
+  cadCanvas.classList.remove(
+    "dimension-linear",
+    "dimension-diameter",
+    "dimension-radius",
+    "dimension-angle",
+  );
+  if (wasActive) renderEntities();
+  if (statusMessage) commandStatus.textContent = statusMessage;
+}
+
+function activateDimension(type) {
+  dismissDimensionMenu();
+  deactivateDimension();
+  deactivatePointSketch();
+  deactivateLineSketch();
+  deactivateJoin();
+  deactivateIntersectingPoint();
+  deactivateThreeEntityCircle();
+  deactivateTrimExtend();
+  deactivatePointOnEntity();
+  deactivateFillet();
+  deactivateRotate();
+  if (!circleRadiusWindow.hidden) closeCircleRadiusWindow(null);
+  if (!hexagonWindow.hidden) closeHexagonWindow(null);
+  if (!rectangleWindow.hidden) closeRectangleWindow(null);
+  if (!boltHoleCircleWindow.hidden) closeBoltHoleCircleWindow(null);
+  if (!offsetWindow.hidden) closeOffsetWindow(null);
+  if (!pointCoordinatesWindow.hidden) closePointCoordinatesWindow(null);
+  if (!lineCoordinatesWindow.hidden) closeLineCoordinatesWindow(null);
+
+  const lineCount = documentModel.entities.filter(
+    (entity) => entity.type === "line",
+  ).length;
+  const visiblePointCount = documentModel.entities.filter(
+    (entity) => entity.type === "point" && !entity.isConstruction,
+  ).length;
+  const radialEntityCount = documentModel.entities.filter(
+    (entity) => entity.type === "circle" || entity.type === "arc",
+  ).length;
+  if (type === "linear" && lineCount === 0 && visiblePointCount < 2) {
+    commandStatus.textContent =
+      "Dimension - Linear needs a line or at least two visible points.";
+    return;
+  }
+  if ((type === "diameter" || type === "radius") && radialEntityCount === 0) {
+    commandStatus.textContent =
+      `Dimension - ${type === "diameter" ? "Diameter" : "Radius"} needs a circle or arc.`;
+    return;
+  }
+  if (type === "angle" && lineCount < 2) {
+    commandStatus.textContent = "Dimension - Angle needs at least two lines.";
+    return;
+  }
+
+  dimensionState.activeType = type;
+  resetDimensionPickState();
+  selectionState.mode = null;
+  selectionState.selectedEntityId = null;
+  selectionState.hoveredEntityId = null;
+  selectionState.pickCycle = null;
+  cadCanvas.classList.remove(
+    "select-single",
+    "dimension-linear",
+    "dimension-diameter",
+    "dimension-radius",
+    "dimension-angle",
+  );
+  cadCanvas.classList.add(`dimension-${type}`);
+  renderEntities();
+
+  if (type === "linear") {
+    commandStatus.textContent =
+      "Dimension - Linear: Select a line, or select the first of two points.";
+  } else if (type === "angle") {
+    commandStatus.textContent = "Dimension - Angle: Select the first line near the desired ray.";
+  } else {
+    const name = type === "diameter" ? "Diameter" : "Radius";
+    commandStatus.textContent =
+      `Dimension - ${name}: Select a circle or arc where the leader should appear.`;
+  }
+}
+
+function getDimensionCandidate(event, allowedTypes) {
+  const worldPoint = screenToWorld(event);
+  return getSelectionHitCandidates(worldPoint, event.target).find(({ entity }) =>
+    allowedTypes.includes(entity.type),
+  )?.entity ?? null;
+}
+
+function handleLinearDimensionClick(event) {
+  const candidate = getDimensionCandidate(event, ["point", "line"]);
+  if (!candidate) {
+    commandStatus.textContent =
+      dimensionState.firstPointId === null
+        ? "Dimension - Linear: Select a line, or select the first point."
+        : "Dimension - Linear: Select the second point.";
+    return;
+  }
+
+  if (candidate.type === "line") {
+    const endpoints = getLineEndpointPair(candidate);
+    if (!endpoints) {
+      commandStatus.textContent = "Dimension - Linear: That line has unusable endpoints.";
+      return;
+    }
+    resetDimensionPickState();
+    const dimension = addLinearDimension(
+      endpoints.startPoint,
+      endpoints.endPoint,
+    );
+    commandStatus.textContent = dimension
+      ? `Created linear dimension ${dimension.id}: ${formatCoordinate(dimension.value)}. Linear dimension remains active.`
+      : "Dimension - Linear: That line has no measurable length.";
+    return;
+  }
+
+  if (dimensionState.firstPointId === null) {
+    dimensionState.firstPointId = candidate.id;
+    renderEntities();
+    commandStatus.textContent =
+      `Dimension - Linear: Point ${candidate.id} selected; select the second point.`;
+    return;
+  }
+  if (candidate.id === dimensionState.firstPointId) {
+    commandStatus.textContent = "Dimension - Linear: Select a different second point.";
+    return;
+  }
+
+  const firstPoint = getPointById(dimensionState.firstPointId);
+  resetDimensionPickState();
+  if (!firstPoint) {
+    renderEntities();
+    commandStatus.textContent = "Dimension - Linear: The first point is no longer available.";
+    return;
+  }
+  const dimension = addLinearDimension(firstPoint, candidate);
+  commandStatus.textContent = dimension
+    ? `Created linear dimension ${dimension.id}: ${formatCoordinate(dimension.value)}. Linear dimension remains active.`
+    : "Dimension - Linear: The selected points occupy the same location.";
+}
+
+function handleRadialDimensionClick(event, dimensionType) {
+  const candidate = getDimensionCandidate(event, ["circle", "arc"]);
+  if (!candidate) {
+    commandStatus.textContent =
+      `Dimension - ${dimensionType === "diameter" ? "Diameter" : "Radius"}: Select a circle or arc.`;
+    return;
+  }
+  const centerPoint = getPointById(candidate.centerPointId);
+  if (!centerPoint) {
+    commandStatus.textContent = "Dimension: The selected entity has no usable center.";
+    return;
+  }
+  const clickPoint = screenToWorld(event);
+  const clickDistance = Math.hypot(
+    clickPoint.x - centerPoint.x,
+    clickPoint.y - centerPoint.y,
+  );
+  const angle =
+    clickDistance <= GEOMETRY_EPSILON
+      ? 0
+      : Math.atan2(clickPoint.y - centerPoint.y, clickPoint.x - centerPoint.x);
+  const dimension = addRadialDimension(candidate, dimensionType, angle);
+  const name = dimensionType === "diameter" ? "diameter" : "radius";
+  const value =
+    dimensionType === "diameter" ? candidate.radius * 2 : candidate.radius;
+  commandStatus.textContent = dimension
+    ? `Created ${name} dimension ${dimension.id}: ${formatCoordinate(value)}. ${name[0].toUpperCase()}${name.slice(1)} dimension remains active.`
+    : `Dimension - ${name}: The selected entity could not be measured.`;
+}
+
+function handleAngleDimensionClick(event) {
+  const candidate = getDimensionCandidate(event, ["line"]);
+  if (!candidate) {
+    commandStatus.textContent =
+      dimensionState.firstLineId === null
+        ? "Dimension - Angle: Select the first line."
+        : "Dimension - Angle: Select the second line.";
+    return;
+  }
+  const pickPoint = screenToWorld(event);
+  if (dimensionState.firstLineId === null) {
+    dimensionState.firstLineId = candidate.id;
+    dimensionState.firstPickWorld = pickPoint;
+    renderEntities();
+    commandStatus.textContent =
+      `Dimension - Angle: Line ${candidate.id} selected; select the second line near the desired ray.`;
+    return;
+  }
+  if (candidate.id === dimensionState.firstLineId) {
+    commandStatus.textContent = "Dimension - Angle: Select a different second line.";
+    return;
+  }
+
+  const firstLine = getEntityById(dimensionState.firstLineId);
+  const firstPick = dimensionState.firstPickWorld;
+  resetDimensionPickState();
+  if (!firstLine || !firstPick) {
+    renderEntities();
+    commandStatus.textContent = "Dimension - Angle: The first line is no longer available.";
+    return;
+  }
+  const result = addAngleDimension(firstLine, candidate, firstPick, pickPoint);
+  if (!result.dimension) {
+    renderEntities();
+    commandStatus.textContent =
+      result.reason === "parallel" || result.reason === "collinear"
+        ? "Dimension - Angle: Parallel or collinear lines do not define an angle. Select the first line again."
+        : "Dimension - Angle: Those lines have unusable geometry. Select the first line again.";
+    return;
+  }
+  commandStatus.textContent =
+    `Created angle dimension ${result.dimension.id}: ${formatCoordinate(result.dimension.valueDegrees)}°. ` +
+    "Angle dimension remains active; select the first line.";
+}
+
+function handleDimensionClick(event) {
+  if (dimensionState.activeType === "linear") {
+    handleLinearDimensionClick(event);
+  } else if (
+    dimensionState.activeType === "diameter" ||
+    dimensionState.activeType === "radius"
+  ) {
+    handleRadialDimensionClick(event, dimensionState.activeType);
+  } else if (dimensionState.activeType === "angle") {
+    handleAngleDimensionClick(event);
+  }
+}
+
 function positionPointOnEntityWindowInitially() {
   const windowBounds = pointOnEntityWindow.getBoundingClientRect();
   const left = Math.max(8, window.innerWidth - windowBounds.width - 24);
@@ -6848,12 +9283,26 @@ pointOnEntityForm.addEventListener("submit", (event) => {
 
 circleRadiusForm.addEventListener("submit", (event) => {
   event.preventDefault();
-  createCircleFromInput();
+  if (circleState.centerMode === "coordinate") {
+    createCoordinateCircleFromInputs(false);
+  } else {
+    createCircleFromInput();
+  }
 });
 
 hexagonForm.addEventListener("submit", (event) => {
   event.preventDefault();
   createHexagonFromInputs();
+});
+
+rectangleForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  createRectangleFromInputs();
+});
+
+boltHoleCircleForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  createBoltHoleCircleFromInputs();
 });
 
 offsetForm.addEventListener("submit", (event) => {
@@ -6907,6 +9356,18 @@ const arithmeticInputConfigurations = [
     successMessage: "Enter the start and end coordinates.",
   },
   {
+    input: circleCenterXInput,
+    messageElement: circleToolMessage,
+    invalidMessage: "Enter a valid arithmetic expression for center X.",
+    successMessage: "Enter the center coordinates and a positive radius.",
+  },
+  {
+    input: circleCenterYInput,
+    messageElement: circleToolMessage,
+    invalidMessage: "Enter a valid arithmetic expression for center Y.",
+    successMessage: "Enter the center coordinates and a positive radius.",
+  },
+  {
     input: circleRadiusInput,
     messageElement: circleToolMessage,
     invalidMessage: "Enter a valid arithmetic expression for the radius.",
@@ -6914,9 +9375,11 @@ const arithmeticInputConfigurations = [
       value > 0 ? null : "Enter a radius greater than zero.",
     successMessage: () =>
       circleState.centerPointId === null
-        ? circleState.centerMode === "sketch"
-          ? "Click the drawing to sketch the center point."
-          : "Select an existing point for the center."
+        ? circleState.centerMode === "coordinate"
+          ? "Enter the center coordinates and a positive radius."
+          : circleState.centerMode === "sketch"
+            ? "Click the drawing to sketch the center point."
+            : "Select an existing point for the center."
         : "Enter a positive radius, then choose Create.",
   },
   {
@@ -6947,6 +9410,86 @@ const arithmeticInputConfigurations = [
       hexagonState.centerPointId === null
         ? "Select an existing point for the center."
         : "Enter the size across flats and an optional corner radius.",
+  },
+  {
+    input: rectangleCenterXInput,
+    messageElement: rectangleToolMessage,
+    invalidMessage: "Enter a valid arithmetic expression for center X.",
+    successMessage:
+      "Enter the center location, overall dimensions, and corner radius.",
+  },
+  {
+    input: rectangleCenterYInput,
+    messageElement: rectangleToolMessage,
+    invalidMessage: "Enter a valid arithmetic expression for center Y.",
+    successMessage:
+      "Enter the center location, overall dimensions, and corner radius.",
+  },
+  {
+    input: rectangleXInput,
+    messageElement: rectangleToolMessage,
+    invalidMessage: "Enter a valid arithmetic expression for X.",
+    validationMessage: (value) =>
+      value > 0 ? null : "X must be greater than zero.",
+    successMessage:
+      "Enter the center location, overall dimensions, and corner radius.",
+  },
+  {
+    input: rectangleYInput,
+    messageElement: rectangleToolMessage,
+    invalidMessage: "Enter a valid arithmetic expression for Y.",
+    validationMessage: (value) =>
+      value > 0 ? null : "Y must be greater than zero.",
+    successMessage:
+      "Enter the center location, overall dimensions, and corner radius.",
+  },
+  {
+    input: rectangleRadiusInput,
+    messageElement: rectangleToolMessage,
+    invalidMessage: "Enter a valid arithmetic expression for the radius.",
+    validationMessage: (value) => {
+      if (value < 0) return "Radius must be zero or greater.";
+      const xSize = getRectangleXInputValue();
+      const ySize = getRectangleYInputValue();
+      return Number.isFinite(xSize) &&
+        Number.isFinite(ySize) &&
+        value > Math.min(xSize, ySize) / 2
+        ? "Radius cannot exceed half of the smaller dimension."
+        : null;
+    },
+    successMessage:
+      "Enter the center location, overall dimensions, and corner radius.",
+  },
+  {
+    input: boltHoleDiameterInput,
+    messageElement: boltHoleCircleToolMessage,
+    invalidMessage:
+      "Enter a valid arithmetic expression for the bolt hole diameter.",
+    validationMessage: (value) =>
+      value > 0 ? null : "Bolt hole diameter must be greater than zero.",
+    successMessage: "Center X0 Y0; the first hole is at 0°.",
+  },
+  {
+    input: boltHoleCountInput,
+    messageElement: boltHoleCircleToolMessage,
+    invalidMessage:
+      "Enter a valid arithmetic expression for the number of holes.",
+    validationMessage: (value) =>
+      Number.isSafeInteger(value) &&
+      value > 0 &&
+      value <= MAX_BOLT_HOLE_COUNT
+        ? null
+        : `Number of holes must be a whole number from 1 to ${MAX_BOLT_HOLE_COUNT}.`,
+    successMessage: "Center X0 Y0; the first hole is at 0°.",
+  },
+  {
+    input: boltHoleFeatureDiameterInput,
+    messageElement: boltHoleCircleToolMessage,
+    invalidMessage:
+      "Enter a valid arithmetic expression for the hole diameter.",
+    validationMessage: (value) =>
+      value >= 0 ? null : "Hole diameter must be zero or greater.",
+    successMessage: "Center X0 Y0; the first hole is at 0°.",
   },
   {
     input: offsetAmountInput,
@@ -7008,10 +9551,12 @@ arithmeticInputConfigurations.forEach((configuration) => {
   configuration.input.addEventListener("blur", () => {
     if (!configuration.input.value.trim()) return;
     resolveArithmeticInput(configuration.input, configuration);
-    if (configuration.input === circleRadiusInput) {
-      circleCreateButton.disabled =
-        circleState.centerPointId === null ||
-        getCircleRadiusInputValue() === null;
+    if (
+      configuration.input === circleCenterXInput ||
+      configuration.input === circleCenterYInput ||
+      configuration.input === circleRadiusInput
+    ) {
+      updateCircleCreateState();
       renderToolPreview();
     }
     if (
@@ -7021,13 +9566,30 @@ arithmeticInputConfigurations.forEach((configuration) => {
       updateHexagonCreateState();
       renderToolPreview();
     }
+    if (
+      configuration.input === rectangleCenterXInput ||
+      configuration.input === rectangleCenterYInput ||
+      configuration.input === rectangleXInput ||
+      configuration.input === rectangleYInput ||
+      configuration.input === rectangleRadiusInput
+    ) {
+      updateRectangleCreateState();
+    }
+    if (
+      configuration.input === boltHoleDiameterInput ||
+      configuration.input === boltHoleCountInput ||
+      configuration.input === boltHoleFeatureDiameterInput
+    ) {
+      updateBoltHoleCircleCreateState();
+    }
   });
 });
 
-circleRadiusInput.addEventListener("input", () => {
-  circleCreateButton.disabled =
-    circleState.centerPointId === null || getCircleRadiusInputValue() === null;
-  renderToolPreview();
+[circleCenterXInput, circleCenterYInput, circleRadiusInput].forEach((input) => {
+  input.addEventListener("input", () => {
+    updateCircleCreateState();
+    renderToolPreview();
+  });
 });
 
 [hexagonAcrossFlatsInput, hexagonCornerRadiusInput].forEach((input) => {
@@ -7035,6 +9597,24 @@ circleRadiusInput.addEventListener("input", () => {
     updateHexagonCreateState();
     renderToolPreview();
   });
+});
+
+[
+  rectangleCenterXInput,
+  rectangleCenterYInput,
+  rectangleXInput,
+  rectangleYInput,
+  rectangleRadiusInput,
+].forEach((input) => {
+  input.addEventListener("input", updateRectangleCreateState);
+});
+
+[
+  boltHoleDiameterInput,
+  boltHoleCountInput,
+  boltHoleFeatureDiameterInput,
+].forEach((input) => {
+  input.addEventListener("input", updateBoltHoleCircleCreateState);
 });
 
 pointCoordinatesMenu.addEventListener("click", activatePointCoordinates);
@@ -7046,13 +9626,30 @@ lineSketchMenu.addEventListener("click", activateLineSketch);
 exportDxfMenu.addEventListener("click", exportDxf);
 lineJoinMenu.addEventListener("click", activateJoin);
 circleCenterRadiusMenu.addEventListener("click", activateCircleCenterRadius);
+circleCoordinateCenterMenu.addEventListener(
+  "click",
+  activateCircleCoordinateCenter,
+);
 circleSketchCenterMenu.addEventListener("click", activateCircleSketchCenter);
 circleThreeEntitiesMenu.addEventListener("click", activateThreeEntityCircle);
 hexagonMenu.addEventListener("click", activateHexagon);
+rectangleMenu.addEventListener("click", activateRectangle);
+boltHoleCircleMenu.addEventListener("click", activateBoltHoleCircle);
 offsetMenu.addEventListener("click", activateOffset);
 trimExtendMenu.addEventListener("click", activateTrimExtend);
 filletRadiusMenu.addEventListener("click", activateFillet);
 rotateMenu.addEventListener("click", activateRotate);
+linearDimensionMenu.addEventListener("click", () => activateDimension("linear"));
+diameterDimensionMenu.addEventListener("click", () =>
+  activateDimension("diameter"),
+);
+radiusDimensionMenu.addEventListener("click", () => activateDimension("radius"));
+angleDimensionMenu.addEventListener("click", () => activateDimension("angle"));
+mirrorXAxisMenu.addEventListener("click", () => mirrorSelectedEntity("x"));
+mirrorYAxisMenu.addEventListener("click", () => mirrorSelectedEntity("y"));
+mirrorBothAxesMenu.addEventListener("click", () =>
+  mirrorSelectedEntity("both"),
+);
 fileMenuButton.addEventListener("click", () => {
   fileMenuItem.classList.remove("is-dismissed");
 });
@@ -7071,6 +9668,12 @@ modifyMenuButton.addEventListener("click", () => {
 modifyMenuItem.addEventListener("pointerleave", () => {
   modifyMenuItem.classList.remove("is-dismissed");
 });
+dimensionMenuButton.addEventListener("click", () => {
+  dimensionMenuItem.classList.remove("is-dismissed");
+});
+dimensionMenuItem.addEventListener("pointerleave", () => {
+  dimensionMenuItem.classList.remove("is-dismissed");
+});
 editMenuButton.addEventListener("click", () => {
   editMenuItem.classList.remove("is-dismissed");
 });
@@ -7079,6 +9682,9 @@ editMenuItem.addEventListener("pointerleave", () => {
 });
 undoMenu.addEventListener("click", undoDocumentChange);
 redoMenu.addEventListener("click", redoDocumentChange);
+copyMenu.addEventListener("click", copySelectedEntities);
+pasteMenu.addEventListener("click", pasteCopiedEntities);
+cutMenu.addEventListener("click", cutSelectedEntities);
 deleteMenu.addEventListener("click", deleteSelectedEntity);
 quickUndoButton.addEventListener("click", () => {
   deactivateWindowZoom();
@@ -7090,13 +9696,48 @@ quickRedoButton.addEventListener("click", () => {
 });
 quickZoomInButton.addEventListener("click", zoomIn);
 quickZoomOutButton.addEventListener("click", zoomOut);
-quickZoomWindowButton.addEventListener("click", activateWindowZoom);
+quickZoomWindowButton.addEventListener("click", () => {
+  deactivateDimension();
+  activateWindowZoom();
+});
+quickHomeButton.addEventListener("click", homeView);
+quickFitButton.addEventListener("click", fitAllGeometry);
 quickCalculatorButton.addEventListener("click", openCalculatorWindow);
 
 document.querySelector(".menu-bar").addEventListener(
   "click",
   (event) => {
     const commandButton = event.target.closest(".dropdown-menu button");
+    const dimensionButtons = [
+      linearDimensionMenu,
+      diameterDimensionMenu,
+      radiusDimensionMenu,
+      angleDimensionMenu,
+    ];
+    if (
+      dimensionState.activeType !== null &&
+      commandButton &&
+      !dimensionButtons.includes(commandButton) &&
+      !commandButton.disabled
+    ) {
+      deactivateDimension();
+    }
+    if (
+      !rectangleWindow.hidden &&
+      commandButton &&
+      commandButton !== rectangleMenu &&
+      !commandButton.disabled
+    ) {
+      closeRectangleWindow(null);
+    }
+    if (
+      !boltHoleCircleWindow.hidden &&
+      commandButton &&
+      commandButton !== boltHoleCircleMenu &&
+      !commandButton.disabled
+    ) {
+      closeBoltHoleCircleWindow(null);
+    }
     if (
       windowZoomState.active &&
       commandButton &&
@@ -7125,6 +9766,10 @@ windowZoomMenu.addEventListener("click", activateWindowZoom);
 homeViewMenu.addEventListener("click", () => {
   dismissViewMenu();
   homeView();
+});
+fitViewMenu.addEventListener("click", () => {
+  dismissViewMenu();
+  fitAllGeometry();
 });
 layerMenuButton.addEventListener("click", () => {
   layerMenuItem.classList.remove("is-dismissed");
@@ -7190,7 +9835,20 @@ themeMenuItem.addEventListener("pointerleave", () => {
 Object.entries(THEME_MENUS).forEach(([themeName, menuButton]) => {
   menuButton.addEventListener("click", () => selectTheme(themeName));
 });
+selectAllMenu.addEventListener("click", selectAllEntities);
 singleSelectMenu.addEventListener("click", activateSingleSelect);
+selectChainMenu.addEventListener("click", activateChainSelect);
+selectPointsMenu.addEventListener("click", selectAllPoints);
+selectLinesMenu.addEventListener("click", selectAllLines);
+selectArcsMenu.addEventListener("click", selectAllArcsAndCircles);
+selectDimensionsMenu.addEventListener("click", selectAllDimensions);
+deselectAllMenu.addEventListener("click", deselectAllEntities);
+selectMenuButton.addEventListener("click", () => {
+  selectMenuItem.classList.remove("is-dismissed");
+});
+selectMenuItem.addEventListener("pointerleave", () => {
+  selectMenuItem.classList.remove("is-dismissed");
+});
 
 cadCanvas.addEventListener("pointerdown", (event) => {
   if (!windowZoomState.active || event.button !== 0) return;
@@ -7238,6 +9896,11 @@ cadCanvas.addEventListener("click", (event) => {
 
   if (rotateState.active && rotateState.awaitingPivot) {
     handleRotatePivotClick(event);
+    return;
+  }
+
+  if (dimensionState.activeType !== null) {
+    handleDimensionClick(event);
     return;
   }
 
@@ -7296,6 +9959,11 @@ cadCanvas.addEventListener("click", (event) => {
     return;
   }
 
+  if (selectionState.mode === "chain") {
+    handleChainSelectClick(event);
+    return;
+  }
+
   if (selectionState.mode !== "single") return;
 
   const worldPoint = screenToWorld(event);
@@ -7321,11 +9989,16 @@ cadCanvas.addEventListener("click", (event) => {
       candidateIds,
       index: candidateIndex,
     };
-    selectionState.selectedEntityId = selectedEntity.id;
+    const previousSelectionCount = selectionState.selectedEntityIds.size;
+    addEntityIdsToSelection([selectedEntity.id]);
+    const wasAdded =
+      selectionState.selectedEntityIds.size > previousSelectionCount;
     selectionState.hoveredEntityId = null;
     renderEntities();
     commandStatus.textContent =
-      `Selected ${selectedEntity.type} ${selectedEntity.id}` +
+      `${wasAdded ? "Selected" : "Kept selected"} ` +
+      `${selectedEntity.type} ${selectedEntity.id}; ` +
+      `${selectionState.selectedEntityIds.size} total` +
       (candidates.length > 1
         ? ` (${candidates.length} entities here; click again to cycle).`
         : ".");
@@ -7548,6 +10221,10 @@ circleCancelButton.addEventListener("click", () => {
   closeCircleRadiusWindow("Circle canceled.");
 });
 
+circleContinueButton.addEventListener("click", () => {
+  createCoordinateCircleFromInputs(true);
+});
+
 circleWindowTitleBar.addEventListener("pointerdown", (event) => {
   if (
     event.button !== 0 ||
@@ -7668,6 +10345,161 @@ hexagonWindowTitleBar.addEventListener("pointercancel", stopHexagonWindowDrag);
 hexagonWindowTitleBar.addEventListener("dblclick", (event) => {
   if (!event.target.closest(".window-control")) {
     toggleHexagonWindowMaximized();
+  }
+});
+
+rectangleMinimizeButton.addEventListener("click", () => {
+  if (rectangleWindow.classList.contains("is-maximized")) {
+    restoreRectangleWindow();
+  }
+  const minimized = !rectangleWindow.classList.contains("is-minimized");
+  setRectangleWindowMinimized(minimized);
+});
+
+rectangleMaximizeButton.addEventListener(
+  "click",
+  toggleRectangleWindowMaximized,
+);
+
+rectangleCloseButton.addEventListener("click", () => {
+  closeRectangleWindow("Rectangle canceled.");
+});
+
+rectangleCancelButton.addEventListener("click", () => {
+  closeRectangleWindow("Rectangle canceled.");
+});
+
+rectangleWindowTitleBar.addEventListener("pointerdown", (event) => {
+  if (
+    event.button !== 0 ||
+    event.target.closest(".window-control") ||
+    rectangleWindow.classList.contains("is-maximized")
+  ) {
+    return;
+  }
+  const bounds = rectangleWindow.getBoundingClientRect();
+  rectangleWindowState.drag = {
+    pointerId: event.pointerId,
+    offsetX: event.clientX - bounds.left,
+    offsetY: event.clientY - bounds.top,
+  };
+  rectangleWindowTitleBar.classList.add("is-dragging");
+  rectangleWindowTitleBar.setPointerCapture(event.pointerId);
+});
+
+rectangleWindowTitleBar.addEventListener("pointermove", (event) => {
+  const drag = rectangleWindowState.drag;
+  if (!drag || drag.pointerId !== event.pointerId) return;
+  const bounds = rectangleWindow.getBoundingClientRect();
+  const maxLeft = Math.max(0, window.innerWidth - bounds.width);
+  const maxTop = Math.max(
+    0,
+    window.innerHeight - rectangleWindowTitleBar.offsetHeight,
+  );
+  const left = Math.min(maxLeft, Math.max(0, event.clientX - drag.offsetX));
+  const top = Math.min(maxTop, Math.max(0, event.clientY - drag.offsetY));
+  rectangleWindow.style.left = `${left}px`;
+  rectangleWindow.style.top = `${top}px`;
+  rectangleWindowState.hasPosition = true;
+});
+
+function stopRectangleWindowDrag(event) {
+  if (rectangleWindowState.drag?.pointerId !== event.pointerId) return;
+  rectangleWindowState.drag = null;
+  rectangleWindowTitleBar.classList.remove("is-dragging");
+  if (rectangleWindowTitleBar.hasPointerCapture(event.pointerId)) {
+    rectangleWindowTitleBar.releasePointerCapture(event.pointerId);
+  }
+}
+
+rectangleWindowTitleBar.addEventListener("pointerup", stopRectangleWindowDrag);
+rectangleWindowTitleBar.addEventListener(
+  "pointercancel",
+  stopRectangleWindowDrag,
+);
+
+rectangleWindowTitleBar.addEventListener("dblclick", (event) => {
+  if (!event.target.closest(".window-control")) {
+    toggleRectangleWindowMaximized();
+  }
+});
+
+boltHoleCircleMinimizeButton.addEventListener("click", () => {
+  if (boltHoleCircleWindow.classList.contains("is-maximized")) {
+    restoreBoltHoleCircleWindow();
+  }
+  const minimized = !boltHoleCircleWindow.classList.contains("is-minimized");
+  setBoltHoleCircleWindowMinimized(minimized);
+});
+
+boltHoleCircleMaximizeButton.addEventListener(
+  "click",
+  toggleBoltHoleCircleWindowMaximized,
+);
+
+boltHoleCircleCloseButton.addEventListener("click", () => {
+  closeBoltHoleCircleWindow("Bolt Hole Circle canceled.");
+});
+
+boltHoleCircleCancelButton.addEventListener("click", () => {
+  closeBoltHoleCircleWindow("Bolt Hole Circle canceled.");
+});
+
+boltHoleCircleWindowTitleBar.addEventListener("pointerdown", (event) => {
+  if (
+    event.button !== 0 ||
+    event.target.closest(".window-control") ||
+    boltHoleCircleWindow.classList.contains("is-maximized")
+  ) {
+    return;
+  }
+  const bounds = boltHoleCircleWindow.getBoundingClientRect();
+  boltHoleCircleWindowState.drag = {
+    pointerId: event.pointerId,
+    offsetX: event.clientX - bounds.left,
+    offsetY: event.clientY - bounds.top,
+  };
+  boltHoleCircleWindowTitleBar.classList.add("is-dragging");
+  boltHoleCircleWindowTitleBar.setPointerCapture(event.pointerId);
+});
+
+boltHoleCircleWindowTitleBar.addEventListener("pointermove", (event) => {
+  const drag = boltHoleCircleWindowState.drag;
+  if (!drag || drag.pointerId !== event.pointerId) return;
+  const bounds = boltHoleCircleWindow.getBoundingClientRect();
+  const maxLeft = Math.max(0, window.innerWidth - bounds.width);
+  const maxTop = Math.max(
+    0,
+    window.innerHeight - boltHoleCircleWindowTitleBar.offsetHeight,
+  );
+  const left = Math.min(maxLeft, Math.max(0, event.clientX - drag.offsetX));
+  const top = Math.min(maxTop, Math.max(0, event.clientY - drag.offsetY));
+  boltHoleCircleWindow.style.left = `${left}px`;
+  boltHoleCircleWindow.style.top = `${top}px`;
+  boltHoleCircleWindowState.hasPosition = true;
+});
+
+function stopBoltHoleCircleWindowDrag(event) {
+  if (boltHoleCircleWindowState.drag?.pointerId !== event.pointerId) return;
+  boltHoleCircleWindowState.drag = null;
+  boltHoleCircleWindowTitleBar.classList.remove("is-dragging");
+  if (boltHoleCircleWindowTitleBar.hasPointerCapture(event.pointerId)) {
+    boltHoleCircleWindowTitleBar.releasePointerCapture(event.pointerId);
+  }
+}
+
+boltHoleCircleWindowTitleBar.addEventListener(
+  "pointerup",
+  stopBoltHoleCircleWindowDrag,
+);
+boltHoleCircleWindowTitleBar.addEventListener(
+  "pointercancel",
+  stopBoltHoleCircleWindowDrag,
+);
+
+boltHoleCircleWindowTitleBar.addEventListener("dblclick", (event) => {
+  if (!event.target.closest(".window-control")) {
+    toggleBoltHoleCircleWindowMaximized();
   }
 });
 
@@ -7971,6 +10803,24 @@ document.addEventListener("keydown", (event) => {
       redoDocumentChange();
       return;
     }
+
+    if (!event.shiftKey && key === "c") {
+      event.preventDefault();
+      copySelectedEntities();
+      return;
+    }
+
+    if (!event.shiftKey && key === "v") {
+      event.preventDefault();
+      pasteCopiedEntities();
+      return;
+    }
+
+    if (!event.shiftKey && key === "x") {
+      event.preventDefault();
+      cutSelectedEntities();
+      return;
+    }
   }
 
   if (!isEditingText && event.key === "Delete") {
@@ -7988,6 +10838,12 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && windowZoomState.active) {
     event.preventDefault();
     deactivateWindowZoom("View - Window canceled.");
+    return;
+  }
+
+  if (event.key === "Escape" && dimensionState.activeType !== null) {
+    event.preventDefault();
+    deactivateDimension("Dimension canceled.");
     return;
   }
 
@@ -8028,6 +10884,16 @@ document.addEventListener("keydown", (event) => {
 
   if (event.key === "Escape" && !hexagonWindow.hidden) {
     closeHexagonWindow("Hexagon canceled.");
+    return;
+  }
+
+  if (event.key === "Escape" && !rectangleWindow.hidden) {
+    closeRectangleWindow("Rectangle canceled.");
+    return;
+  }
+
+  if (event.key === "Escape" && !boltHoleCircleWindow.hidden) {
+    closeBoltHoleCircleWindow("Bolt Hole Circle canceled.");
     return;
   }
 
@@ -8083,6 +10949,11 @@ window.addEventListener("resize", () => {
   );
   keepToolWindowInViewport(circleRadiusWindow, circleWindowTitleBar);
   keepToolWindowInViewport(hexagonWindow, hexagonWindowTitleBar);
+  keepToolWindowInViewport(rectangleWindow, rectangleWindowTitleBar);
+  keepToolWindowInViewport(
+    boltHoleCircleWindow,
+    boltHoleCircleWindowTitleBar,
+  );
   keepToolWindowInViewport(offsetWindow, offsetWindowTitleBar);
   keepToolWindowInViewport(filletWindow, filletWindowTitleBar);
   keepToolWindowInViewport(rotateWindow, rotateWindowTitleBar);
@@ -8100,6 +10971,8 @@ cadCanvas.addEventListener("mousemove", (event) => {
   if (windowZoomState.active) {
     setSelectionProximityHover(null);
     clearEntityHoverInfo();
+  } else if (selectionState.mode === "chain") {
+    updateChainSelectionPreview(worldPoint, event.target);
   } else if (selectionState.mode === "single") {
     const hoveredEntity = getSelectionHitCandidates(worldPoint, event.target)[0]
       ?.entity;
@@ -8131,6 +11004,12 @@ cadCanvas.addEventListener("mouseleave", () => {
   cursorY.textContent = "Y: ----";
   clearEntityHoverInfo();
   setSelectionProximityHover(null);
+
+  if (selectionState.mode === "chain") {
+    chainSelectionState.candidateEntityId = null;
+    chainSelectionState.exitEndpointIndex = null;
+    renderToolPreview();
+  }
 
   if (joinState.active && joinState.firstPointId !== null) {
     joinState.previewWorld = null;

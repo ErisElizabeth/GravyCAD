@@ -1,3 +1,11 @@
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("assets/AtkinsonHyperlegible-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
 :root {
   --drawing-background: #a3a0a0;
   --entity-color: #010b13;
@@ -179,6 +187,8 @@ body[data-theme="matrix"] {
 .tool-window.is-maximized #lineCoordinatesForm,
 .tool-window.is-maximized #circleRadiusForm,
 .tool-window.is-maximized #hexagonForm,
+.tool-window.is-maximized #rectangleForm,
+.tool-window.is-maximized #boltHoleCircleForm,
 .tool-window.is-maximized #offsetForm,
 .tool-window.is-maximized #pointOnEntityForm,
 .tool-window.is-maximized #filletForm,
@@ -190,6 +200,8 @@ body[data-theme="matrix"] {
 #lineCoordinatesForm,
 #circleRadiusForm,
 #hexagonForm,
+#rectangleForm,
+#boltHoleCircleForm,
 #offsetForm,
 #pointOnEntityForm,
 #filletForm,
@@ -203,6 +215,8 @@ body[data-theme="matrix"] {
 #lineCoordinatesForm label,
 #circleRadiusForm label,
 #hexagonForm label,
+#rectangleForm label,
+#boltHoleCircleForm label,
 #offsetForm label,
 #pointOnEntityForm label,
 #filletForm label,
@@ -522,6 +536,33 @@ body[data-theme="matrix"] {
   pointer-events: stroke;
 }
 
+.dimension-geometry {
+  fill: none;
+  stroke: var(--entity-color);
+  stroke-width: 1.15;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.dimension-hit-target {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 12;
+  vector-effect: non-scaling-stroke;
+  pointer-events: stroke;
+}
+
+.dimension-text {
+  fill: var(--entity-color);
+  stroke: var(--drawing-background);
+  stroke-width: 3px;
+  paint-order: stroke fill;
+  font-family: "Atkinson Hyperlegible", sans-serif;
+  font-weight: 600;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
 .join-preview,
 .line-sketch-preview {
   fill: none;
@@ -563,6 +604,16 @@ body[data-theme="matrix"] {
   pointer-events: none;
 }
 
+.chain-direction-arrow {
+  fill: none;
+  stroke: var(--entity-selected-color);
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
 .entity-hit-target {
   fill: transparent;
   stroke: none;
@@ -585,9 +636,17 @@ body[data-theme="matrix"] {
   cursor: pointer;
 }
 
+#cadCanvas.select-single .dimension-entity {
+  cursor: pointer;
+}
+
 #cadCanvas.select-single .line-hit-target,
 #cadCanvas.select-single .circle-hit-target,
 #cadCanvas.select-single .arc-hit-target {
+  pointer-events: stroke;
+}
+
+#cadCanvas.select-single .dimension-hit-target {
   pointer-events: stroke;
 }
 
@@ -595,7 +654,7 @@ body[data-theme="matrix"] {
   stroke: var(--entity-hover-color);
 }
 
-#cadCanvas.select-single .point-entity.is-selected .point-x {
+#cadCanvas .point-entity.is-selected .point-x {
   stroke: var(--entity-selected-color);
 }
 
@@ -603,7 +662,7 @@ body[data-theme="matrix"] {
   stroke: var(--entity-hover-color);
 }
 
-#cadCanvas.select-single .line-entity.is-selected .line-geometry {
+#cadCanvas .line-entity.is-selected .line-geometry {
   stroke: var(--entity-selected-color);
 }
 
@@ -611,7 +670,7 @@ body[data-theme="matrix"] {
   stroke: var(--entity-hover-color);
 }
 
-#cadCanvas.select-single .circle-entity.is-selected .circle-geometry {
+#cadCanvas .circle-entity.is-selected .circle-geometry {
   stroke: var(--entity-selected-color);
 }
 
@@ -619,7 +678,52 @@ body[data-theme="matrix"] {
   stroke: var(--entity-hover-color);
 }
 
-#cadCanvas.select-single .arc-entity.is-selected .arc-geometry {
+#cadCanvas .arc-entity.is-selected .arc-geometry {
+  stroke: var(--entity-selected-color);
+}
+
+#cadCanvas.select-single .dimension-entity.is-proximity-hovered .dimension-geometry {
+  stroke: var(--entity-hover-color);
+}
+
+#cadCanvas.select-single .dimension-entity.is-proximity-hovered .dimension-text {
+  fill: var(--entity-hover-color);
+}
+
+#cadCanvas .dimension-entity.is-selected .dimension-geometry {
+  stroke: var(--entity-selected-color);
+}
+
+#cadCanvas .dimension-entity.is-selected .dimension-text {
+  fill: var(--entity-selected-color);
+}
+
+#cadCanvas.dimension-linear,
+#cadCanvas.dimension-linear .point-entity,
+#cadCanvas.dimension-linear .line-entity,
+#cadCanvas.dimension-diameter,
+#cadCanvas.dimension-diameter .circle-entity,
+#cadCanvas.dimension-diameter .arc-entity,
+#cadCanvas.dimension-radius,
+#cadCanvas.dimension-radius .circle-entity,
+#cadCanvas.dimension-radius .arc-entity,
+#cadCanvas.dimension-angle,
+#cadCanvas.dimension-angle .line-entity {
+  cursor: crosshair;
+}
+
+#cadCanvas.dimension-linear .point-entity:hover .point-x,
+#cadCanvas.dimension-linear .line-entity:hover .line-geometry,
+#cadCanvas.dimension-diameter .circle-entity:hover .circle-geometry,
+#cadCanvas.dimension-diameter .arc-entity:hover .arc-geometry,
+#cadCanvas.dimension-radius .circle-entity:hover .circle-geometry,
+#cadCanvas.dimension-radius .arc-entity:hover .arc-geometry,
+#cadCanvas.dimension-angle .line-entity:hover .line-geometry {
+  stroke: var(--entity-hover-color);
+}
+
+#cadCanvas.dimension-linear .point-entity.is-dimension-first .point-x,
+#cadCanvas.dimension-angle .line-entity.is-dimension-first .line-geometry {
   stroke: var(--entity-selected-color);
 }
 
@@ -913,7 +1017,7 @@ body[data-theme="matrix"] {
   color: #111;
   background: #d4d0c8;
   border: 0;
-  font-family: Arial, sans-serif;
+  font-family: "Atkinson Hyperlegible", sans-serif;
   font-size: 8px;
   line-height: 16px;
   text-align: center;
@@ -1003,7 +1107,7 @@ button,
 input,
 select,
 textarea {
-  font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+  font-family: "Atkinson Hyperlegible", sans-serif;
 }
 
 body {
@@ -1220,6 +1324,29 @@ body {
 
 .dropdown-menu button:disabled:hover {
   background: transparent;
+}
+
+.menu-checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-top: 1px solid #c6c6c6;
+  color: #111;
+  cursor: pointer;
+  user-select: none;
+}
+
+.menu-checkbox-option:hover,
+.menu-checkbox-option:focus-within {
+  background: #d8d8d8;
+}
+
+.menu-checkbox-option input {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: #365bb8;
 }
 
 .dropdown-menu .theme-option {

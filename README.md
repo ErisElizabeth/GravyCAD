@@ -2,7 +2,7 @@
 
 **You draw. It solves.**
 
-**Current version: V0.1.1 Alpha Dev Build**
+**Current version: V0.1.21 Alpha Dev Build**
 
 PrometheusCAD is a portable 2D drawing and shop-math utility for machinists, inspectors, hobbyists, and anyone who needs quick geometry without CAM bloat.
 
@@ -68,6 +68,34 @@ The surface plate exists.
 - True Position Checker
 - Angle/length endpoint solver
 - Triangle helper
+
+---
+
+## To-do list
+
+1. **Inch/metric switch**
+
+   Treat this as `document units = inch / mm` rather than multiplying every coordinate by 25.4. PrometheusCAD's internal geometry should remain unit-neutral.
+
+2. **Layers**
+
+   Flesh out the rudimentary layer system into actual create, rename, delete, current-layer, and visibility behavior. Layers should become infrastructure that later geometry, text, and selections can live inside cleanly.
+
+3. **Text**
+
+   Add native text entities first, including position, content, size, rotation, layer, selection, delete, copy/paste, and undo/redo behavior.
+
+4. **Text → Geometry**
+
+   Implement this only after Text itself is stable. This should be a conversion operation into lines, arcs, or another chosen geometry representation, consuming a known-good text entity rather than introducing a parallel text system.
+
+5. **Select Region**
+
+   Build window and crossing selection on the existing cumulative selection architecture rather than creating a second selection mechanism.
+
+6. **Regular Polygon**
+
+   Add a self-contained polygon tool with number of sides, size definition, and corner radius controls.
 
 ---
 
@@ -817,3 +845,283 @@ Changes made since V0.1.0:
 - Wired the toolbar Calculator button to open the existing scientific calculator in a movable window above the drawing canvas.
 - The calculator opens centered over the drawing on first use, preserves its dragged position on subsequent openings, and restores from its minimized state when the toolbar button is used again.
 - The Calculator toolbar button remains visually pressed while the calculator window is open and clears when its Close button is used.
+- Removed the unused `Select All` item from the Edit menu.
+- Reorganized the Select menu as All, Single, Chain, Layer, Points, Lines, and Arcs. Single retains its existing selection behavior; the other selection modes are disabled placeholders for future implementation.
+
+## V0.1.2 Alpha Dev Build
+
+Future Command Menu Foundations
+
+Changes made since V0.1.1:
+
+- Renamed the active File > Export DXF command to File > Export without changing its existing DXF export behavior.
+- Added a disabled File > Import placeholder immediately above Export.
+- Added disabled Modify > Mirror and Modify > Translate placeholders.
+- Added disabled Draw > Rectangle and Draw > Bolt Hole Circle placeholders.
+- Updated the application metadata, browser title, header, About window, and runtime identity to V0.1.2.
+
+## V0.1.3 Alpha Dev Build
+
+Bolt Hole Circle
+
+Changes made since V0.1.2:
+
+- Activated Draw > Bolt Hole Circle as a one-shot drawing command.
+- Added a movable, minimizable, maximizable, and closable Bolt Hole Circle dialog.
+- Added arithmetic-capable Bolt Hole Diameter, Number of Holes, and Hole Diameter fields.
+- Defaulted the bolt hole diameter to `3.000`, the number of holes to `6`, and the hole diameter to `0`.
+- Bolt hole circles are centered at X0 Y0, begin at CAD 0° on the positive X axis, and place the remaining positions counterclockwise at equal angular spacing.
+- A zero hole diameter creates a point at each bolt-hole position; a positive hole diameter creates an independent circular entity at each position using half the entered diameter as its radius.
+- Limited the hole count to a positive whole number no greater than 1,000 to prevent an accidental expression from creating an impractically large pattern.
+- Records the complete pattern as one document-history action so one Undo removes the entire bolt hole circle.
+- Closes the Bolt Hole Circle dialog after a successful creation; Cancel, Close, Escape, or choosing another menu command exits without creating geometry.
+- Updated the application metadata, browser title, header, About window, runtime identity, and DXF producer version to V0.1.3.
+
+## V0.1.4 Alpha Dev Build
+
+Rectangle
+
+Changes made since V0.1.3:
+
+- Activated Draw > Rectangle as a one-shot drawing command.
+- Added a movable, minimizable, maximizable, and closable Rectangle dialog.
+- Added arithmetic-capable X, Y, and Radius fields with defaults of `2.000`, `1.000`, and `0.250`.
+- Treats X and Y as the rectangle's overall dimensions, anchors the lower-left corner at X0 Y0, and extends the geometry into positive X and positive Y.
+- A zero radius creates four sharp, independent line entities.
+- A positive radius creates four independent quarter-circle corner arcs and the nonzero independent side-line entities required between them.
+- Allows a corner radius up to half of the smaller rectangle dimension; zero-length sides are omitted cleanly at the maximum radius.
+- Uses hidden construction references so the lines and arcs remain individually selectable, deletable, rotatable, and otherwise modifiable.
+- Records the entire rectangle as one document-history action so one Undo removes all of its geometry.
+- Closes the Rectangle dialog after successful creation; Cancel, Close, Escape, or choosing another menu command exits without creating geometry.
+- Updated the application metadata, browser title, header, About window, runtime identity, and DXF producer version to V0.1.4.
+
+## V0.1.5 Alpha Dev Build
+
+Rectangle Center Location
+
+Changes made since V0.1.4:
+
+- Changed Rectangle placement from a lower-left X0 Y0 anchor to an explicit center location.
+- Added arithmetic-capable Center X and Center Y fields, both defaulting to `0`.
+- Retained X and Y as the overall rectangle dimensions and Radius as the common corner radius.
+- Generates sharp and rounded rectangle geometry symmetrically around the entered center coordinate.
+- Updated rectangle history descriptions and completion messages to include the chosen center.
+- Updated the application metadata, browser title, header, About window, runtime identity, and DXF producer version to V0.1.5.
+
+## V0.1.6 Alpha Dev Build
+
+Mirror
+
+Changes made since V0.1.5:
+
+- Activated Modify > Mirror as a hover flyout containing X Axis, Y Axis, and X and Y Axis commands.
+- Added a Copy checkbox to the Mirror flyout, defaulting to unchecked.
+- Mirror acts on the entity previously selected with the current Single selection mode.
+- With Copy unchecked, the selected point, line, circle, or arc is reflected in place across the chosen axis or axes.
+- With Copy checked, the source remains unchanged and a separately selectable mirrored entity is created and selected.
+- Mirrored line, circle, and arc copies use independent hidden construction references so later modifications do not alter the source entity.
+- Reverses reflected arc endpoints for single-axis reflections, preserving the original arc sweep instead of producing the complementary arc.
+- Treats X and Y axis mirroring as a 180° reflection about X0 Y0 and retains the original arc orientation.
+- Each Mirror or Mirror and Copy operation is recorded as one Undo/Redo history action.
+- Updated the application metadata, browser title, header, About window, runtime identity, and DXF producer version to V0.1.6.
+
+## V0.1.7 Alpha Dev Build
+
+Dimensioning Foundations
+
+Changes made since V0.1.6:
+
+- Activated Dimension > Linear, Diameter, Radius, and Angle as persistent drawing commands.
+- Linear accepts either one line or two visible points and creates an aligned length dimension offset from the measured geometry.
+- Diameter and Radius accept a circle or arc; the click position determines the leader direction.
+- Angle accepts two lines. Clicking each line near the intended ray selects the smaller included angle at their infinite-line intersection.
+- Parallel, collinear, degenerate, and zero-length geometry is rejected without changing the drawing.
+- Added proper dimension graphics with extension lines, dimension or leader lines, arrowheads, upright measurement text, and theme-aware colors.
+- Dimensions are document entities with stable IDs and participate in hover descriptions, Select > Single, Delete, Undo, and Redo.
+- Dimension commands remain active for repeated placement until another command is selected or Escape is pressed.
+- Dimension values and placement geometry are static snapshots in this first pass; later edits to the measured source geometry do not yet update an existing dimension automatically.
+- R12 DXF export remains geometry-only and does not yet emit dimension annotations.
+- Updated the application metadata, browser title, header, About window, runtime identity, and DXF producer version to V0.1.7.
+
+## V0.1.8 Alpha Dev Build
+
+Dimension Selection Placeholder
+
+Changes made since V0.1.7:
+
+- Added Dimensions to the Select dropdown after Arcs.
+- Kept Dimensions disabled, matching the current placeholder state of the entity-type selection commands while Select > Single remains the active selection method for dimension entities.
+- Updated the application metadata, browser title, header, About window, runtime identity, and DXF producer version to V0.1.8.
+
+## V0.1.9 Alpha Dev Build
+
+Cumulative Point Selection
+
+Changes made since V0.1.8:
+
+- Activated Select > Points.
+- Select > Points selects every visible point while excluding hidden construction references.
+- Added a cumulative selection set so category-based selections can be combined without clearing entities selected by an earlier category command.
+- Selected points use the same theme-aware selected color as entities chosen with Select > Single.
+- Select > Single retains its one-at-a-time behavior: its next drawing click replaces the cumulative selection with the single chosen entity, while an empty click clears the complete selection.
+- Existing commands that begin a drawing or modification operation still clear the complete selection wherever they previously cleared the single selected entity.
+- Updated the application metadata, browser title, header, About window, runtime identity, and DXF producer version to V0.1.9.
+
+## V0.1.10 Alpha Dev Build
+
+Deselect All
+
+Changes made since V0.1.9:
+
+- Added Select > Deselect All as the final command in the Select dropdown.
+- Deselect All clears every entity in the cumulative selection and immediately removes all selected highlighting.
+- The active selection mode is preserved, allowing Select > Single to remain ready for another click after clearing the selection.
+- Updated the application metadata, browser title, header, About window, runtime identity, and DXF producer version to V0.1.10.
+
+## V0.1.11 Alpha Dev Build
+
+Cumulative Line Selection
+
+Changes made since V0.1.10:
+
+- Activated Select > Lines.
+- Select > Lines selects every line entity in the document.
+- Line selection is cumulative, preserving points and any other entities selected by earlier category-selection commands.
+- Selected lines use the same theme-aware selected color as entities chosen with Select > Single.
+- Updated the application metadata, browser title, header, About window, runtime identity, and DXF producer version to V0.1.11.
+
+## V0.1.12 Alpha Dev Build
+
+Cumulative Arc and Circle Selection
+
+Changes made since V0.1.11:
+
+- Activated Select > Arcs.
+- Select > Arcs selects every current arc and circle entity in the document.
+- Arc and circle selection is cumulative, preserving points, lines, dimensions, and any other entities selected by earlier category-selection commands.
+- Selected arcs and circles use the same theme-aware selected color as entities chosen with Select > Single.
+- Updated the application metadata, browser title, header, About window, runtime identity, and DXF producer version to V0.1.12.
+
+## V0.1.13 Alpha Dev Build
+
+Atkinson Hyperlegible Typography
+
+Changes made since V0.1.12:
+
+- Added the locally bundled `assets/AtkinsonHyperlegible-Regular.ttf` font through `@font-face` with no network dependency.
+- Changed the application shell, menus, dialogs, inputs, buttons, status displays, scroll controls, and SVG dimension labels to Atkinson Hyperlegible.
+- Updated the embedded calculator and its standalone demonstration page to use the same bundled typeface.
+- Retained a generic sans-serif fallback for environments where the local font cannot be loaded.
+- Updated the application metadata, browser title, header, About window, runtime identity, and DXF producer version to V0.1.13.
+
+## V0.1.14 Alpha Dev Build
+
+Cumulative Dimension Selection
+
+Changes made since V0.1.13:
+
+- Activated Select > Dimensions.
+- Select > Dimensions selects every linear, radius, diameter, and angle dimension currently in the document.
+- Dimension selection is cumulative, preserving points, lines, arcs, circles, and any other entities selected by earlier category-selection commands.
+- Selected dimension graphics and text continue to use the active theme's selected color.
+- Updated the application metadata, browser title, header, About window, runtime identity, and DXF producer version to V0.1.14.
+
+## V0.1.15 Alpha Dev Build
+
+Select All
+
+Changes made since V0.1.14:
+
+- Activated Select > All.
+- Select > All selects every user-visible entity in the document regardless of type, including points, lines, circles, arcs, and all dimension types.
+- Hidden construction-point references remain excluded because they are implementation details rather than visible CAD entities.
+- The command uses the cumulative selection model, ensuring every visible entity is selected without disrupting selection-state consistency.
+- Updated the application metadata, browser title, header, About window, runtime identity, and DXF producer version to V0.1.15.
+
+## V0.1.16 Alpha Dev Build
+
+Circle by Coordinate Center
+
+Changes made since V0.1.15:
+
+- Added Draw > Arc > Coordinate Center immediately after Point Center.
+- Coordinate Center opens the existing movable, minimizable, maximizable, and closable Circle tool window in coordinate-entry mode.
+- Added arithmetic-capable Center X, Center Y, and Radius fields with defaults of X0, Y0, and radius 1.
+- Create makes one circle and closes the dialog; Continue creates the circle and keeps the dialog open for additional coordinate-center circles.
+- A visible center point is created at the entered coordinates when one does not already exist; an exact existing visible point is reused.
+- The center point and circle are recorded together as one Undo/Redo history action.
+- The command does not require a pre-existing center point or a drawing-canvas click.
+- Updated the application metadata, browser title, header, About window, runtime identity, and DXF producer version to V0.1.16.
+
+## V0.1.17 Alpha Dev Build
+
+Fit View
+
+Changes made since V0.1.16:
+
+- Added `View > Fit` as the final command in the View menu.
+- Fit centers the viewport on all visible drawing geometry and dimensions, then scales the view so everything is visible.
+- The fitted view preserves the drawing canvas aspect ratio and adds clearance around the drawing.
+- Point-only drawings and geometry with zero width or height receive a useful minimum viewing area.
+- Very large drawings can fit below the ordinary Zoom Out limit without altering the limits of the manual zoom commands.
+- An empty drawing returns to the Home view.
+- Updated the application metadata, browser title, header, About window, runtime identity, and DXF producer version to V0.1.17.
+
+## V0.1.18 Alpha Dev Build
+
+Home and Fit Toolbar Buttons
+
+Changes made since V0.1.17:
+
+- Added Home and Fit buttons to the quick-tool toolbar between Zoom Window and Calculator.
+- Used the supplied `assets/home.png` and `assets/fit.png` artwork with the existing square toolbar-button styling.
+- Wired Home to restore the default drawing view.
+- Wired Fit to center and scale all visible geometry and dimensions onto the canvas while preserving the canvas aspect ratio.
+- Added accessible labels and tooltips for both controls.
+- Updated the application metadata, browser title, header, About window, runtime identity, and DXF producer version to V0.1.18.
+
+## V0.1.19 Alpha Dev Build
+
+Copy, Paste, and Cut
+
+Changes made since V0.1.18:
+
+- Reordered the Edit menu as Undo, Redo, Copy, Paste, Cut, and Delete.
+- Copy stores all currently selected visible entities in PrometheusCAD's internal geometry clipboard.
+- Paste creates independent duplicates at the original coordinates, preserves shared point relationships, and selects the newly pasted entities.
+- Supporting points required by copied lines, circles, and arcs are duplicated as hidden construction references unless the point itself was selected.
+- Cut copies and removes all selected entities as one Undo/Redo action while keeping unselected connected geometry unchanged.
+- Added Ctrl+C, Ctrl+V, and Ctrl+X keyboard shortcuts outside text-entry fields and the calculator.
+- Copy and Cut are disabled without a selection, and Paste is disabled until geometry has been copied or cut.
+- Updated the application metadata, browser title, header, About window, runtime identity, and DXF producer version to V0.1.19.
+
+## V0.1.20 Alpha Dev Build
+
+Additive Single Selection and Multi-Delete
+
+Changes made since V0.1.19:
+
+- Restored Select > Single as an additive one-entity-at-a-time selection mode.
+- Each entity click adds that entity to the current selection instead of replacing earlier selections.
+- Repeated clicks at overlapping geometry continue cycling through candidates and add each candidate as it is reached.
+- Clicking empty drawing space still clears the complete selection.
+- Edit > Delete and the Delete key now remove every currently selected entity as one Undo/Redo action.
+- Deleting selected points keeps unselected connected lines unchanged by replacing their endpoint references with hidden construction points.
+- Existing circle and arc dependency behavior is preserved when their defining visible point is deleted.
+- Updated the application metadata, browser title, header, About window, runtime identity, and DXF producer version to V0.1.20.
+
+## V0.1.21 Alpha Dev Build
+
+Directional Chain Selection
+
+Changes made since V0.1.20:
+
+- Activated Select > Chain as a persistent, cumulative selection tool for lines and arcs.
+- Hovering a line or arc displays a constant-screen-size arrow showing the prospective chain direction.
+- Moving across the opposite half of the entity reverses the arrow before selection is confirmed.
+- Clicking follows endpoint-connected line and arc geometry in the confirmed direction.
+- Closed continuous shapes are followed back to the starting entity and selected completely.
+- Open chains stop at their free endpoint; chains stop before an ambiguous branch instead of choosing an arbitrary path.
+- Endpoint connectivity is geometric, allowing independently stored lines and arcs with matching coordinates to chain together.
+- Chain selections are added to any entities that were already selected, while clicking empty drawing space clears the selection.
+- Updated the application metadata, browser title, header, About window, runtime identity, and DXF producer version to V0.1.21.

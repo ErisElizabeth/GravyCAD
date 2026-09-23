@@ -1,3 +1,11 @@
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("../assets/AtkinsonHyperlegible-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
 /*
  * Calculator.css — styles for Calculator.js.
  * Everything is scoped under .calc-window; retint it with the custom properties below.
@@ -31,7 +39,7 @@
   padding: 3px;
   background: var(--calc-face);
   color: var(--calc-ink);
-  font: 12px/1.25 "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font: 12px/1.25 "Atkinson Hyperlegible", sans-serif;
   box-shadow:
     inset -1px -1px var(--calc-dark), inset 1px 1px var(--calc-light),
     inset -2px -2px var(--calc-shadow), inset 2px 2px var(--calc-hilite),
