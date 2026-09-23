@@ -1,8 +1,10 @@
-# GravyCAD
+# PrometheusCAD
 
 **You draw. It solves.**
 
-GravyCAD is a portable 2D drawing and shop-math utility for machinists, inspectors, hobbyists, and anyone who needs quick geometry without CAM bloat.
+**Current version: V0.1.1 Alpha Dev Build**
+
+PrometheusCAD is a portable 2D drawing and shop-math utility for machinists, inspectors, hobbyists, and anyone who needs quick geometry without CAM bloat.
 
 It is meant to be simple, useful, and portable.
 
@@ -69,9 +71,9 @@ The surface plate exists.
 
 ---
 
-## What GravyCAD is
+## What PrometheusCAD is
 
-GravyCAD is:
+PrometheusCAD is:
 
 - Easy 2D drawing
 - Useful geometry
@@ -80,9 +82,9 @@ GravyCAD is:
 - DXF export, eventually
 - Portable by design
 
-## What GravyCAD is not
+## What PrometheusCAD is not
 
-GravyCAD is not CAM.
+PrometheusCAD is not CAM.
 
 It will not generate toolpaths.  
 It will not output G-code.  
@@ -512,3 +514,306 @@ Changes made since V0.0.27:
 - Includes drawing extents and marks the drawing as English measurement; coordinate values are intended as inches.
 - Reports the number of exported entities in the status bar.
 - An empty drawing reports that there are no entities to export instead of downloading an empty file.
+
+## V0.0.29 Alpha Dev Build
+
+Arithmetic in Dialog Fields
+
+Changes made since V0.0.28:
+
+- Numeric dialog fields now accept arithmetic expressions using `+`, `-`, `*`, `/`, parentheses, decimals, and unary positive or negative signs.
+- Moving to another field with Tab or clicking elsewhere evaluates the expression and replaces it with the numeric result; for example, `3/2` becomes `1.5`.
+- Arithmetic works in Point - Coordinates X/Y, circle radius, offset amount, and Point on Entity percentage/degrees.
+- Pressing Create also evaluates an expression if the field has not yet lost focus.
+- Radius and offset expressions must resolve to values greater than zero, and line percentages must still resolve between 0 and 100.
+- Invalid expressions and division by zero are rejected with a dialog message.
+- Expressions are parsed by GravyCAD's arithmetic parser without executing JavaScript code.
+
+## V0.0.30 Alpha Dev Build
+
+Fillet Radius
+
+Changes made since V0.0.29:
+
+- Added Modify > Fillet Radius for lines, circles, and arcs.
+- Added a movable, minimizable, maximizable, and closable Fillet Radius tool window.
+- The radius field supports the same arithmetic expressions as the other numeric dialogs and defaults to `0.25`.
+- Added an Automatic Trim/Extend checkbox that is checked by default whenever the command is opened.
+- The first and second click locations identify the intended portions of the two entities and guide selection among possible tangent fillet solutions.
+- The tangent solver supports line-line, line-circle, line-arc, circle-circle, circle-arc, and arc-arc combinations using the entities' exact CAD geometry.
+- Fillets are created as native Arc entities with ordinary center and tangent endpoint points.
+- With Automatic Trim/Extend checked, the nearby endpoint of each selected line or arc moves to its tangent point.
+- Full circles remain intact because a single tangent point does not by itself define which portion of a closed circle should be removed.
+- With Automatic Trim/Extend unchecked, both source entities remain unchanged and the fillet must fit on their existing finite spans.
+- Each completed fillet, including generated points and endpoint changes, is recorded as one undoable document change.
+- Fillet Radius remains active after creation so another pair of entities can be selected immediately.
+
+## V0.0.31 Alpha Dev Build
+
+Rotate
+
+Changes made since V0.0.30:
+
+- Added Modify > Rotate for the entity currently chosen with Select > Single.
+- Added a movable, minimizable, maximizable, and closable Rotate tool window.
+- The angle is entered in counterclockwise degrees and accepts the same arithmetic expressions as the other numeric dialogs.
+- Rotation defaults to the CAD origin at X0 Y0.
+- A Specified point option lets the user choose any existing point entity as the rotation pivot.
+- Rotating a point moves that point directly, so geometry that depends on it follows naturally.
+- Rotating a line, circle, or arc gives only that selected entity rotated reference points, avoiding unintended movement of other geometry that shared its original points.
+- Circle and arc radii remain unchanged; arc center and endpoint references rotate together.
+- Exact quarter-turn rotations suppress floating-point noise near zero.
+- Each completed rotation is recorded as one undoable document change.
+- The selected entity remains highlighted, and the Rotate window stays open for repeated rotations of that entity.
+
+## V0.0.32 Alpha Dev Build
+
+Hexagon
+
+Changes made since V0.0.31:
+
+- Added Draw > Hexagon for creating regular six-sided geometry around an existing center point.
+- Hexagons are oriented with their left and right flats parallel to the Y axis, producing points at the top and bottom.
+- Hexagon size is entered as the exact distance across the vertical flats.
+- Added an optional corner-radius field that defaults to `0` for sharp corners.
+- A positive corner radius produces six tangent line segments and six native arc entities.
+- Corner radii must be zero or greater and less than half the across-flats size.
+- Both dimension fields accept GravyCAD arithmetic expressions and show a live dashed preview after the center point is selected.
+- Added a movable, minimizable, maximizable, and closable Hexagon tool window.
+- The generated points, lines, and optional arcs are recorded as one undoable document change.
+- Hexagon remains active after creation and preserves the entered dimensions for repeated placement.
+- Generated lines and arcs are ordinary GravyCAD geometry and are included automatically in DXF export.
+
+## V0.0.33 Alpha Dev Build
+
+Independent Hexagon Arc Selection
+
+Changes made since V0.0.32:
+
+- Hexagon vertices, tangent locations, and arc centers are now internal construction references rather than visible Point entities.
+- Internal construction references are not selectable, included in the visible entity count, or exported as DXF `POINT` records.
+- Each rounded hexagon corner remains an individual native Arc entity and each flat remains an individual Line entity.
+- Select > Single now resolves clicks by distance to the actual CAD geometry instead of accepting whichever invisible SVG hit target is visually on top.
+- Clicking the body of a short rounded corner selects the arc even when its old endpoint hit areas would have covered the entire curve.
+- Hover highlighting and the bottom entity description use the same nearest-geometry result as selection.
+- When multiple entities occupy the same exact location, repeated clicks at that location cycle through the available entities.
+- Rotating a selected hexagon arc creates new internal center and endpoint references for that arc only; its neighboring flats and corner arcs remain unchanged.
+- Unused internal construction points are removed automatically after rotation or deletion.
+
+## V0.0.34 Alpha Dev Build
+
+Points Flyout Menu
+
+Changes made since V0.0.33:
+
+- Reorganized the Draw dropdown so all point-construction methods are grouped under a single Points entry.
+- Points opens a right-side flyout menu containing Coordinates, Intersecting, On Entity, and Sketch.
+- The flyout opens when Points is hovered and closes when the pointer leaves both the Points entry and its flyout.
+- Keyboard focus also keeps the flyout available for accessibility.
+- Coordinates, Intersecting, and On Entity retain their existing commands and behavior.
+- Sketch remains disabled as a placeholder for the next implementation pass.
+
+## V0.0.35 Alpha Dev Build
+
+Point - Sketch
+
+Changes made since V0.0.34:
+
+- Enabled Draw > Points > Sketch.
+- Activating Sketch changes the drawing pointer to a plain crosshair.
+- Clicking the drawing creates an exact Point entity at the CAD/world coordinate beneath the center of the crosshair.
+- Sketch remains active after every point so multiple points can be placed continuously.
+- Each sketched point is recorded as its own undoable document change.
+- Undo and Redo preserve the active Sketch mode and its crosshair cursor.
+- Clicking the exact location of an existing explicit point does not create a duplicate.
+- Choosing another drawing, selection, or Modify command ends Sketch mode automatically.
+- Escape explicitly cancels Sketch mode.
+
+## V0.0.36 Alpha Dev Build
+
+Line Flyout Menu
+
+Changes made since V0.0.35:
+
+- Reorganized the Draw dropdown so line-construction methods are grouped under a single Line entry.
+- Line opens a right-side flyout containing Coordinates, Join, and Sketch.
+- Join retains the existing continuous Line - Join command and behavior.
+- Coordinates and Sketch are disabled placeholders for their upcoming implementation passes.
+- The Line flyout uses the same hover, pointer-leave, and keyboard-focus behavior as the Points flyout.
+
+## V0.0.37 Alpha Dev Build
+
+Line - Coordinates
+
+Changes made since V0.0.36:
+
+- Enabled Draw > Line > Coordinates.
+- Added a movable, minimizable, maximizable, and closable Line Coordinates tool window.
+- The dialog provides Start X/Y and End X/Y coordinate fields.
+- All four coordinate fields support GravyCAD arithmetic expressions and evaluate when focus leaves the field or a creation button is used.
+- Create makes one exact line and closes the dialog.
+- Continue makes one exact line and leaves the dialog open for additional coordinate lines.
+- Cancel, Close, and Escape close the window without creating another line.
+- Existing explicit points at the typed endpoints are reused; missing endpoints are created as ordinary visible Point entities.
+- A coordinate line and any newly created endpoint points are recorded as one undoable document change.
+- Zero-length lines and duplicate lines at the same coordinates are rejected.
+- Choosing another drawing, selection, or Modify command closes the Line Coordinates window.
+
+## V0.0.38 Alpha Dev Build
+
+Independent Line Geometry
+
+Changes made since V0.0.37:
+
+- Lines now own hidden internal endpoint geometry instead of depending on visible Point entities.
+- Deleting a visible point at a line endpoint leaves the line in place and unchanged.
+- Line - Join and Line - Coordinates still use or create visible endpoint points for the normal CAD workflow, but those points can be edited or deleted independently afterward.
+- Offset lines use the same independent endpoint model.
+- Trim/Extend and automatic Fillet trimming preserve line independence when they replace an endpoint.
+- Point on Entity treats a line's hidden endpoints as temporary direction choices, so its ambiguous-direction workflow remains usable.
+- Existing in-memory lines that still reference a visible point are detached automatically if that point is deleted.
+- Undo and Redo preserve both the line and its independent internal endpoints as one document state.
+
+## V0.0.39 Alpha Dev Build
+
+Line - Sketch
+
+Changes made since V0.0.38:
+
+- Enabled Draw > Line > Sketch.
+- Line Sketch uses the same plain crosshair cursor as Point Sketch.
+- The first drawing click creates or reuses a visible start point.
+- Pointer movement after the first click shows a live dashed line preview.
+- The second click creates or reuses the visible end point and completes the line.
+- Sketched lines use private internal endpoint geometry, so either visible endpoint point can be deleted or rotated without changing the line.
+- Zero-length and duplicate lines are rejected.
+- After each completed line, Line Sketch stays active and waits for the first point of the next line.
+- Escape or choosing another drawing, selection, or Modify command exits Line Sketch.
+- Undo and Redo leave Line Sketch active and ready for a new first point.
+
+## V0.0.40 Alpha Dev Build
+
+Arc Flyout Organization
+
+Changes made since V0.0.39:
+
+- Replaced the disabled top-level Arc placeholder with a Draw > Arc flyout.
+- Moved the existing Circle - Point Center and Radius command into the Arc flyout and labeled it Point Center.
+- Moved Fillet from Modify into the Arc flyout and shortened its menu label from Fillet Radius to Fillet.
+- Fillet now dismisses the Draw menu when activated from its new location.
+- Added disabled Sketch Center and 3 Entities placeholders for upcoming arc-construction passes.
+- Modify now contains Trim/Extend, Offset, and Rotate.
+
+## V0.0.41 Alpha Dev Build
+
+Circle - Sketch Center
+
+Changes made since V0.0.40:
+
+- Enabled Draw > Arc > Sketch Center.
+- Sketch Center reuses the existing movable Circle radius window and arithmetic-capable Radius field.
+- The drawing cursor becomes the same plain crosshair used by the other Sketch tools.
+- Clicking the drawing creates or reuses a visible Point entity at the circle center.
+- The selected center point is highlighted and a live circle preview reflects the entered radius.
+- Create adds a circle of the defined radius centered on the sketched point.
+- After creation, Sketch Center remains active and waits for the next center click.
+- Cancel, Close, Escape, or choosing another tool exits the command.
+- Point Center remains unchanged and continues to require an existing point.
+
+## V0.0.42 Alpha Dev Build
+
+Circle - 3 Entities / Apollonius Solver
+
+Changes made since V0.0.41:
+
+- Enabled Draw > Arc > 3 Entities for three distinct Point, Line, or Circle selections.
+- Added a unified signed algebraic solver for the Problem of Apollonius instead of separate implementations for the ten classical input combinations.
+- Points are represented as zero-radius circle constraints.
+- Circle constraints enumerate internal and external tangency orientations.
+- Line constraints use normalized signed distance equations, avoiding the incompatible quadratic terms produced by squaring a line-distance equation.
+- Mixed point/circle/line problems reduce to two linear planes in `(x, y, r)`; their intersection is parameterized and substituted into one remaining quadratic equation.
+- Three-line problems are solved directly as a signed 3-by-3 linear system.
+- Candidate roots are checked against the original tangency equations, non-positive radii are discarded, and duplicate solutions are removed.
+- Lines are treated as their infinite supporting lines, matching the stated Apollonius distance equation.
+- Each selected entity is highlighted, and its exact mouse-click coordinate is retained.
+- Candidate filtering calculates the exact tangency point for each source entity and minimizes the sum of the three squared click distances.
+- Scores within `1e-6` of the minimum use the smaller candidate radius as the tie-breaker.
+- The chosen result creates a visible center point and Circle entity as one undoable document change.
+- 3 Entities remains active after creation and resets for another three selections; Escape or another tool exits it.
+
+## V0.0.43 Alpha Dev Build
+
+Overlay Drawing Scrollbars
+
+Changes made since V0.0.42:
+
+- Added always-visible horizontal and vertical scrollbars over the bottom and right edges of the drawing surface.
+- The SVG drawing area retains its full width and height; the scrollbars overlay it instead of shrinking the canvas.
+- A scrollbar remains gray and disabled until document geometry extends beyond the centered visible view on that axis.
+- Points, independent Lines, Circles, and the actual swept bounds of Arcs contribute to the scrollable document bounds.
+- Enabled bars support arrow-button steps, track page steps, draggable thumbs, and keyboard navigation.
+- The scrollbar thumb size reflects the visible drawing span relative to the total required geometry span.
+- Vertical scrolling preserves GravyCAD's coordinate law: Up moves toward Y+ and Down moves toward Y-.
+- Zooming recalculates the visible and scrollable spans while preserving the current view center whenever possible.
+- Home now restores both 100% zoom and the original X0 Y0-centered view.
+- Deleting or undoing outlying geometry disables the unnecessary bar and safely returns that axis to the centered view.
+
+## V0.0.44 Alpha Dev Build
+
+View - Window
+
+Changes made since V0.0.43:
+
+- Added Window to the View dropdown between Zoom Out and Home.
+- View is now ordered Zoom In, Zoom Out, Window, and Home.
+- Window changes the drawing cursor to a plain crosshair and accepts a drag in any direction.
+- A dashed selection rectangle previews the exact area that will become the new view.
+- The dragged area is expanded around its center as needed to preserve the drawing canvas's aspect ratio without cutting off any enclosed area.
+- Releasing the pointer centers and zooms the drawing to the aspect-matched window.
+- Window is a one-shot view operation; the drawing command that was active beforehand remains available afterward.
+- A click or undersized drag cancels safely without changing the view, and Escape cancels Window immediately.
+- Selecting another menu command while Window is waiting cancels the Window operation.
+- Window-created off-center views participate in the overlay scrollbar navigation until Home is chosen.
+- Home clears the Window navigation anchor and restores the original X0 Y0-centered 100% view.
+
+## V0.1.0 Alpha Dev Build
+
+PrometheusCAD Rechristening
+
+Changes made since V0.0.44:
+
+- Renamed the application from GravyCAD to **PrometheusCAD** to reflect the project’s expanded scope.
+- Advanced the project version from the V0.0.x development series to **V0.1.0**.
+- Updated the browser title, application header, application metadata, source identity comments, and current README branding.
+- Added the visible V0.1.0 version marker beside the PrometheusCAD name in the application header.
+- Renamed exported drawings from `GravyCAD.dxf` to `PrometheusCAD.dxf`.
+- Updated the DXF identification comment to record PrometheusCAD V0.1.0 as the producing application.
+- Retained historical GravyCAD references inside earlier version notes so the development record remains accurate.
+- Changed View > Window from a one-shot command into a persistent view action.
+- After each successful Window zoom, the crosshair remains active and another zoom area can be dragged immediately.
+- An undersized or interrupted drag leaves Window active; choosing another menu action or pressing Escape exits it.
+
+## V0.1.1 Alpha Dev Build
+
+Layer and Help Menu Foundations
+
+Changes made since V0.1.0:
+
+- Added a Layer dropdown immediately after Dimension.
+- Layer shows the current `Layer: 0` entry and a disabled New placeholder for future layer creation.
+- Added a Help dropdown immediately after Layer.
+- Added Help > About.
+- About opens a compact movable window containing `PrometheusCAD V0.1.1` and `2026 eriselizabeth.com` on separate lines.
+- `eriselizabeth.com` links to `https://eriselizabeth.com` in a new browser tab.
+- About can be closed with its X button or Escape and remains inside the visible application area when the window is resized.
+- Centralized the runtime application name and version so the browser title, header version marker, About text, DXF producer identity, and DXF filename use the same application identity.
+- Updated the visible application version and metadata to V0.1.1.
+- Added a right-aligned quick-tool strip to the menu bar using the PNGs in "Assets": Undo, Redo, Zoom In, Zoom Out, Zoom Window, and Calculator PNG artwork in that order.
+- Each quick tool sits on a 28-pixel square `#D9DDDC` button with rounded corners, with Calculator occupying the far-right position.
+- Wired the toolbar Undo and Redo buttons to the existing document-history commands; their enabled states mirror the Edit menu items.
+- Wired toolbar Zoom In and Zoom Out to the existing 20% view commands.
+- Wired toolbar Zoom Window to the persistent aspect-ratio-preserving Window command and added a pressed visual state while that command is active.
+- Embedded the Calculator component directly from the `Calculator` folder without duplicating its implementation.
+- Wired the toolbar Calculator button to open the existing scientific calculator in a movable window above the drawing canvas.
+- The calculator opens centered over the drawing on first use, preserves its dragged position on subsequent openings, and restores from its minimized state when the toolbar button is used again.
+- The Calculator toolbar button remains visually pressed while the calculator window is open and clears when its Close button is used.

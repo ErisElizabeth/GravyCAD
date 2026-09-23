@@ -142,39 +142,83 @@ body[data-theme="matrix"] {
   background: #2b2c2f;
 }
 
+.about-window {
+  width: min(320px, calc(100vw - 32px));
+}
+
+.about-content {
+  padding: 28px 24px 30px;
+  text-align: center;
+}
+
+.about-content p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.about-content p:first-child {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.about-content a {
+  color: #9eb8ff;
+}
+
+.about-content a:hover,
+.about-content a:focus-visible {
+  color: #c9d6ff;
+}
+
 .tool-window.is-maximized .tool-window-body {
   height: calc(100% - 35px);
   overflow: auto;
 }
 
 .tool-window.is-maximized #pointCoordinatesForm,
+.tool-window.is-maximized #lineCoordinatesForm,
 .tool-window.is-maximized #circleRadiusForm,
+.tool-window.is-maximized #hexagonForm,
 .tool-window.is-maximized #offsetForm,
-.tool-window.is-maximized #pointOnEntityForm {
+.tool-window.is-maximized #pointOnEntityForm,
+.tool-window.is-maximized #filletForm,
+.tool-window.is-maximized #rotateForm {
   max-width: 360px;
 }
 
 #pointCoordinatesForm,
+#lineCoordinatesForm,
 #circleRadiusForm,
+#hexagonForm,
 #offsetForm,
-#pointOnEntityForm {
+#pointOnEntityForm,
+#filletForm,
+#rotateForm {
   display: grid;
   gap: 8px;
   padding: 14px 16px 16px;
 }
 
 #pointCoordinatesForm label,
+#lineCoordinatesForm label,
 #circleRadiusForm label,
+#hexagonForm label,
 #offsetForm label,
-#pointOnEntityForm label {
+#pointOnEntityForm label,
+#filletForm label,
+#rotateForm label {
   margin-top: 4px;
   color: #d0d0d0;
   font-size: 0.8rem;
 }
 
 .circle-center-readout,
+.hexagon-center-readout,
 .offset-source-readout,
-.point-on-entity-readout {
+.point-on-entity-readout,
+.fillet-source-readout,
+.rotate-selection-readout,
+.rotate-pivot-readout {
   display: grid;
   gap: 4px;
   padding: 9px 10px;
@@ -183,15 +227,23 @@ body[data-theme="matrix"] {
 }
 
 .circle-center-readout span,
+.hexagon-center-readout span,
 .offset-source-readout span,
-.point-on-entity-readout span {
+.point-on-entity-readout span,
+.fillet-source-readout span,
+.rotate-selection-readout span,
+.rotate-pivot-readout span {
   color: #bfc2c7;
   font-size: 0.75rem;
 }
 
 .circle-center-readout strong,
+.hexagon-center-readout strong,
 .offset-source-readout strong,
-.point-on-entity-readout strong {
+.point-on-entity-readout strong,
+.fillet-source-readout strong,
+.rotate-selection-readout strong,
+.rotate-pivot-readout strong {
   color: #f0d36c;
   font-size: 0.85rem;
   font-weight: 600;
@@ -225,6 +277,87 @@ body[data-theme="matrix"] {
 
 .coordinate-input input:focus {
   box-shadow: inset 0 0 0 2px #6889e8;
+}
+
+.coordinate-pair-group {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 9px 10px 11px;
+  border: 1px solid #555;
+}
+
+.coordinate-pair-group legend {
+  padding: 0 4px;
+  color: #f0d36c;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+#filletForm .checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 3px 0;
+  color: #e5e5e5;
+  cursor: default;
+}
+
+#filletForm .checkbox-row input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: #365bb8;
+}
+
+.rotate-pivot-options {
+  display: grid;
+  gap: 7px;
+  margin: 4px 0 0;
+  padding: 9px 10px 10px;
+  border: 1px solid #555;
+}
+
+.rotate-pivot-options legend {
+  padding: 0 4px;
+  color: #d0d0d0;
+  font-size: 0.8rem;
+}
+
+#rotateForm .rotate-option-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #e5e5e5;
+  cursor: default;
+}
+
+#rotateForm .rotate-option-row input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: #365bb8;
+}
+
+.rotate-pivot-readout button {
+  justify-self: start;
+  padding: 6px 9px;
+  border: 1px solid #666;
+  color: #f2f2f2;
+  background: #414246;
+  cursor: pointer;
+}
+
+.rotate-pivot-readout button:hover,
+.rotate-pivot-readout button:focus-visible {
+  background: #505259;
+}
+
+.rotate-pivot-readout button:disabled {
+  color: #999;
+  background: #35363a;
+  cursor: not-allowed;
 }
 
 .primary-action {
@@ -300,9 +433,11 @@ body[data-theme="matrix"] {
 }
 
 .drawing-area {
+  position: relative;
   flex: 1;
   min-width: 0;
   min-height: 0;
+  overflow: hidden;
   background: var(--drawing-background);
   padding: 0;
   box-sizing: border-box;
@@ -310,7 +445,7 @@ body[data-theme="matrix"] {
   align-items: center;
   justify-content: center;
 }
-/* TEMP DEV: Thick axes/ticks for visibility while building GravyCAD. Refine later. */
+/* TEMP DEV: Thick axes/ticks for visibility while building PrometheusCAD. Refine later. */
 .axis-line {
   stroke: var(--axis-color);
   stroke-width: var(--axis-stroke-width);
@@ -387,7 +522,8 @@ body[data-theme="matrix"] {
   pointer-events: stroke;
 }
 
-.join-preview {
+.join-preview,
+.line-sketch-preview {
   fill: none;
   stroke: var(--entity-hover-color);
   stroke-width: 1.5;
@@ -405,6 +541,26 @@ body[data-theme="matrix"] {
   vector-effect: non-scaling-stroke;
   pointer-events: none;
   opacity: 0.9;
+}
+
+.hexagon-preview {
+  fill: none;
+  stroke: var(--entity-hover-color);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 4;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.window-zoom-preview {
+  fill: var(--entity-selected-color);
+  fill-opacity: 0.08;
+  stroke: var(--entity-selected-color);
+  stroke-width: 1.5;
+  stroke-dasharray: 7 4;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
 }
 
 .entity-hit-target {
@@ -435,7 +591,7 @@ body[data-theme="matrix"] {
   pointer-events: stroke;
 }
 
-#cadCanvas.select-single .point-entity:hover .point-x {
+#cadCanvas.select-single .point-entity.is-proximity-hovered .point-x {
   stroke: var(--entity-hover-color);
 }
 
@@ -443,7 +599,7 @@ body[data-theme="matrix"] {
   stroke: var(--entity-selected-color);
 }
 
-#cadCanvas.select-single .line-entity:hover .line-geometry {
+#cadCanvas.select-single .line-entity.is-proximity-hovered .line-geometry {
   stroke: var(--entity-hover-color);
 }
 
@@ -451,7 +607,7 @@ body[data-theme="matrix"] {
   stroke: var(--entity-selected-color);
 }
 
-#cadCanvas.select-single .circle-entity:hover .circle-geometry {
+#cadCanvas.select-single .circle-entity.is-proximity-hovered .circle-geometry {
   stroke: var(--entity-hover-color);
 }
 
@@ -459,7 +615,7 @@ body[data-theme="matrix"] {
   stroke: var(--entity-selected-color);
 }
 
-#cadCanvas.select-single .arc-entity:hover .arc-geometry {
+#cadCanvas.select-single .arc-entity.is-proximity-hovered .arc-geometry {
   stroke: var(--entity-hover-color);
 }
 
@@ -479,7 +635,23 @@ body[data-theme="matrix"] {
   stroke: var(--entity-selected-color);
 }
 
+#cadCanvas.point-sketch {
+  cursor: crosshair;
+}
+
+#cadCanvas.line-sketch {
+  cursor: crosshair;
+}
+
+#cadCanvas.line-sketch .point-entity.is-line-sketch-start .point-x {
+  stroke: var(--entity-selected-color);
+}
+
 #cadCanvas.circle-center-radius .point-entity {
+  cursor: crosshair;
+}
+
+#cadCanvas.circle-sketch-center {
   cursor: crosshair;
 }
 
@@ -487,7 +659,39 @@ body[data-theme="matrix"] {
   stroke: var(--entity-hover-color);
 }
 
-#cadCanvas.circle-center-radius .point-entity.is-circle-center .point-x {
+#cadCanvas.circle-center-radius .point-entity.is-circle-center .point-x,
+#cadCanvas.circle-sketch-center .point-entity.is-circle-center .point-x {
+  stroke: var(--entity-selected-color);
+}
+
+#cadCanvas.apollonius-entities,
+#cadCanvas.apollonius-entities .point-entity,
+#cadCanvas.apollonius-entities .line-entity,
+#cadCanvas.apollonius-entities .circle-entity {
+  cursor: crosshair;
+}
+
+#cadCanvas.apollonius-entities .point-entity:hover .point-x,
+#cadCanvas.apollonius-entities .line-entity:hover .line-geometry,
+#cadCanvas.apollonius-entities .circle-entity:hover .circle-geometry {
+  stroke: var(--entity-hover-color);
+}
+
+#cadCanvas.apollonius-entities .point-entity.is-apollonius-source .point-x,
+#cadCanvas.apollonius-entities .line-entity.is-apollonius-source .line-geometry,
+#cadCanvas.apollonius-entities .circle-entity.is-apollonius-source .circle-geometry {
+  stroke: var(--entity-selected-color);
+}
+
+#cadCanvas.hexagon-center .point-entity {
+  cursor: crosshair;
+}
+
+#cadCanvas.hexagon-center .point-entity:hover .point-x {
+  stroke: var(--entity-hover-color);
+}
+
+#cadCanvas.hexagon-center .point-entity.is-hexagon-center .point-x {
   stroke: var(--entity-selected-color);
 }
 
@@ -589,10 +793,76 @@ body[data-theme="matrix"] {
   pointer-events: none;
 }
 
+#cadCanvas.fillet-entity {
+  cursor: crosshair;
+}
+
+#cadCanvas.fillet-entity .line-entity,
+#cadCanvas.fillet-entity .circle-entity,
+#cadCanvas.fillet-entity .arc-entity {
+  cursor: crosshair;
+}
+
+#cadCanvas.fillet-entity .line-entity:hover .line-geometry,
+#cadCanvas.fillet-entity .circle-entity:hover .circle-geometry,
+#cadCanvas.fillet-entity .arc-entity:hover .arc-geometry {
+  stroke: var(--entity-hover-color);
+}
+
+#cadCanvas.fillet-entity .line-entity.is-fillet-first .line-geometry,
+#cadCanvas.fillet-entity .circle-entity.is-fillet-first .circle-geometry,
+#cadCanvas.fillet-entity .arc-entity.is-fillet-first .arc-geometry {
+  stroke: var(--entity-selected-color);
+}
+
+#cadCanvas.fillet-entity .point-entity,
+#cadCanvas.fillet-entity .point-entity .entity-hit-target {
+  pointer-events: none;
+}
+
+#cadCanvas.rotate-pivot-pick {
+  cursor: crosshair;
+}
+
+#cadCanvas.rotate-pivot-pick .point-entity {
+  cursor: crosshair;
+}
+
+#cadCanvas.rotate-pivot-pick .point-entity:hover .point-x {
+  stroke: var(--entity-hover-color);
+}
+
+#cadCanvas.rotate-pivot-pick .line-entity,
+#cadCanvas.rotate-pivot-pick .circle-entity,
+#cadCanvas.rotate-pivot-pick .arc-entity,
+#cadCanvas.rotate-pivot-pick .line-hit-target,
+#cadCanvas.rotate-pivot-pick .circle-hit-target,
+#cadCanvas.rotate-pivot-pick .arc-hit-target {
+  pointer-events: none;
+}
+
+#cadCanvas.rotate-active .point-entity.is-selected .point-x,
+#cadCanvas.rotate-active .line-entity.is-selected .line-geometry,
+#cadCanvas.rotate-active .circle-entity.is-selected .circle-geometry,
+#cadCanvas.rotate-active .arc-entity.is-selected .arc-geometry {
+  stroke: var(--entity-selected-color);
+}
+
 .temporary-direction-point .entity-hit-target {
   fill: transparent;
   stroke: none;
   pointer-events: all;
+}
+
+#cadCanvas.window-zoom {
+  cursor: crosshair;
+}
+
+#cadCanvas.window-zoom .entity-hit-target,
+#cadCanvas.window-zoom .line-hit-target,
+#cadCanvas.window-zoom .circle-hit-target,
+#cadCanvas.window-zoom .arc-hit-target {
+  pointer-events: none !important;
 }
 
 #gridLayer line {
@@ -605,6 +875,123 @@ body[data-theme="matrix"] {
   box-sizing: border-box;
   background: var(--drawing-background);
   border: 0;
+}
+
+.cad-scrollbar {
+  position: absolute;
+  z-index: 20;
+  display: flex;
+  box-sizing: border-box;
+  color: #111;
+  background: #d4d0c8;
+  border: 1px solid #595959;
+  user-select: none;
+}
+
+.cad-scrollbar-horizontal {
+  right: 18px;
+  bottom: 0;
+  left: 0;
+  height: 18px;
+  flex-direction: row;
+}
+
+.cad-scrollbar-vertical {
+  top: 0;
+  right: 0;
+  bottom: 18px;
+  width: 18px;
+  flex-direction: column;
+}
+
+.cad-scroll-arrow {
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  min-width: 0;
+  padding: 0;
+  color: #111;
+  background: #d4d0c8;
+  border: 0;
+  font-family: Arial, sans-serif;
+  font-size: 8px;
+  line-height: 16px;
+  text-align: center;
+}
+
+.cad-scroll-arrow:not(:disabled):hover,
+.cad-scroll-arrow:not(:disabled):focus-visible {
+  background: #e8e5df;
+}
+
+.cad-scroll-arrow:not(:disabled):active {
+  background: #bbb7af;
+}
+
+.cad-scroll-arrow:disabled {
+  color: #8f8f8f;
+  background: #b8b8b8;
+}
+
+.cad-scroll-track {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: #8f8f8f;
+  outline: none;
+  touch-action: none;
+}
+
+.cad-scroll-track:focus-visible {
+  box-shadow: inset 0 0 0 2px #0000ff;
+}
+
+.cad-scroll-thumb {
+  position: absolute;
+  box-sizing: border-box;
+  min-width: 20px;
+  min-height: 20px;
+  background: #dedbd4;
+  border: 1px solid #494949;
+  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #8b8b8b;
+  touch-action: none;
+}
+
+.cad-scrollbar-horizontal .cad-scroll-thumb {
+  top: 0;
+  bottom: 0;
+  min-height: 0;
+}
+
+.cad-scrollbar-vertical .cad-scroll-thumb {
+  right: 0;
+  left: 0;
+  min-width: 0;
+}
+
+.cad-scrollbar.is-disabled .cad-scroll-track {
+  background: #a9a9a9;
+}
+
+.cad-scrollbar.is-disabled .cad-scroll-thumb {
+  background: #b8b8b8;
+  border-color: #8c8c8c;
+  box-shadow: none;
+}
+
+.cad-scroll-corner {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 21;
+  width: 18px;
+  height: 18px;
+  box-sizing: border-box;
+  background: #b8b8b8;
+  border-top: 1px solid #595959;
+  border-left: 1px solid #595959;
 }
 html,
 body {
@@ -641,6 +1028,15 @@ body {
   line-height: 1.1;
 }
 
+.brand-block .app-version {
+  margin-left: 6px;
+  color: #d8def1;
+  font-size: 0.52em;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  vertical-align: middle;
+}
+
 .brand-block p {
   margin: 2px 0 0;
   font-size: 0.85rem;
@@ -660,6 +1056,7 @@ body {
 
 .menu-item {
   position: relative;
+  flex: 0 0 auto;
 }
 
 .menu-button {
@@ -677,6 +1074,66 @@ body {
   background: #44464a;
 }
 
+.menu-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.menu-toolbar-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  padding: 3px;
+  overflow: hidden;
+  background: #d9dddc;
+  border: 1px solid #8e9492;
+  border-radius: 5px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.menu-toolbar-button:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.menu-toolbar-button:not(:disabled) {
+  cursor: pointer;
+}
+
+.menu-toolbar-button:not(:disabled):hover,
+.menu-toolbar-button:not(:disabled):focus-visible {
+  background: #eef1f0;
+  border-color: #5e6563;
+  outline: none;
+}
+
+.menu-toolbar-button:not(:disabled):active,
+.menu-toolbar-button.is-active {
+  background: #bfc9c6;
+  border-color: #29459a;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.28);
+}
+
+#quickUndoButton:disabled,
+#quickRedoButton:disabled {
+  opacity: 0.45;
+}
+
+.menu-toolbar-button img {
+  display: block;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
 .dropdown-menu {
   position: absolute;
   top: 100%;
@@ -690,13 +1147,53 @@ body {
   z-index: 100;
 }
 
-.menu-item:hover .dropdown-menu,
-.menu-item:focus-within .dropdown-menu {
+.menu-item:hover > .dropdown-menu,
+.menu-item:focus-within > .dropdown-menu {
   display: flex;
 }
 
-.menu-item.is-dismissed .dropdown-menu {
+.menu-item.is-dismissed > .dropdown-menu {
   display: none;
+}
+
+.submenu-item {
+  position: relative;
+}
+
+.dropdown-menu .submenu-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.submenu-arrow {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.submenu-menu {
+  position: absolute;
+  top: -1px;
+  left: calc(100% - 1px);
+  min-width: 150px;
+  display: none;
+  flex-direction: column;
+  background: #f2f2f2;
+  border: 1px solid #444;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  z-index: 110;
+}
+
+.submenu-item:hover > .submenu-menu,
+.submenu-item:focus-within > .submenu-menu {
+  display: flex;
+}
+
+.submenu-item:hover > .submenu-trigger,
+.submenu-item:focus-within > .submenu-trigger {
+  background: #d8d8d8;
+  outline: none;
 }
 
 .dropdown-menu button {

@@ -1,0 +1,268 @@
+/*
+ * Calculator.css — styles for Calculator.js.
+ * Everything is scoped under .calc-window; retint it with the custom properties below.
+ */
+
+.calc-window {
+  --calc-face: #708090;          /* slate gray */
+  --calc-key: #a9b3bc;
+  --calc-key-digit: #c0c7ce;
+  --calc-key-on: #d3d9de;
+  --calc-screen: #e8ebee;
+  --calc-hilite: #e6eaed;
+  --calc-light: #97a3ae;
+  --calc-shadow: #48525c;
+  --calc-dark: #15191d;
+  --calc-ink: #000;
+  --calc-ink-soft: #39424b;
+
+  --calc-raised:
+    inset -1px -1px var(--calc-dark), inset 1px 1px var(--calc-hilite),
+    inset -2px -2px var(--calc-shadow);
+  --calc-pressed:
+    inset 1px 1px var(--calc-dark), inset -1px -1px var(--calc-hilite),
+    inset 2px 2px var(--calc-shadow);
+  --calc-sunken:
+    inset 1px 1px var(--calc-shadow), inset -1px -1px var(--calc-hilite),
+    inset 2px 2px var(--calc-dark), inset -2px -2px var(--calc-light);
+
+  position: fixed;
+  z-index: 1000;
+  padding: 3px;
+  background: var(--calc-face);
+  color: var(--calc-ink);
+  font: 12px/1.25 "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  box-shadow:
+    inset -1px -1px var(--calc-dark), inset 1px 1px var(--calc-light),
+    inset -2px -2px var(--calc-shadow), inset 2px 2px var(--calc-hilite),
+    0 12px 32px rgba(0, 0, 0, 0.35);
+  user-select: none;
+  -webkit-user-select: none;
+  outline: none;
+}
+
+.calc-window[hidden] {
+  display: none;
+}
+
+.calc-window,
+.calc-window *,
+.calc-window *::before,
+.calc-window *::after {
+  box-sizing: border-box;
+}
+
+/* Title bar ------------------------------------------------------------------ */
+
+.calc-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 2px 0 4px;
+  background: linear-gradient(90deg, #b3bcc5, #7c8b99);
+  font-weight: 700;
+  cursor: default;
+  touch-action: none;
+}
+
+.calc-window:not(:focus-within) .calc-titlebar {
+  background: #8995a1;   /* inactive window */
+}
+
+.calc-icon {
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+
+.calc-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.calc-caption-btn {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 16px;
+  height: 14px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--calc-key);
+  color: var(--calc-ink);
+  box-shadow: var(--calc-raised);
+}
+
+.calc-caption-btn + .calc-caption-btn {
+  margin-left: 2px;
+}
+
+.calc-caption-btn:active {
+  box-shadow: var(--calc-pressed);
+}
+
+.calc-caption-btn svg {
+  width: 8px;
+  height: 7px;
+  fill: none;
+  stroke: currentColor;
+}
+
+/* Body ---------------------------------------------------------------------- */
+
+.calc-body {
+  padding: 6px 5px 5px;
+}
+
+.calc-window.is-minimized .calc-body {
+  display: none;
+}
+
+.calc-display {
+  padding: 4px 8px 4px;
+  background: var(--calc-screen);
+  box-shadow: var(--calc-sunken);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  cursor: text;
+}
+
+.calc-status {
+  display: flex;
+  gap: 8px;
+  height: 13px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 13px;
+  color: var(--calc-ink-soft);
+}
+
+.calc-mem {
+  margin-left: auto;
+}
+
+.calc-expr,
+.calc-result {
+  white-space: nowrap;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.calc-expr {
+  height: 20px;
+  font-size: 14px;
+  line-height: 20px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+.calc-expr::-webkit-scrollbar {
+  display: none;
+}
+
+.calc-result {
+  height: 38px;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 38px;
+  overflow: hidden;
+}
+
+.calc-result.is-preview {
+  font-weight: 400;
+  color: var(--calc-ink-soft);
+}
+
+/* Angle unit group box ------------------------------------------------------ */
+
+.calc-angles {
+  display: flex;
+  justify-content: space-around;
+  margin: 6px 0;
+  padding: 3px 4px;
+  border: 1px solid var(--calc-shadow);
+  box-shadow: inset 1px 1px var(--calc-hilite), 1px 1px var(--calc-hilite);
+}
+
+.calc-angles label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: default;
+}
+
+.calc-angles input {
+  margin: 0;
+  accent-color: #1f262d;
+}
+
+/* Keys ---------------------------------------------------------------------- */
+
+.calc-keys {
+  display: flex;
+  gap: 8px;
+}
+
+.calc-keypad {
+  display: grid;
+  grid-auto-rows: 31px;
+  gap: 4px;
+}
+
+.calc-keypad-sci {
+  grid-template-columns: repeat(3, 50px);
+}
+
+.calc-keypad-std {
+  grid-template-columns: repeat(4, 50px);
+}
+
+.calc-key {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--calc-key);
+  color: var(--calc-ink);
+  font: inherit;
+  font-size: 13px;
+  white-space: nowrap;
+  box-shadow: var(--calc-raised);
+  cursor: default;
+}
+
+.calc-key-digit {
+  background: var(--calc-key-digit);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.calc-key-eq {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.calc-key:active,
+.calc-key.is-down {
+  padding: 2px 0 0 2px;
+  box-shadow: var(--calc-pressed);
+}
+
+.calc-key[aria-pressed="true"] {
+  padding: 2px 0 0 2px;
+  background: var(--calc-key-on);
+  box-shadow: var(--calc-pressed);
+  font-weight: 700;
+}
+
+.calc-key:focus {
+  outline: none;
+}
